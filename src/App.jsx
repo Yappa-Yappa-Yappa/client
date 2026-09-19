@@ -50,7 +50,7 @@ export default function App() {
         <Route path="trend" element={<Trending />} />
 
         {/* Profile */}
-        <Route path="profile" element={<Profile />} />
+        <Route path="profile/:username" element={<Profile />} />
       </Route>
     </Routes>
   );

@@ -80,7 +80,7 @@ export default function Logout() {
               <p className="text-[11px] text-neutral-500">Account menu</p>
             </div>
             <NavLink
-              to="/profile"
+              to={`/profile/${currentUser.username}`}
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-2 px-3 py-2.5 text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
             >

@@ -18,6 +18,7 @@ import { deleteFeed, editFeed, getFeeds, postFeed } from "../../api/post";
 import { getLikesByPost, likePost, unlikePost } from "../../api/like";
 import { useAuth } from "../../hooks/useAuth";
 import FeedSkeleton from "../../components/FeedSkeleton";
+import { NavLink } from "react-router-dom";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -459,6 +460,7 @@ export default function Feed() {
           const isOwnPost = Boolean(user?.id && authorId === user.id);
           const authorName =
             post.user?.name || post.authorName || post.author || "Yapper";
+          const avatarUrl = post.user?.imageUrl;
           const username =
             post.user?.username ||
             post.username ||
@@ -479,17 +481,30 @@ export default function Feed() {
             >
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
-                    {authorName[0]?.toUpperCase()}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 leading-tight">
-                      {authorName}
-                    </h4>
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                      {username}
-                    </span>
-                  </div>
+                  <NavLink
+                    to={`/profile/${post.user.username}`}
+                    className={"flex items-center gap-2 shrink-0"}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt={authorName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        authorName[0]?.toUpperCase()
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 leading-tight">
+                        {authorName}
+                      </h4>
+                      <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                        @{username}
+                      </span>
+                    </div>
+                  </NavLink>
                 </div>
 
                 <div className="relative flex items-center gap-2">
