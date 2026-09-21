@@ -36,7 +36,9 @@ export default function MainLayout() {
       {/* Main Content Area with Contextual Sticky Header */}
       <div
         id="main-scroll-container"
-        className="flex-1 flex flex-col h-full min-w-0 overflow-y-auto"
+        className={`flex-1 flex flex-col h-full min-w-0 ${
+          location.pathname === "/chat" ? "overflow-hidden" : "overflow-y-auto"
+        }`}
       >
         {/* Subtle Sticky Header */}
         <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 backdrop-blur-xl bg-white/40 dark:bg-black/20 border-b border-black/5 dark:border-white/5">
@@ -52,7 +54,13 @@ export default function MainLayout() {
         </header>
 
         {/* Page Content Rendered via Outlet */}
-        <main className="flex-1 p-6 max-w-4xl mx-auto w-full">
+        <main
+          className={`flex-1 min-h-0 w-full ${
+            location.pathname === "/chat"
+              ? "max-w-none p-0"
+              : "max-w-4xl mx-auto p-6"
+          }`}
+        >
           <Outlet />
         </main>
       </div>

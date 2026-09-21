@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   getProfile,
   changeAvatar,
@@ -6,6 +6,7 @@ import {
   changeBio,
 } from "../api/user";
 import { followUser, unfollowUser } from "../api/follow";
+import { openDirectConversation } from "../api/conversation";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import Cropper from "react-easy-crop";
@@ -64,6 +65,7 @@ const createCroppedImage = (imageSrc, pixelCrop) =>
 
 export default function Profile() {
   const { username } = useParams();
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -78,6 +80,7 @@ export default function Profile() {
   const [coverZoom, setCoverZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [isMessageLoading, setIsMessageLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -222,6 +225,19 @@ export default function Profile() {
     }
   };
 
+  const openMessage = async () => {
+    if (!profile || isMessageLoading) return;
+    setIsMessageLoading(true);
+    try {
+      const response = await openDirectConversation(profile.id);
+      navigate("/chat", { state: { conversationId: response.data.id } });
+    } catch (err) {
+      console.error("Failed to open conversation:", err);
+    } finally {
+      setIsMessageLoading(false);
+    }
+  };
+
   if (loading) return <ProfileSkeleton />;
   if (!profile)
     return <div className="text-center py-10">Failed to load profile.</div>;
@@ -324,21 +340,22 @@ export default function Profile() {
               Edit Profile
             </button>
           ) : (
-            <button
-              onClick={handleFollowToggle}
-              disabled={isFollowLoading}
-              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-colors disabled:cursor-wait disabled:opacity-60 ${
-                profile.isFollowing
-                  ? "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
-                  : "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500"
-              }`}
-            >
-              {isFollowLoading
-                ? "Updating..."
-                : profile.isFollowing
-                  ? "Following"
-                  : "Follow"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={openMessage} disabled={isMessageLoading} className="rounded-full border border-indigo-500/30 px-4 py-1.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-500/10 disabled:cursor-wait disabled:opacity-60 dark:text-indigo-300">
+                {isMessageLoading ? "Opening..." : "Message"}
+              </button>
+              <button
+                onClick={handleFollowToggle}
+                disabled={isFollowLoading}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-colors disabled:cursor-wait disabled:opacity-60 ${
+                  profile.isFollowing
+                    ? "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
+                    : "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500"
+                }`}
+              >
+                {isFollowLoading ? "Updating..." : profile.isFollowing ? "Following" : "Follow"}
+              </button>
+            </div>
           )}
         </div>
         {profile.username && (
