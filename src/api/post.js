@@ -10,6 +10,13 @@ export const getFeeds = async (page = 1, limit = 20) => {
   return res.data;
 };
 
+export const getPostsByUser = async (userId, page = 1, limit = 20) => {
+  const res = await api.get("/posts", {
+    params: { userId, page, limit },
+  });
+  return res.data;
+};
+
 export const getFeedById = async (id) => {
   const res = await api.get(`/posts/${id}`);
   return res.data;

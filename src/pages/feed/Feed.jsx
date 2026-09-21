@@ -485,7 +485,7 @@ export default function Feed() {
                     to={`/profile/${post.user.username}`}
                     className={"flex items-center gap-2 shrink-0"}
                   >
-                    <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}
