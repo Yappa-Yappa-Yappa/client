@@ -13,6 +13,8 @@ export default function MainLayout() {
         return "Home Feed";
       case "/search":
         return "Explore & Search";
+      case "/notification":
+        return "Notification Box";
       case "/chat":
         return "Yaps & Messages";
       case "/friend":

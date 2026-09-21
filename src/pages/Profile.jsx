@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { getProfile, changeAvatar, changeBio } from "../api/user";
+import { followUser, unfollowUser } from "../api/follow";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
 import { Camera, PenLine, Check, X, CalendarDays } from "lucide-react";
@@ -14,6 +15,7 @@ export default function Profile() {
   const [bioText, setBioText] = useState("");
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -79,6 +81,34 @@ export default function Profile() {
     }
   };
 
+  const handleFollowToggle = async () => {
+    if (!profile || isFollowLoading) return;
+
+    setIsFollowLoading(true);
+    const wasFollowing = profile.isFollowing;
+
+    try {
+      if (wasFollowing) await unfollowUser(profile.id);
+      else await followUser(profile.id);
+
+      setProfile((prev) => ({
+        ...prev,
+        isFollowing: !wasFollowing,
+        _count: {
+          ...prev._count,
+          followings: Math.max(
+            0,
+            (prev._count?.followings || 0) + (wasFollowing ? -1 : 1),
+          ),
+        },
+      }));
+    } catch (err) {
+      console.error("Failed to update follow state:", err);
+    } finally {
+      setIsFollowLoading(false);
+    }
+  };
+
   if (loading) return <div className="text-center py-10">Loading...</div>;
   if (!profile)
     return <div className="text-center py-10">Failed to load profile.</div>;
@@ -126,9 +156,35 @@ export default function Profile() {
         {avatarError && (
           <p className="mt-2 text-xs text-red-500">{avatarError}</p>
         )}
-        <h1 className="text-xl font-bold text-neutral-900 mt-2 dark:text-neutral-100">
-          {profile.name || "Profile"}
-        </h1>
+
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-bold text-neutral-900 mt-2 dark:text-neutral-100">
+            {profile.name || "Profile"}
+          </h1>
+
+          {isOwnProfile ? (
+            <button className="px-4 py-1.5 text-xs font-medium text-white bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-500 rounded-full transition-colors shadow-sm">
+              Edit Profile
+            </button>
+          ) : (
+            <button
+              onClick={handleFollowToggle}
+              disabled={isFollowLoading}
+              className={`px-4 py-1.5 text-xs font-medium rounded-full transition-colors disabled:cursor-wait disabled:opacity-60 ${
+                profile.isFollowing
+                  ? "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
+                  : "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500"
+              }`}
+            >
+              {isFollowLoading
+                ? "Updating..."
+                : profile.isFollowing
+                  ? "Following"
+                  : "Follow"}
+            </button>
+          )}
+        </div>
+
         {profile.username && (
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
             @{profile.username}
@@ -136,7 +192,7 @@ export default function Profile() {
         )}
 
         {profile.createdAt && (
-          <p className="flex items-center gap-2 text-s text-neutral-500 dark:text-neutral-400">
+          <p className="flex items-center gap-2 text-xs py-1 text-neutral-500 dark:text-neutral-400">
             <CalendarDays className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
             <span>
               Joined{" "}
@@ -147,6 +203,21 @@ export default function Profile() {
             </span>
           </p>
         )}
+
+        <div className="flex justify-start items-center space-x-4">
+          <p>
+            {profile._count?.followings ?? 0}{" "}
+            <span className="text-neutral-400 text-xs dark:text-neutral-500">
+              Followers
+            </span>
+          </p>
+          <p>
+            {profile._count?.followers ?? 0}{" "}
+            <span className="text-neutral-400 text-xs dark:text-neutral-500">
+              Following
+            </span>
+          </p>
+        </div>
 
         <div className="mt-3">
           {isEditingBio ? (
@@ -192,16 +263,18 @@ export default function Profile() {
                 </button>
               )}
             </div>
+          ) : isOwnProfile ? (
+            <button
+              onClick={startEditingBio}
+              className="flex items-center gap-2 text-xs font-semibold text-indigo-500 hover:text-indigo-400 transition-colors py-1"
+            >
+              <PenLine className="w-3.5 h-3.5" />
+              <span>Add a bio</span>
+            </button>
           ) : (
-            isOwnProfile && (
-              <button
-                onClick={startEditingBio}
-                className="flex items-center gap-2 text-xs font-semibold text-indigo-500 hover:text-indigo-400 transition-colors py-1"
-              >
-                <PenLine className="w-3.5 h-3.5" />
-                <span>Add a bio</span>
-              </button>
-            )
+            <p className="text-sm italic text-neutral-400 dark:text-neutral-500">
+              This user has no bio yet...
+            </p>
           )}
         </div>
       </div>

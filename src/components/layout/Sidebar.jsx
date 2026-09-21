@@ -1,14 +1,18 @@
 import {
+  Bell,
   History,
   Home,
   MessageCircle,
   Search,
   TrendingUp,
+  User,
   Users,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Sidebar() {
+  const { user } = useAuth();
   const navItems = [
     {
       icon: <Home className="w-6 h-6 shrink-0" />,
@@ -19,6 +23,11 @@ export default function Sidebar() {
       icon: <Search className="w-6 h-6 shrink-0" />,
       label: "Search",
       path: "/search",
+    },
+    {
+      icon: <Bell className="w-6 h-6 shrink-0" />,
+      label: "Notification",
+      path: "/notification",
     },
     {
       icon: <MessageCircle className="w-6 h-6 shrink-0" />,
@@ -39,6 +48,11 @@ export default function Sidebar() {
       icon: <TrendingUp className="w-6 h-6 shrink-0" />,
       label: "Trending",
       path: "/trend",
+    },
+    {
+      icon: <User className="w-6 h-6 shrink-0" />,
+      label: "Profile",
+      path: `/profile/${user.username}`,
     },
   ];
 
