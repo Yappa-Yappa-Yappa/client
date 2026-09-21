@@ -1,10 +1,65 @@
 import { useParams } from "react-router-dom";
-import { getProfile, changeAvatar, changeBio } from "../api/user";
+import {
+  getProfile,
+  changeAvatar,
+  changeBackground,
+  changeBio,
+} from "../api/user";
 import { followUser, unfollowUser } from "../api/follow";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
-import { Camera, PenLine, Check, X, CalendarDays } from "lucide-react";
+import Cropper from "react-easy-crop";
+import {
+  Camera,
+  PenLine,
+  Check,
+  X,
+  CalendarDays,
+  LoaderCircle,
+  Minus,
+  Plus,
+} from "lucide-react";
 import UserPost from "./UserPost";
+
+const createCroppedImage = (imageSrc, pixelCrop) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = pixelCrop.width;
+      canvas.height = pixelCrop.height;
+
+      const context = canvas.getContext("2d");
+      context.drawImage(
+        image,
+        pixelCrop.x,
+        pixelCrop.y,
+        pixelCrop.width,
+        pixelCrop.height,
+        0,
+        0,
+        pixelCrop.width,
+        pixelCrop.height,
+      );
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error("Could not prepare the cropped image."));
+            return;
+          }
+          resolve(
+            new File([blob], "profile-cover.jpg", { type: "image/jpeg" }),
+          );
+        },
+        "image/jpeg",
+        0.9,
+      );
+    };
+    image.onerror = () =>
+      reject(new Error("Could not load the selected image."));
+    image.src = imageSrc;
+  });
 
 export default function Profile() {
   const { username } = useParams();
@@ -15,6 +70,12 @@ export default function Profile() {
   const [bioText, setBioText] = useState("");
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [isUploadingBackground, setIsUploadingBackground] = useState(false);
+  const [backgroundError, setBackgroundError] = useState("");
+  const [coverCropImage, setCoverCropImage] = useState("");
+  const [coverCrop, setCoverCrop] = useState({ x: 0, y: 0 });
+  const [coverZoom, setCoverZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   useEffect(() => {
@@ -81,6 +142,57 @@ export default function Profile() {
     }
   };
 
+  const handleBackgroundChange = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setBackgroundError("Please choose an image file.");
+      return;
+    }
+
+    setBackgroundError("");
+    setCoverCropImage(URL.createObjectURL(file));
+    setCoverCrop({ x: 0, y: 0 });
+    setCoverZoom(1);
+    setCroppedAreaPixels(null);
+  };
+
+  const closeCoverCrop = (force = false) => {
+    if (isUploadingBackground && !force) return;
+
+    if (coverCropImage) URL.revokeObjectURL(coverCropImage);
+    setCoverCropImage("");
+    setCroppedAreaPixels(null);
+  };
+
+  const applyCoverCrop = async () => {
+    if (!coverCropImage || !croppedAreaPixels) return;
+
+    setIsUploadingBackground(true);
+
+    try {
+      const croppedFile = await createCroppedImage(
+        coverCropImage,
+        croppedAreaPixels,
+      );
+      const res = await changeBackground(croppedFile);
+      const bgUrl = res.data?.result?.bgUrl;
+      if (bgUrl) {
+        setProfile((prev) => ({ ...prev, bgUrl }));
+      }
+      closeCoverCrop(true);
+    } catch (err) {
+      console.error("Failed to update profile cover:", err);
+      setBackgroundError(
+        "Could not update your profile cover. Please try again.",
+      );
+    } finally {
+      setIsUploadingBackground(false);
+    }
+  };
+
   const handleFollowToggle = async () => {
     if (!profile || isFollowLoading) return;
 
@@ -115,49 +227,93 @@ export default function Profile() {
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <div className="rounded-2xl border border-black/10 bg-white/60 p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
-        <div className="group relative w-28 h-28 shrink-0">
-          <div className="w-full h-full bg-indigo-100 dark:bg-indigo-950 rounded-full overflow-hidden ring-4 ring-white/70 dark:ring-neutral-800">
-            {profile.imageUrl ? (
-              <img
-                src={profile.imageUrl}
-                alt={profile.name || "Profile"}
-                className="w-full h-full object-cover"
+      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+        <div className="group relative h-36 overflow-hidden bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 sm:h-44">
+          {profile.bgUrl && (
+            <img
+              src={profile.bgUrl}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          {isUploadingBackground && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/35 text-white">
+              <LoaderCircle
+                className="h-8 w-8 animate-spin"
+                aria-label="Uploading cover"
               />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center text-3xl font-bold text-indigo-600 dark:text-indigo-300">
-                {(profile.name || profile.username || "P")
-                  .charAt(0)
-                  .toUpperCase()}
-              </span>
-            )}
-          </div>
+            </div>
+          )}
           {isOwnProfile && (
             <label
-              htmlFor="profile-image-upload"
-              className={`absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-indigo-600 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-indigo-500 dark:border-neutral-900 ${isUploadingAvatar ? "pointer-events-none opacity-60" : ""}`}
-              title="Change profile image"
+              htmlFor="profile-background-upload"
+              className={`absolute right-4 top-4 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-black/30 text-white opacity-0 shadow-md backdrop-blur transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-black/50 ${isUploadingBackground ? "pointer-events-none opacity-60" : ""}`}
+              title="Change profile cover"
             >
               <Camera className="h-4 w-4" />
               <input
-                id="profile-image-upload"
+                id="profile-background-upload"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                onChange={handleAvatarChange}
-                disabled={isUploadingAvatar}
+                onChange={handleBackgroundChange}
+                disabled={isUploadingBackground}
                 className="sr-only"
               />
             </label>
           )}
         </div>
-        {isUploadingAvatar && (
-          <p className="mt-2 text-xs text-indigo-500">Uploading image...</p>
-        )}
+        <div className="px-6 pb-6">
+          <div className="group relative -mt-14 w-28 h-28 shrink-0">
+            <div className="w-full h-full bg-indigo-100 dark:bg-indigo-950 rounded-full overflow-hidden ring-4 ring-white/70 dark:ring-neutral-800">
+              {profile.imageUrl ? (
+                <img
+                  src={profile.imageUrl}
+                  alt={profile.name || "Profile"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center text-3xl font-bold text-indigo-600 dark:text-indigo-300">
+                  {(profile.name || profile.username || "P")
+                    .charAt(0)
+                    .toUpperCase()}
+                </span>
+              )}
+            </div>
+            {isOwnProfile && (
+              <label
+                htmlFor="profile-image-upload"
+                className={`absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-indigo-600 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-indigo-500 dark:border-neutral-900 ${isUploadingAvatar ? "pointer-events-none opacity-60" : ""}`}
+                title="Change profile image"
+              >
+                <Camera className="h-4 w-4" />
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarChange}
+                  disabled={isUploadingAvatar}
+                  className="sr-only"
+                />
+              </label>
+            )}
+            {isUploadingAvatar && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/35 text-white">
+                <LoaderCircle
+                  className="h-7 w-7 animate-spin"
+                  aria-label="Uploading profile image"
+                />
+              </div>
+            )}
+          </div>
+        </div>
         {avatarError && (
-          <p className="mt-2 text-xs text-red-500">{avatarError}</p>
+          <p className="px-6 text-xs text-red-500">{avatarError}</p>
         )}
-
-        <div className="flex justify-between items-center">
+        {backgroundError && (
+          <p className="px-6 text-xs text-red-500">{backgroundError}</p>
+        )}
+        <div className="flex items-center justify-between px-6">
           <h1 className="text-xl font-bold text-neutral-900 mt-2 dark:text-neutral-100">
             {profile.name || "Profile"}
           </h1>
@@ -184,15 +340,13 @@ export default function Profile() {
             </button>
           )}
         </div>
-
         {profile.username && (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="px-6 text-sm text-neutral-500 dark:text-neutral-400">
             @{profile.username}
           </p>
         )}
-
         {profile.createdAt && (
-          <p className="flex items-center gap-2 text-xs py-1 text-neutral-500 dark:text-neutral-400">
+          <p className="flex items-center gap-2 px-6 py-1 text-xs text-neutral-500 dark:text-neutral-400">
             <CalendarDays className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
             <span>
               Joined{" "}
@@ -203,8 +357,7 @@ export default function Profile() {
             </span>
           </p>
         )}
-
-        <div className="flex justify-start items-center space-x-4">
+        <div className="flex items-center justify-start space-x-4 px-6">
           <p>
             {profile._count?.followings ?? 0}{" "}
             <span className="text-neutral-400 text-xs dark:text-neutral-500">
@@ -217,9 +370,8 @@ export default function Profile() {
               Following
             </span>
           </p>
-        </div>
-
-        <div className="mt-3">
+        </div>{" "}
+        <div className="my-3 px-6">
           {isEditingBio ? (
             <div className="flex flex-col gap-2">
               <textarea
@@ -278,6 +430,90 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      {coverCropImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cover-crop-title"
+            className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-neutral-900"
+          >
+            <div className="flex items-center justify-between border-b border-black/10 px-5 py-4 dark:border-neutral-800">
+              <div>
+                <h2
+                  id="cover-crop-title"
+                  className="font-semibold text-neutral-900 dark:text-neutral-100"
+                >
+                  Adjust your cover photo
+                </h2>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                  Drag to reposition and zoom to choose the visible area.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeCoverCrop}
+                disabled={isUploadingBackground}
+                className="rounded-lg p-2 text-neutral-400 hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
+                aria-label="Close cover crop editor"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="relative h-64 w-full bg-neutral-950 sm:h-80">
+              <Cropper
+                image={coverCropImage}
+                crop={coverCrop}
+                zoom={coverZoom}
+                aspect={3 / 1}
+                onCropChange={setCoverCrop}
+                onZoomChange={setCoverZoom}
+                onCropComplete={(_, pixels) => setCroppedAreaPixels(pixels)}
+                showGrid={false}
+              />
+            </div>
+
+            <div className="flex items-center gap-3 px-5 pt-4">
+              <Minus className="h-4 w-4 text-neutral-400" />
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.05}
+                value={coverZoom}
+                onChange={(event) => setCoverZoom(Number(event.target.value))}
+                className="w-full accent-indigo-600"
+                aria-label="Cover photo zoom"
+              />
+              <Plus className="h-4 w-4 text-neutral-400" />
+            </div>
+
+            <div className="flex justify-end gap-3 px-5 py-4">
+              <button
+                type="button"
+                onClick={closeCoverCrop}
+                disabled={isUploadingBackground}
+                className="rounded-full px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-black/5 disabled:opacity-50 dark:text-neutral-300 dark:hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={applyCoverCrop}
+                disabled={isUploadingBackground || !croppedAreaPixels}
+                className="flex min-w-24 items-center justify-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:cursor-wait disabled:opacity-60"
+              >
+                {isUploadingBackground && (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                )}
+                {isUploadingBackground ? "Saving..." : "Apply"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <UserPost userId={profile.id} />
     </div>
   );

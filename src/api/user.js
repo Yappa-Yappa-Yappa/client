@@ -13,6 +13,14 @@ export const changeAvatar = async (file) => {
   return res.data;
 };
 
+export const changeBackground = async (file) => {
+  const formData = new FormData();
+  formData.append("bgUrl", file);
+
+  const res = await api.patch("/user/update-background", formData);
+  return res.data;
+};
+
 export const getProfile = async (username) => {
   const res = await api.get(`/user/${username}`);
   return res.data;
