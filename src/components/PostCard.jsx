@@ -8,6 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -46,6 +47,7 @@ export default function PostCard({
   likingPostIds,
   openModal,
 }) {
+  const navigate = useNavigate();
   const postId = post._id || post.id;
   const authorId = post.userId || post.user?.id || post.authorId;
   const isOwnPost = Boolean(currentUser?.id && authorId === currentUser.id);
@@ -210,7 +212,7 @@ export default function PostCard({
           <Heart className={`w-4 h-4 ${post.isLiked ? "fill-current text-rose-500" : ""}`} />
           <span>{post._count?.likes ?? post.likes ?? 0}</span>
         </button>
-        <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+        <button onClick={() => navigate(`/post/${postId}`, { state: { from: "/home" } })} className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
           <MessageSquare className="w-4 h-4" />
           <span>{post._count?.comments || post.comments || 0}</span>
         </button>

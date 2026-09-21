@@ -229,7 +229,7 @@ export default function Profile() {
   return (
     <div className="mx-auto w-full max-w-2xl">
       <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
-        <div className="group relative h-36 overflow-hidden bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 sm:h-44">
+        <div className="group relative h-36 overflow-hidden bg-indigo-500 sm:h-44">
           {profile.bgUrl && (
             <img
               src={profile.bgUrl}

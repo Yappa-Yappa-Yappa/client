@@ -18,7 +18,7 @@ import { deleteFeed, editFeed, getFeeds, postFeed } from "../../api/post";
 import { getLikesByPost, likePost, unlikePost } from "../../api/like";
 import { useAuth } from "../../hooks/useAuth";
 import FeedSkeleton from "../../components/FeedSkeleton";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -36,6 +36,7 @@ const formatRelativeTime = (dateValue) => {
 };
 
 export default function Feed() {
+  const navigate = useNavigate();
   const [postText, setPostText] = useState("");
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -640,7 +641,10 @@ export default function Feed() {
                   <span>{post._count?.likes ?? post.likes ?? 0}</span>
                 </button>
 
-                <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                <button
+                  onClick={() => navigate(`/post/${postId}`, { state: { from: "/home" } })}
+                  className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                >
                   <MessageSquare className="w-4 h-4" />
                   <span>{post._count?.comments || post.comments || 0}</span>
                 </button>
