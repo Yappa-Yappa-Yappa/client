@@ -28,8 +28,8 @@ export default function AuthProvider({ children }) {
     const refreshSession = async () => {
       try {
         const res = await refresh();
-        setAccessToken(res.data.accessToken);
-        setUser(res.data.user);
+        setAccessToken(res.data?.accessToken);
+        setUser(res.data?.user);
       } catch {
         setAccessToken(null);
         setUser(null);
@@ -50,8 +50,8 @@ export default function AuthProvider({ children }) {
 
       try {
         const res = await refresh();
-        setAccessToken(res.data.accessToken);
-        setUser(res.data.user);
+        setAccessToken(res.data?.accessToken);
+        setUser(res.data?.user);
       } catch {
         setAccessToken(null);
         setUser(null);
@@ -65,8 +65,8 @@ export default function AuthProvider({ children }) {
 
   const login = async (data) => {
     const res = await apiLogin(data);
-    setUser(res.data.user);
-    setAccessToken(res.data.accessToken);
+    setUser(res.data?.user);
+    setAccessToken(res.data?.accessToken);
     localStorage.setItem("yappaHasSession", "true");
   };
 

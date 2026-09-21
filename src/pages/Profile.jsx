@@ -20,6 +20,7 @@ import {
   Plus,
 } from "lucide-react";
 import UserPost from "./UserPost";
+import ProfileSkeleton from "../components/ProfileSkeleton";
 
 const createCroppedImage = (imageSrc, pixelCrop) =>
   new Promise((resolve, reject) => {
@@ -221,7 +222,7 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (loading) return <ProfileSkeleton />;
   if (!profile)
     return <div className="text-center py-10">Failed to load profile.</div>;
 

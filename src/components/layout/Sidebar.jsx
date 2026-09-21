@@ -10,9 +10,11 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { useNotifications } from "../../hooks/useNotifications";
 
 export default function Sidebar() {
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const navItems = [
     {
       icon: <Home className="w-6 h-6 shrink-0" />,
@@ -97,6 +99,11 @@ export default function Sidebar() {
             <div className="flex items-center gap-3">
               {item.icon}
               <span>{item.label}</span>
+              {item.label === "Notification" && unreadCount > 0 && (
+                <span className="ml-auto min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             </div>
 
             {/* Active Indicator Dot */}
