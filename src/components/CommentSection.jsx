@@ -54,7 +54,8 @@ export default function CommentSection({ postId }) {
       const response = await createComment(postId, trimmedContent);
       setComments((current) => [...current, response.data]);
       setContent("");
-      if (commentInputRef.current) commentInputRef.current.style.height = "auto";
+      if (commentInputRef.current)
+        commentInputRef.current.style.height = "auto";
     } catch (requestError) {
       setError(
         requestError.response?.data?.message || "Could not post your comment.",
@@ -185,7 +186,9 @@ export default function CommentSection({ postId }) {
                       <div className="flex min-w-0 flex-1 flex-col gap-2">
                         <textarea
                           value={editContent}
-                          onChange={(event) => setEditContent(event.target.value)}
+                          onChange={(event) =>
+                            setEditContent(event.target.value)
+                          }
                           maxLength={500}
                           rows={2}
                           autoFocus

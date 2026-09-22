@@ -341,7 +341,11 @@ export default function Profile() {
             </button>
           ) : (
             <div className="flex items-center gap-2">
-              <button onClick={openMessage} disabled={isMessageLoading} className="rounded-full border border-indigo-500/30 px-4 py-1.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-500/10 disabled:cursor-wait disabled:opacity-60 dark:text-indigo-300">
+              <button
+                onClick={openMessage}
+                disabled={isMessageLoading}
+                className="rounded-full border border-indigo-500/30 px-4 py-1.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-500/10 disabled:cursor-wait disabled:opacity-60 dark:text-indigo-300"
+              >
                 {isMessageLoading ? "Opening..." : "Message"}
               </button>
               <button
@@ -353,7 +357,11 @@ export default function Profile() {
                     : "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500"
                 }`}
               >
-                {isFollowLoading ? "Updating..." : profile.isFollowing ? "Following" : "Follow"}
+                {isFollowLoading
+                  ? "Updating..."
+                  : profile.isFollowing
+                    ? "Following"
+                    : "Follow"}
               </button>
             </div>
           )}
@@ -396,13 +404,13 @@ export default function Profile() {
                 value={bioText}
                 onChange={(e) => setBioText(e.target.value)}
                 rows={3}
-                maxLength={255}
+                maxLength={350}
                 autoFocus
                 className="w-full resize-none rounded-xl border border-indigo-500/40 bg-transparent p-3 text-sm text-neutral-800 outline-none dark:text-neutral-200"
               />
               <div className="flex items-center justify-between">
                 <span className="text-xs text-neutral-400 dark:text-neutral-500">
-                  {bioText.length}/255
+                  {bioText.length}/350
                 </span>
                 <div className="flex justify-end gap-2">
                   <button
