@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { getFeedById } from "../api/post";
 import CommentSection from "../components/CommentSection";
+import LinkifiedText from "../components/LinkifiedText";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -79,7 +80,7 @@ export default function PostDetail() {
         </div>
         {post.content && (
           <p className="mt-4 whitespace-pre-line text-sm leading-relaxed">
-            {post.content}
+            <LinkifiedText text={post.content} />
           </p>
         )}
         {post.images?.length > 0 && (

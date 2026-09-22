@@ -18,6 +18,7 @@ import { deleteFeed, editFeed, getFeeds, postFeed } from "../../api/post";
 import { getLikesByPost, likePost, unlikePost } from "../../api/like";
 import { useAuth } from "../../hooks/useAuth";
 import FeedSkeleton from "../../components/FeedSkeleton";
+import LinkifiedText from "../../components/LinkifiedText";
 import { NavLink, useNavigate } from "react-router-dom";
 
 const formatRelativeTime = (dateValue) => {
@@ -587,7 +588,7 @@ export default function Feed() {
                 </div>
               ) : post.content ? (
                 <p className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 mb-3 whitespace-pre-line">
-                  {post.content}
+                  <LinkifiedText text={post.content} />
                 </p>
               ) : null}
 

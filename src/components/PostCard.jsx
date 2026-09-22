@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import LinkifiedText from "./LinkifiedText";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -168,7 +169,7 @@ export default function PostCard({
         </div>
       ) : post.content ? (
         <p className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 mb-3 whitespace-pre-line">
-          {post.content}
+          <LinkifiedText text={post.content} />
         </p>
       ) : null}
 
