@@ -1,5 +1,5 @@
 import { Pencil, Send, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createComment, getCommentsByPost } from "../api/comment";
 import { deleteComment, updateComment } from "../api/commentActions";
 import { useAuth } from "../hooks/useAuth";
@@ -24,6 +24,7 @@ export default function CommentSection({ postId }) {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editContent, setEditContent] = useState("");
   const [error, setError] = useState("");
+  const commentInputRef = useRef(null);
 
   const loadComments = useCallback(async () => {
     try {
@@ -52,6 +53,7 @@ export default function CommentSection({ postId }) {
       const response = await createComment(postId, trimmedContent);
       setComments((current) => [...current, response.data]);
       setContent("");
+      if (commentInputRef.current) commentInputRef.current.style.height = "auto";
     } catch (requestError) {
       setError(
         requestError.response?.data?.message || "Could not post your comment.",
@@ -59,6 +61,13 @@ export default function CommentSection({ postId }) {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleContentChange = (event) => {
+    const textarea = event.target;
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+    setContent(textarea.value);
   };
 
   const handleDelete = async (commentId) => {
@@ -115,12 +124,13 @@ export default function CommentSection({ postId }) {
       </h2>
       <form onSubmit={handleSubmit} className="mt-4 flex items-end gap-2">
         <textarea
+          ref={commentInputRef}
           value={content}
-          onChange={(event) => setContent(event.target.value)}
+          onChange={handleContentChange}
           maxLength={500}
           rows={2}
           placeholder="Add a comment…"
-          className="w-full resize-none rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700"
+          className="w-full resize-none overflow-hidden rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700"
         />
         <button
           type="submit"
@@ -177,7 +187,7 @@ export default function CommentSection({ postId }) {
                           maxLength={500}
                           rows={2}
                           autoFocus
-                          className="w-full resize-none rounded-lg border border-indigo-500/40 bg-transparent px-2 py-1.5 text-sm outline-none"
+                          className="w-full resize-none overflow-hidden break-words rounded-lg border border-indigo-500/40 bg-transparent px-2 py-1.5 text-sm outline-none"
                         />
                         <div className="flex justify-end gap-2">
                           <button
@@ -198,7 +208,7 @@ export default function CommentSection({ postId }) {
                         </div>
                       </div>
                     ) : (
-                      <p className="mt-1 whitespace-pre-line text-sm text-neutral-700 dark:text-neutral-300">
+                      <p className="mt-1 min-w-0 whitespace-pre-wrap break-words text-sm text-neutral-700 dark:text-neutral-300">
                         {comment.content}
                       </p>
                     )}
