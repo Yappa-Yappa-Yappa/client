@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   getProfile,
   changeAvatar,
@@ -386,15 +386,21 @@ export default function Profile() {
         <div className="flex items-center justify-start space-x-4 px-6">
           <p>
             {profile._count?.followings ?? 0}{" "}
-            <span className="text-neutral-400 text-xs dark:text-neutral-500">
+            <Link
+              to={`/friend/${username}/following`}
+              className="hover:underline text-neutral-400 text-xs dark:text-neutral-500"
+            >
               Followers
-            </span>
+            </Link>
           </p>
           <p>
             {profile._count?.followers ?? 0}{" "}
-            <span className="text-neutral-400 text-xs dark:text-neutral-500">
+            <Link
+              to={`/friend/${username}/followers`}
+              className="hover:underline text-neutral-400 text-xs dark:text-neutral-500"
+            >
               Following
-            </span>
+            </Link>
           </p>
         </div>{" "}
         <div className="my-3 px-6">

@@ -49,7 +49,8 @@ export default function App() {
         <Route path="notification" element={<Notification />} />
         <Route path="post/:id" element={<PostDetail />} />
         <Route path="chat" element={<Chat />} />
-        <Route path="friend" element={<Friend />} />
+        <Route path="friend/:username/followers" element={<Friend />} />
+        <Route path="friend/:username/following" element={<Friend />} />
         <Route path="history" element={<History />} />
         <Route path="trend" element={<Trending />} />
 

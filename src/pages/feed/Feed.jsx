@@ -642,7 +642,9 @@ export default function Feed() {
                 </button>
 
                 <button
-                  onClick={() => navigate(`/post/${postId}`, { state: { from: "/home" } })}
+                  onClick={() =>
+                    navigate(`/post/${postId}`, { state: { from: "/home" } })
+                  }
                   className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" />

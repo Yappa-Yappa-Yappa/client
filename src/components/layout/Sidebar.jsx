@@ -39,7 +39,7 @@ export default function Sidebar() {
     {
       icon: <Users className="w-6 h-6 shrink-0" />,
       label: "Yappers",
-      path: "/friend",
+      path: `/friend/${user.username}/following`,
     },
     {
       icon: <History className="w-6 h-6 shrink-0" />,
