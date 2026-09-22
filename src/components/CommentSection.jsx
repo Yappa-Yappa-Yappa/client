@@ -1,4 +1,4 @@
-import { Pencil, Send, Trash2 } from "lucide-react";
+import { Ellipsis, Pencil, Send, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createComment, getCommentsByPost } from "../api/comment";
 import { deleteComment, updateComment } from "../api/commentActions";
@@ -25,6 +25,7 @@ export default function CommentSection({ postId }) {
   const [editContent, setEditContent] = useState("");
   const [error, setError] = useState("");
   const commentInputRef = useRef(null);
+  const [openCommentMenuId, setOpenCommentMenuId] = useState(null);
 
   const loadComments = useCallback(async () => {
     try {
@@ -84,6 +85,7 @@ export default function CommentSection({ postId }) {
   const startEditing = (comment) => {
     setEditingCommentId(comment.id);
     setEditContent(comment.content || "");
+    setOpenCommentMenuId(null);
     setError("");
   };
 
@@ -169,7 +171,7 @@ export default function CommentSection({ postId }) {
                     </span>
                   )}
                 </div>
-                <div className="min-w-0 flex-1 rounded-xl bg-neutral-100 px-3 py-2 dark:bg-neutral-800">
+                <div className="relative min-w-0 flex-1 rounded-xl bg-neutral-100 px-3 py-2 dark:bg-neutral-800">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-bold">
                       {author.name || "Yapper"}
@@ -212,26 +214,43 @@ export default function CommentSection({ postId }) {
                         {comment.content}
                       </p>
                     )}
-                    {isOwnComment && (
-                      <div className="flex shrink-0 gap-1">
-                        {editingCommentId !== comment.id && (
-                          <button
-                            type="button"
-                            onClick={() => startEditing(comment)}
-                            aria-label="Edit comment"
-                            className="rounded-lg p-1.5 text-neutral-400 hover:bg-indigo-500/10 hover:text-indigo-500"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                        )}
+                    {isOwnComment && editingCommentId !== comment.id && (
+                      <div className="relative shrink-0">
                         <button
                           type="button"
-                          onClick={() => handleDelete(comment.id)}
-                          aria-label="Delete comment"
-                          className="rounded-lg p-1.5 text-neutral-400 hover:bg-rose-500/10 hover:text-rose-500"
+                          onClick={() =>
+                            setOpenCommentMenuId((currentId) =>
+                              currentId === comment.id ? null : comment.id,
+                            )
+                          }
+                          aria-label="Comment options"
+                          className="rounded-lg p-1.5 text-neutral-400 hover:bg-black/5 hover:text-neutral-700 dark:hover:bg-white/10 dark:hover:text-neutral-200"
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Ellipsis className="h-4 w-4" />
                         </button>
+                        {openCommentMenuId === comment.id && (
+                          <div className="absolute right-0 top-8 z-10 min-w-28 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+                            <button
+                              type="button"
+                              onClick={() => startEditing(comment)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOpenCommentMenuId(null);
+                                handleDelete(comment.id);
+                              }}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Delete
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
