@@ -43,8 +43,7 @@ export default function Friend() {
       setUsers([]);
       setCount(0);
       setError(
-        requestError.response?.data?.message ||
-          `Could not load ${activeTab}.`,
+        requestError.response?.data?.message || `Could not load ${activeTab}.`,
       );
     } finally {
       setLoading(false);
