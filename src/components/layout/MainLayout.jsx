@@ -36,13 +36,13 @@ export default function MainLayout() {
       {/* Main Content Area with Contextual Sticky Header */}
       <div
         id="main-scroll-container"
-        className={`flex-1 flex flex-col h-full min-w-0 ${
+        className={`flex h-full min-w-0 flex-1 flex-col pb-16 md:pb-0 ${
           location.pathname === "/chat" ? "overflow-hidden" : "overflow-y-auto"
         }`}
       >
         {/* Subtle Sticky Header */}
-        <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 backdrop-blur-xl bg-white/40 dark:bg-black/20 border-b border-black/5 dark:border-white/5">
-          <h2 className="text-base font-semibold tracking-tight text-neutral-800 dark:text-neutral-200">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-black/5 bg-white/40 px-4 py-3 backdrop-blur-xl dark:border-white/5 dark:bg-black/20 sm:px-6 sm:py-4">
+          <h2 className="truncate text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 sm:text-base">
             {getPageTitle(location.pathname)}
           </h2>
 
@@ -58,7 +58,7 @@ export default function MainLayout() {
           className={`flex-1 min-h-0 w-full ${
             location.pathname === "/chat"
               ? "max-w-none p-0"
-              : "max-w-4xl mx-auto p-6"
+              : "mx-auto max-w-4xl p-4 sm:p-6"
           }`}
         >
           <Outlet />

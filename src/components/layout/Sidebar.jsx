@@ -3,11 +3,13 @@ import {
   History,
   Home,
   MessageCircle,
+  MoreHorizontal,
   Search,
   TrendingUp,
   User,
   Users,
 } from "lucide-react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
@@ -15,6 +17,7 @@ import { useNotifications } from "../../hooks/useNotifications";
 export default function Sidebar() {
   const { user } = useAuth();
   const { unreadCount } = useNotifications();
+  const [moreOpen, setMoreOpen] = useState(false);
   const navItems = [
     {
       icon: <Home className="w-6 h-6 shrink-0" />,
@@ -59,8 +62,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside
-      className="relative flex flex-col h-screen w-[220px] transition-colors duration-300 select-none shrink-0 px-4 py-6 z-20
+    <>
+      <aside
+        className="relative hidden h-screen w-[220px] shrink-0 select-none flex-col px-4 py-6 transition-colors duration-300 md:flex z-20
       /* Light Mode */
       bg-white/70 border-r border-black/10 text-neutral-900
       /* Dark Mode */
@@ -111,6 +115,74 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-    </aside>
+      </aside>
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-black/10 bg-white/90 px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-neutral-950/90 md:hidden">
+        {[
+          { icon: Home, label: "Home", path: "/home" },
+          { icon: Search, label: "Search", path: "/search" },
+          { icon: MessageCircle, label: "Chat", path: "/chat" },
+          { icon: Bell, label: "Alerts", path: "/notification" },
+          { icon: User, label: "Profile", path: `/profile/${user.username}` },
+        ].map(({ icon: Icon, label, path }) => (
+          <NavLink
+            key={label}
+            to={path}
+            className={({ isActive }) =>
+              `relative flex min-w-0 flex-col items-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
+                isActive
+                  ? "text-indigo-600 dark:text-indigo-400"
+                  : "text-neutral-500 dark:text-neutral-400"
+              }`
+            }
+          >
+            <span className="relative">
+              <Icon className="h-5 w-5" />
+              {label === "Alerts" && unreadCount > 0 && (
+                <span className="absolute -right-2 -top-2 min-w-4 rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </span>
+            <span className="truncate">{label}</span>
+          </NavLink>
+        ))}
+
+        <div className="relative flex min-w-0 flex-col items-center">
+          {moreOpen && (
+            <div className="absolute bottom-14 right-1 min-w-40 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+              {[
+                { icon: Users, label: "Yappers", path: `/friend/${user.username}/following` },
+                { icon: History, label: "History", path: "/history" },
+                { icon: TrendingUp, label: "Trending", path: "/trend" },
+              ].map(({ icon: Icon, label, path }) => (
+                <NavLink
+                  key={label}
+                  to={path}
+                  onClick={() => setMoreOpen(false)}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </NavLink>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setMoreOpen((open) => !open)}
+            className={`flex w-full min-w-0 flex-col items-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
+              moreOpen
+                ? "text-indigo-600 dark:text-indigo-400"
+                : "text-neutral-500 dark:text-neutral-400"
+            }`}
+            aria-label="More navigation options"
+          >
+            <MoreHorizontal className="h-5 w-5" />
+            <span>More</span>
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }
