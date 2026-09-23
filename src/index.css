@@ -26,6 +26,10 @@ html, body, #root {
   --accent-hover: #4F46E5;      /* Deep Indigo */
   --accent-subtle: #F4F3FF;     /* Softest Lavender Tint */
   --accent-glow: rgba(236, 72, 153, 0.15); /* Soft Rose Glow */
+
+  --scrollbar-track: #F4F3FF;
+  --scrollbar-thumb: #C4B5FD;
+  --scrollbar-thumb-hover: #818CF8;
 }
 
 .dark {
@@ -43,6 +47,35 @@ html, body, #root {
   --accent-hover: #A5B4FC;      /* Pastel Soft Purple */
   --accent-subtle: rgba(168, 85, 247, 0.12); /* Translucent Orchid */
   --accent-glow: rgba(236, 72, 153, 0.25); /* Rose Pink Glow */
+
+  --scrollbar-track: #151020;
+  --scrollbar-thumb: #4C3B72;
+  --scrollbar-thumb-hover: #A5B4FC;
+}
+
+/* Themed scrollbars for the page and nested chat/conversation panels */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border: 2px solid var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Override Chrome Autofill Styles */
