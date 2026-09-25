@@ -76,6 +76,12 @@ export default function AuthProvider({ children }) {
     localStorage.setItem("yappaHasSession", "true");
   };
 
+  const updateUser = (updates) => {
+    setUser((currentUser) =>
+      currentUser ? { ...currentUser, ...updates } : currentUser,
+    );
+  };
+
   const logout = async () => {
     await apiLogout();
     setUser(null);
@@ -84,7 +90,15 @@ export default function AuthProvider({ children }) {
   };
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, login, setSession, logout, loading }}
+      value={{
+        user,
+        accessToken,
+        login,
+        setSession,
+        updateUser,
+        logout,
+        loading,
+      }}
     >
       {children}
     </AuthContext.Provider>

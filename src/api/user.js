@@ -5,6 +5,16 @@ export const changeBio = async (data) => {
   return res.data;
 };
 
+export const changeName = async (data) => {
+  const res = await api.patch("/user/update-name", data);
+  return res.data;
+};
+
+export const changeUsername = async (data) => {
+  const res = await api.patch("/user/update-username", data);
+  return res.data;
+};
+
 export const changeAvatar = async (file) => {
   const formData = new FormData();
   formData.append("imageUrl", file);

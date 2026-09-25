@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import UserPost from "./UserPost";
 import ProfileSkeleton from "../components/ProfileSkeleton";
+import EditProfileModal from "../components/EditProfileModal";
 
 const createCroppedImage = (imageSrc, pixelCrop) =>
   new Promise((resolve, reject) => {
@@ -66,7 +67,7 @@ const createCroppedImage = (imageSrc, pixelCrop) =>
 export default function Profile() {
   const { username } = useParams();
   const navigate = useNavigate();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, updateUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditingBio, setIsEditingBio] = useState(false);
@@ -81,6 +82,7 @@ export default function Profile() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
   const [isMessageLoading, setIsMessageLoading] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -137,6 +139,7 @@ export default function Profile() {
       const imageUrl = res.data?.result?.imageUrl;
       if (imageUrl) {
         setProfile((prev) => ({ ...prev, imageUrl }));
+        updateUser({ imageUrl });
       }
     } catch (err) {
       console.error("Failed to update avatar:", err);
@@ -194,6 +197,14 @@ export default function Profile() {
       );
     } finally {
       setIsUploadingBackground(false);
+    }
+  };
+
+  const handleProfileSaved = (updates) => {
+    setProfile((prev) => ({ ...prev, ...updates }));
+    updateUser(updates);
+    if (updates.username && updates.username !== username) {
+      navigate(`/profile/${updates.username}`, { replace: true });
     }
   };
 
@@ -336,7 +347,11 @@ export default function Profile() {
           </h1>
 
           {isOwnProfile ? (
-            <button className="px-4 py-1.5 text-xs font-medium text-white bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-500 rounded-full transition-colors shadow-sm">
+            <button
+              type="button"
+              onClick={() => setIsEditProfileOpen(true)}
+              className="px-4 py-1.5 text-xs font-medium text-white bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-500 rounded-full transition-colors shadow-sm"
+            >
               Edit Profile
             </button>
           ) : (
@@ -545,6 +560,17 @@ export default function Profile() {
             </div>
           </div>
         </div>
+      )}
+      {isEditProfileOpen && (
+        <EditProfileModal
+          profile={profile}
+          onClose={() => setIsEditProfileOpen(false)}
+          onSaved={handleProfileSaved}
+          onAvatarChange={handleAvatarChange}
+          onBackgroundChange={handleBackgroundChange}
+          isUploadingAvatar={isUploadingAvatar}
+          isUploadingBackground={isUploadingBackground}
+        />
       )}
       <UserPost userId={profile.id} />
     </div>

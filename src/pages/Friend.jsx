@@ -1,16 +1,26 @@
 import { ArrowLeft, LoaderCircle, Search, UserRound, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { getFollowers, getFollowing } from "../api/follow";
+import {
+  followUser,
+  getFollowers,
+  getFollowing,
+  unfollowUser,
+} from "../api/follow";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Friend() {
   const { username } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
+  const [followStates, setFollowStates] = useState({});
+  const [followLoadingId, setFollowLoadingId] = useState(null);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
 
@@ -33,14 +43,23 @@ export default function Friend() {
       const items =
         activeTab === "followers" ? result.followers : result.followings;
 
-      setUsers(
-        (items || [])
-          .map((item) => item.follower || item.following)
-          .filter(Boolean),
+      const nextUsers = (items || [])
+        .map((item) => item.follower || item.following)
+        .filter(Boolean);
+
+      setUsers(nextUsers);
+      setFollowStates(
+        Object.fromEntries(
+          nextUsers.map((user) => [
+            user.id,
+            Boolean(user.isFollowing),
+          ]),
+        ),
       );
       setCount(result.count || 0);
     } catch (requestError) {
       setUsers([]);
+      setFollowStates({});
       setCount(0);
       setError(
         requestError.response?.data?.message || `Could not load ${activeTab}.`,
@@ -57,6 +76,30 @@ export default function Friend() {
 
   const changeTab = (tab) => {
     navigate(`/friend/${username}/${tab}`);
+  };
+
+  const handleFollowToggle = async (user) => {
+    if (!user.id || user.id === currentUser?.id || followLoadingId) return;
+
+    const isFollowing = Boolean(followStates[user.id]);
+    setFollowLoadingId(user.id);
+    setActionError("");
+
+    try {
+      if (isFollowing) await unfollowUser(user.id);
+      else await followUser(user.id);
+
+      setFollowStates((previous) => ({
+        ...previous,
+        [user.id]: !isFollowing,
+      }));
+    } catch (requestError) {
+      setActionError(
+        requestError.response?.data?.message || "Could not update follow status.",
+      );
+    } finally {
+      setFollowLoadingId(null);
+    }
   };
 
   const filteredUsers = useMemo(() => {
@@ -158,6 +201,9 @@ export default function Friend() {
           <p className="mb-4 text-xs text-neutral-500">
             {count} {count === 1 ? "person" : "people"}
           </p>
+          {actionError && (
+            <p className="mb-4 text-xs text-rose-500">{actionError}</p>
+          )}
 
           {loading ? (
             <div className="flex justify-center py-12 text-indigo-500">
@@ -179,33 +225,64 @@ export default function Friend() {
           ) : (
             <div className="space-y-2">
               {filteredUsers.map((user) => (
-                <Link
+                <div
                   key={user.id}
-                  to={`/profile/${user.username}`}
                   className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
                 >
-                  <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600 dark:text-indigo-300">
-                    {user.imageUrl ? (
-                      <img
-                        src={user.imageUrl}
-                        alt={user.name || "Yapper"}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex h-full items-center justify-center">
-                        {(user.name || user.username || "Y")[0].toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                      {user.name || "Yapper"}
-                    </p>
-                    <p className="truncate text-xs text-neutral-500">
-                      @{user.username || "yapper"}
-                    </p>
-                  </div>
-                </Link>
+                  <Link
+                    to={`/profile/${user.username}`}
+                    className="flex min-w-0 flex-1 items-center gap-3"
+                  >
+                    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600 dark:text-indigo-300">
+                      {user.imageUrl ? (
+                        <img
+                          src={user.imageUrl}
+                          alt={user.name || "Yapper"}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-full items-center justify-center">
+                          {(user.name || user.username || "Y")[0].toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                        {user.name || "Yapper"}
+                      </p>
+                      <p className="truncate text-xs text-neutral-500">
+                        @{user.username || "yapper"}
+                      </p>
+                    </div>
+                  </Link>
+                  {user.id !== currentUser?.id && (
+                    <button
+                      type="button"
+                      onClick={() => handleFollowToggle(user)}
+                      disabled={followLoadingId === user.id}
+                      title={
+                        followStates[user.id]
+                          ? `Unfollow ${user.name || user.username || "user"}`
+                          : activeTab === "followers"
+                            ? `Follow back ${user.name || user.username || "user"}`
+                            : `Follow ${user.name || user.username || "user"}`
+                      }
+                      className={`group shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-wait disabled:opacity-60 ${
+                        followStates[user.id]
+                          ? "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
+                          : "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500"
+                      }`}
+                    >
+                      {followLoadingId === user.id
+                        ? "Updating..."
+                        : followStates[user.id]
+                          ? <><span className="group-hover:hidden">Following</span><span className="hidden group-hover:inline">Unfollow</span></>
+                          : activeTab === "followers"
+                            ? "Follow back"
+                            : "Follow"}
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           )}
