@@ -58,10 +58,16 @@ export default function MainLayout() {
           className={`flex-1 min-h-0 w-full ${
             location.pathname === "/chat"
               ? "max-w-none p-0"
-              : "mx-auto max-w-4xl p-4 sm:p-6"
+              : "mx-auto max-w-4xl p-4 sm:p-6 md:pb-6"
           }`}
         >
           <Outlet />
+          {location.pathname !== "/chat" && (
+            <div
+              className="h-[calc(6rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
+              aria-hidden="true"
+            />
+          )}
         </main>
       </div>
     </div>

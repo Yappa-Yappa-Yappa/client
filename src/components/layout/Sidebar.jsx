@@ -117,7 +117,7 @@ export default function Sidebar() {
       </nav>
       </aside>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-black/10 bg-white/90 px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-neutral-950/90 md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-6 border-t border-black/10 bg-white px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-neutral-950 md:hidden">
         {[
           { icon: Home, label: "Home", path: "/home" },
           { icon: Search, label: "Search", path: "/search" },

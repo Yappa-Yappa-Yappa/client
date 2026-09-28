@@ -117,7 +117,7 @@ export default function Notification() {
                   onClick={() => openNotification(notification)}
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
                 >
-                  <div className="relative h-11 w-11 shrink-0 rounded-full bg-indigo-500/20 text-center text-sm font-bold text-indigo-600 dark:text-indigo-300">
+                  <div className="relative isolate h-11 w-11 shrink-0 rounded-full bg-indigo-500/20 text-center text-sm font-bold text-indigo-600 dark:text-indigo-300">
                     <div className="h-full w-full overflow-hidden rounded-full">
                       {notification.actor?.imageUrl ? (
                         <img
@@ -132,7 +132,7 @@ export default function Notification() {
                       )}
                     </div>
                     <span
-                      className={`absolute -bottom-1 -right-1 z-10 rounded-full border-2 border-white bg-white p-0.5 dark:border-neutral-900 dark:bg-neutral-900 ${meta.color}`}
+                      className={`absolute -bottom-1 -right-1 z-0 rounded-full border-2 border-white bg-white p-0.5 dark:border-neutral-900 dark:bg-neutral-900 ${meta.color}`}
                     >
                       <Icon className="h-3 w-3" />
                     </span>
