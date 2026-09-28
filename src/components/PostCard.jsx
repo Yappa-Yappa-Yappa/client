@@ -209,7 +209,7 @@ export default function PostCard({
               onClick={() => openModal(postImages, index)}
               className={`cursor-pointer overflow-hidden group bg-neutral-100 dark:bg-neutral-950 transition-colors text-left ${
                 postImages.length === 1
-                  ? "max-h-[420px]"
+                  ? ""
                   : postImages.length === 5 && index < 2
                     ? "h-40 col-span-1"
                     : "h-36"
@@ -218,7 +218,11 @@ export default function PostCard({
               <img
                 src={src}
                 alt="Attachment"
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className={`block w-full transition-transform duration-300 group-hover:scale-105 ${
+                  postImages.length === 1
+                    ? "h-auto max-h-[70vh] object-contain"
+                    : "h-full object-cover"
+                }`}
               />
             </button>
           ))}

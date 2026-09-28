@@ -384,7 +384,7 @@ export default function Feed() {
                   key={index}
                   className={`relative group bg-neutral-100 dark:bg-neutral-950 overflow-hidden ${
                     imagePreviews.length === 1
-                      ? "max-h-[420px]"
+                      ? ""
                       : imagePreviews.length === 5 && index < 2
                         ? "h-40 col-span-1"
                         : "h-36"
@@ -393,7 +393,11 @@ export default function Feed() {
                   <img
                     src={src}
                     alt={`Upload preview ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className={`block w-full ${
+                      imagePreviews.length === 1
+                        ? "h-auto max-h-[70vh] object-contain"
+                        : "h-full object-cover"
+                    }`}
                   />
                   <button
                     type="button"
@@ -605,7 +609,7 @@ export default function Feed() {
                       onClick={() => openModal(postImages, idx)}
                       className={`cursor-pointer overflow-hidden group bg-neutral-100 dark:bg-neutral-950 transition-colors ${
                         postImages.length === 1
-                          ? "max-h-[420px]"
+                          ? ""
                           : postImages.length === 5 && idx < 2
                             ? "h-40 col-span-1"
                             : "h-36"
@@ -614,7 +618,11 @@ export default function Feed() {
                       <img
                         src={src}
                         alt="Attachment"
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        className={`block w-full transition-transform duration-300 group-hover:scale-105 ${
+                          postImages.length === 1
+                            ? "h-auto max-h-[70vh] object-contain"
+                            : "h-full object-cover"
+                        }`}
                       />
                     </div>
                   ))}
