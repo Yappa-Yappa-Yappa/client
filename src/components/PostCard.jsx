@@ -7,6 +7,7 @@ import {
   Share2,
   Trash2,
 } from "lucide-react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import LinkifiedText from "./LinkifiedText";
@@ -49,6 +50,7 @@ export default function PostCard({
   openModal,
 }) {
   const navigate = useNavigate();
+  const [shareStatus, setShareStatus] = useState("");
   const postId = post._id || post.id;
   const authorId = post.userId || post.user?.id || post.authorId;
   const isOwnPost = Boolean(currentUser?.id && authorId === currentUser.id);
@@ -65,6 +67,29 @@ export default function PostCard({
     : post.image || post.imageUrl
       ? [post.image || post.imageUrl]
       : [];
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/post/${postId}`;
+    const shareData = {
+      title: `${authorName}'s yap on Yappa Yappa`,
+      text: post.content?.slice(0, 120) || "Check out this yap on Yappa Yappa.",
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        setShareStatus("Shared");
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareStatus("Link copied");
+      }
+      window.setTimeout(() => setShareStatus(""), 2200);
+    } catch (error) {
+      if (error?.name !== "AbortError") setShareStatus("Could not share");
+      window.setTimeout(() => setShareStatus(""), 2200);
+    }
+  };
 
   return (
     <article className="p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200 shadow-sm">
@@ -217,8 +242,15 @@ export default function PostCard({
           <MessageSquare className="w-4 h-4" />
           <span>{post._count?.comments || post.comments || 0}</span>
         </button>
-        <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors ml-auto">
+        <button
+          type="button"
+          onClick={handleShare}
+          aria-label="Share post"
+          title={shareStatus || "Share post"}
+          className="ml-auto flex items-center gap-2 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+        >
           <Share2 className="w-4 h-4" />
+          {shareStatus && <span className="text-[11px] font-medium">{shareStatus}</span>}
         </button>
       </div>
     </article>

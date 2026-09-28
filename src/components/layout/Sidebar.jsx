@@ -10,14 +10,53 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { useEffect } from "react";
+import { io } from "socket.io-client";
 import { NavLink } from "react-router-dom";
+import { getUnreadConversationCount } from "../../api/conversation";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
 
+const socketUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/api\/?$/, "");
+
 export default function Sidebar() {
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
   const { unreadCount } = useNotifications();
+  const [chatUnreadCount, setChatUnreadCount] = useState(0);
   const [moreOpen, setMoreOpen] = useState(false);
+
+  useEffect(() => {
+    if (!accessToken) return undefined;
+
+    const refreshChatUnreadCount = async () => {
+      try {
+        const response = await getUnreadConversationCount();
+        setChatUnreadCount(response.data?.count || 0);
+      } catch {
+        // Keep the existing count if the unread-count request fails.
+      }
+    };
+
+    refreshChatUnreadCount();
+    const socket = socketUrl
+      ? io(socketUrl, { auth: { token: accessToken } })
+      : null;
+
+    socket?.on("message:new", (message) => {
+      if (message.senderId !== user?.id) {
+        setChatUnreadCount((count) => count + 1);
+      }
+    });
+    socket?.on("conversation:unread-count", ({ count } = {}) => {
+      setChatUnreadCount(count || 0);
+    });
+    window.addEventListener("focus", refreshChatUnreadCount);
+
+    return () => {
+      window.removeEventListener("focus", refreshChatUnreadCount);
+      socket?.disconnect();
+    };
+  }, [accessToken, user?.id]);
   const navItems = [
     {
       icon: <Home className="w-6 h-6 shrink-0" />,
@@ -108,6 +147,11 @@ export default function Sidebar() {
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
+              {item.label === "Yap" && chatUnreadCount > 0 && (
+                <span className="ml-auto min-w-5 rounded-full bg-indigo-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+                  {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+                </span>
+              )}
             </div>
 
             {/* Active Indicator Dot */}
@@ -141,6 +185,11 @@ export default function Sidebar() {
               {label === "Alerts" && unreadCount > 0 && (
                 <span className="absolute -right-2 -top-2 min-w-4 rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold text-white">
                   {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+              {label === "Chat" && chatUnreadCount > 0 && (
+                <span className="absolute -right-2 -top-2 min-w-4 rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold text-white">
+                  {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
                 </span>
               )}
             </span>

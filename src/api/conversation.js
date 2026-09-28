@@ -5,6 +5,16 @@ export const getConversations = async () => {
   return res.data;
 };
 
+export const getUnreadConversationCount = async () => {
+  const res = await api.get("/conversations/unread-count");
+  return res.data;
+};
+
+export const markConversationRead = async (conversationId) => {
+  const res = await api.post(`/conversations/${conversationId}/read`);
+  return res.data;
+};
+
 export const openDirectConversation = async (userId) => {
   const res = await api.post(`/conversations/direct/${userId}`);
   return res.data;

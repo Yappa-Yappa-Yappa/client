@@ -68,7 +68,19 @@ export default function Chat() {
       setMessagesLoading(true);
       getConversationMessages(activeId)
         .then((response) => {
-          if (!cancelled) setMessages(response.data?.messages || []);
+          if (!cancelled) {
+            setMessages(response.data?.messages || []);
+            setConversations((current) =>
+              current.map((conversation) =>
+                conversation.id === activeId
+                  ? { ...conversation, unreadCount: 0 }
+                  : conversation,
+              ),
+            );
+            socketRef.current?.emit("conversation:read", {
+              conversationId: activeId,
+            });
+          }
         })
         .catch(() => {
           if (!cancelled) setError("Could not load messages.");
@@ -98,8 +110,19 @@ export default function Chat() {
     });
     socket.on("disconnect", () => setConnected(false));
     socket.on("message:new", (message) => {
-      setConversations((current) => [...current.map((conversation) => conversation.id === message.conversationId ? { ...conversation, lastMessage: message } : conversation)].sort((a, b) => new Date(b.lastMessage?.createdAt || b.createdAt).getTime() - new Date(a.lastMessage?.createdAt || a.createdAt).getTime()));
-      if (message.conversationId === activeIdRef.current) {
+      const isActiveConversation = message.conversationId === activeIdRef.current;
+      const isOwnMessage = message.senderId === currentUser?.id;
+      setConversations((current) => [...current.map((conversation) => conversation.id === message.conversationId ? {
+        ...conversation,
+        lastMessage: message,
+        unreadCount: isOwnMessage || isActiveConversation
+          ? 0
+          : (conversation.unreadCount || 0) + 1,
+      } : conversation)].sort((a, b) => new Date(b.lastMessage?.createdAt || b.createdAt).getTime() - new Date(a.lastMessage?.createdAt || a.createdAt).getTime()));
+      if (isActiveConversation) {
+        if (!isOwnMessage) {
+          socket.emit("conversation:read", { conversationId: message.conversationId });
+        }
         setMessages((current) => {
           const pendingIndex = message.clientMessageId
             ? current.findIndex((item) => item.clientMessageId === message.clientMessageId)
@@ -119,7 +142,7 @@ export default function Chat() {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [accessToken]);
+  }, [accessToken, currentUser?.id]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -145,7 +168,7 @@ export default function Chat() {
       createdAt: new Date().toISOString(),
     };
     setMessages((current) => [...current, optimisticMessage]);
-    setConversations((current) => [...current.map((conversation) => conversation.id === activeId ? { ...conversation, lastMessage: optimisticMessage } : conversation)].sort((a, b) => new Date(b.lastMessage?.createdAt || b.createdAt).getTime() - new Date(a.lastMessage?.createdAt || a.createdAt).getTime()));
+    setConversations((current) => [...current.map((conversation) => conversation.id === activeId ? { ...conversation, lastMessage: optimisticMessage, unreadCount: 0 } : conversation)].sort((a, b) => new Date(b.lastMessage?.createdAt || b.createdAt).getTime() - new Date(a.lastMessage?.createdAt || a.createdAt).getTime()));
     socketRef.current.emit("message:send", { conversationId: activeId, content, clientMessageId }, (response) => {
       if (!response?.ok) {
         setMessages((current) => current.filter((message) => message.clientMessageId !== clientMessageId));
