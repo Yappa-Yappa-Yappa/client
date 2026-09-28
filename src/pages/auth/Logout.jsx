@@ -104,22 +104,22 @@ export default function Logout() {
       {/* Centered Modal Overlay via React Portal */}
       {isLogoutConfirmOpen &&
         createPortal(
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="w-full max-w-sm rounded-2xl bg-neutral-900 border border-neutral-800 p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm dark:bg-black/80">
+            <div className="w-full max-w-sm space-y-4 rounded-2xl border border-black/10 bg-white p-6 text-neutral-900 shadow-2xl animate-in fade-in zoom-in-95 duration-150 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-bold text-neutral-100">
+                <h3 className="text-base font-bold dark:text-neutral-100">
                   Log Out
                 </h3>
                 <button
                   onClick={() => setIsLogoutConfirmOpen(false)}
                   disabled={isLoggingOut}
-                  className="p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                  className="rounded-lg p-1 text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <p className="text-xs text-neutral-400 leading-relaxed">
+              <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
                 Are you sure you want to log out of your account?
               </p>
 
@@ -128,7 +128,7 @@ export default function Logout() {
                   type="button"
                   onClick={() => setIsLogoutConfirmOpen(false)}
                   disabled={isLoggingOut}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-neutral-800 transition-colors"
+                  className="rounded-xl px-4 py-2 text-xs font-semibold text-neutral-700 transition-colors hover:bg-black/5 dark:text-neutral-300 dark:hover:bg-neutral-800"
                 >
                   Cancel
                 </button>

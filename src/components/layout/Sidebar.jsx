@@ -149,12 +149,12 @@ export default function Sidebar() {
                 {item.icon}
                 <span>{item.label}</span>
                 {item.label === "Notification" && unreadCount > 0 && (
-                  <span className="ml-auto min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-center text-[10px] font-bold leading-none text-white">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
                 {item.label === "Yap" && chatUnreadCount > 0 && (
-                  <span className="ml-auto min-w-5 rounded-full bg-indigo-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1.5 text-center text-[10px] font-bold leading-none text-white">
                     {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
                   </span>
                 )}
@@ -189,12 +189,12 @@ export default function Sidebar() {
             <span className="relative">
               <Icon className="h-5 w-5" />
               {label === "Alerts" && unreadCount > 0 && (
-                <span className="absolute -right-2 -top-2 min-w-4 rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold text-white">
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold leading-none text-white">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
               {label === "Chat" && chatUnreadCount > 0 && (
-                <span className="absolute -right-2 -top-2 min-w-4 rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold text-white">
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold leading-none text-white">
                   {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
                 </span>
               )}
@@ -205,13 +205,14 @@ export default function Sidebar() {
 
         <div className="relative flex min-w-0 flex-col items-center">
           {moreOpen && (
-            <div className="absolute bottom-14 right-1 min-w-40 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+            <div className="absolute bottom-16 right-1 min-w-40 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
               {[
                 {
                   icon: Users,
                   label: "Yappers",
                   path: `/friend/${user.username}/following`,
                 },
+                { icon: Star, label: "Favorite", path: "/favorite" },
                 { icon: History, label: "History", path: "/history" },
                 { icon: TrendingUp, label: "Trending", path: "/trend" },
               ].map(({ icon: Icon, label, path }) => (
