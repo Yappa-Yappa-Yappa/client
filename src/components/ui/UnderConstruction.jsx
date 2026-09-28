@@ -8,8 +8,16 @@ export default function UnderConstruction() {
         <div className="pointer-events-none absolute -bottom-24 -left-20 h-52 w-52 rounded-full bg-fuchsia-400/15 blur-3xl dark:bg-fuchsia-500/15" />
 
         <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/25 dark:from-indigo-400 dark:to-violet-500">
-          <Construction className="h-10 w-10" strokeWidth={1.8} aria-hidden="true" />
-          <Sparkles className="absolute -right-2 -top-2 h-6 w-6 rotate-12 text-fuchsia-400 dark:text-fuchsia-300" strokeWidth={2.2} aria-hidden="true" />
+          <Construction
+            className="h-10 w-10"
+            strokeWidth={1.8}
+            aria-hidden="true"
+          />
+          <Sparkles
+            className="absolute -right-2 -top-2 h-6 w-6 rotate-12 text-fuchsia-400 dark:text-fuchsia-300"
+            strokeWidth={2.2}
+            aria-hidden="true"
+          />
         </div>
 
         <div className="relative mt-7">
@@ -22,6 +30,9 @@ export default function UnderConstruction() {
           <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-neutral-600 dark:text-neutral-400 sm:text-base">
             Our tiny team is still negotiating with the last div. Check back
             soon before the CSS starts another meeting.
+            <br />
+            I'm doing this alone and I'm getting not paid,{" "}
+            <span className="text-xs text-emerald-600">Fuck you</span>
           </p>
         </div>
       </div>

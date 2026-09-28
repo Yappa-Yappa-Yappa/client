@@ -19,6 +19,8 @@ export default function MainLayout() {
         return "Yaps & Messages";
       case "/friend":
         return "Community Yappers";
+      case "/favorite":
+        return "Favorites Yaps";
       case "/history":
         return "Activity History";
       case "/trend":

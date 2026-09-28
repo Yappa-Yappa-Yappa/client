@@ -17,6 +17,7 @@ import Profile from "./pages/Profile";
 import Notification from "./pages/Notification";
 import PostDetail from "./pages/PostDetail";
 import NotFound from "./errors/NotFound";
+import Favorite from "./pages/Favorite";
 
 export default function App() {
   return (
@@ -54,6 +55,7 @@ export default function App() {
         <Route path="friend/:username/following" element={<Friend />} />
         <Route path="history" element={<History />} />
         <Route path="trend" element={<Trending />} />
+        <Route path="favorite" element={<Favorite />} />
 
         {/* Profile */}
         <Route path="profile/:username" element={<Profile />} />

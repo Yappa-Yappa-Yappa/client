@@ -5,6 +5,7 @@ import {
   MessageCircle,
   MoreHorizontal,
   Search,
+  Star,
   TrendingUp,
   User,
   Users,
@@ -84,6 +85,11 @@ export default function Sidebar() {
       path: `/friend/${user.username}/following`,
     },
     {
+      icon: <Star className="w-6 h-6 shrink-0" />,
+      label: "Favorite",
+      path: "/favorite",
+    },
+    {
       icon: <History className="w-6 h-6 shrink-0" />,
       label: "History",
       path: "/history",
@@ -109,56 +115,56 @@ export default function Sidebar() {
       /* Dark Mode */
       dark:bg-black/40 dark:border-r dark:border-white/10 dark:text-neutral-100
       backdrop-blur-xl"
-    >
-      {/* Ambient Lighting Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-36 bg-indigo-500/10 dark:bg-indigo-600/20 rounded-full blur-[70px] pointer-events-none" />
+      >
+        {/* Ambient Lighting Glows */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-36 bg-indigo-500/10 dark:bg-indigo-600/20 rounded-full blur-[70px] pointer-events-none" />
 
-      {/* Brand Header */}
-      <div className="px-3 mb-8 relative z-10">
-        <h1 className="text-2xl font-lacquer tracking-wide text-indigo-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-neutral-200 dark:to-indigo-300">
-          Yappa Yappa
-        </h1>
-      </div>
+        {/* Brand Header */}
+        <div className="px-3 mb-8 relative z-10">
+          <h1 className="text-2xl font-lacquer tracking-wide text-indigo-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-neutral-200 dark:to-indigo-300">
+            Yappa Yappa
+          </h1>
+        </div>
 
-      {/* Navigation Links */}
-      <nav className="flex flex-col gap-1.5 px-1 relative z-10">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `group px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-between ${
-                isActive
-                  ? /* Active State */
-                    "bg-indigo-600/10 text-indigo-600 border border-indigo-500/20 font-semibold shadow-sm " +
-                    "dark:bg-white/[0.08] dark:text-white dark:border-white/15 dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-md"
-                  : /* Inactive Hover State */
-                    "text-neutral-600 hover:text-black hover:bg-black/5 " +
-                    "dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/[0.04] border border-transparent"
-              }`
-            }
-          >
-            {/* Group icon and text together */}
-            <div className="flex items-center gap-3">
-              {item.icon}
-              <span>{item.label}</span>
-              {item.label === "Notification" && unreadCount > 0 && (
-                <span className="ml-auto min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-              {item.label === "Yap" && chatUnreadCount > 0 && (
-                <span className="ml-auto min-w-5 rounded-full bg-indigo-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
-                  {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
-                </span>
-              )}
-            </div>
+        {/* Navigation Links */}
+        <nav className="flex flex-col gap-1.5 px-1 relative z-10">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `group px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-between ${
+                  isActive
+                    ? /* Active State */
+                      "bg-indigo-600/10 text-indigo-600 border border-indigo-500/20 font-semibold shadow-sm " +
+                      "dark:bg-white/[0.08] dark:text-white dark:border-white/15 dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-md"
+                    : /* Inactive Hover State */
+                      "text-neutral-600 hover:text-black hover:bg-black/5 " +
+                      "dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/[0.04] border border-transparent"
+                }`
+              }
+            >
+              {/* Group icon and text together */}
+              <div className="flex items-center gap-3">
+                {item.icon}
+                <span>{item.label}</span>
+                {item.label === "Notification" && unreadCount > 0 && (
+                  <span className="ml-auto min-w-5 rounded-full bg-rose-500 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+                {item.label === "Yap" && chatUnreadCount > 0 && (
+                  <span className="ml-auto min-w-5 rounded-full bg-indigo-600 px-1.5 py-0.5 text-center text-[10px] font-bold text-white">
+                    {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+                  </span>
+                )}
+              </div>
 
-            {/* Active Indicator Dot */}
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 opacity-0 group-[.active]:opacity-100 transition-opacity" />
-          </NavLink>
-        ))}
-      </nav>
+              {/* Active Indicator Dot */}
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 opacity-0 group-[.active]:opacity-100 transition-opacity" />
+            </NavLink>
+          ))}
+        </nav>
       </aside>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-6 border-t border-black/10 bg-white px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-neutral-950 md:hidden">
@@ -201,7 +207,11 @@ export default function Sidebar() {
           {moreOpen && (
             <div className="absolute bottom-14 right-1 min-w-40 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
               {[
-                { icon: Users, label: "Yappers", path: `/friend/${user.username}/following` },
+                {
+                  icon: Users,
+                  label: "Yappers",
+                  path: `/friend/${user.username}/following`,
+                },
                 { icon: History, label: "History", path: "/history" },
                 { icon: TrendingUp, label: "Trending", path: "/trend" },
               ].map(({ icon: Icon, label, path }) => (
