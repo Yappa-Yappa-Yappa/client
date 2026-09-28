@@ -400,21 +400,21 @@ export default function Profile() {
         )}
         <div className="flex items-center justify-start space-x-4 px-6">
           <p>
-            {profile._count?.followings ?? 0}{" "}
+            {profile._count?.followers ?? 0}{" "}
             <Link
               to={`/friend/${username}/following`}
               className="hover:underline text-neutral-400 text-xs dark:text-neutral-500"
             >
-              Followers
+              Following
             </Link>
           </p>
           <p>
-            {profile._count?.followers ?? 0}{" "}
+            {profile._count?.followings ?? 0}{" "}
             <Link
               to={`/friend/${username}/followers`}
               className="hover:underline text-neutral-400 text-xs dark:text-neutral-500"
             >
-              Following
+              Followers
             </Link>
           </p>
         </div>{" "}

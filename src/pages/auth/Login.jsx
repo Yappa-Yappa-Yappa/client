@@ -1,11 +1,19 @@
-import { useState } from "react";
-import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+} from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { requestOtp } from "../../api/auth";
+import { loginWithGoogle, requestOtp } from "../../api/auth";
 import { useAuth } from "../../hooks/useAuth";
 import AuthShell from "../../components/auth/AuthShell";
 
 export default function Login() {
+  const hasGoogleClientId = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -13,9 +21,70 @@ export default function Login() {
   const [isRequestingVerification, setIsRequestingVerification] =
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const googleButtonRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, setSession } = useAuth();
+
+  const handleGoogleCredential = useCallback(
+    async (response) => {
+      setError("");
+      setCanVerifyAccount(false);
+      setIsGoogleSubmitting(true);
+
+      try {
+        const result = await loginWithGoogle(response.credential);
+        setSession(result.data);
+        navigate("/", { replace: true });
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+            "Google could not sign you in. Please try again.",
+        );
+      } finally {
+        setIsGoogleSubmitting(false);
+      }
+    },
+    [navigate, setSession],
+  );
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const script = document.querySelector(
+      'script[src="https://accounts.google.com/gsi/client"]',
+    );
+
+    const renderGoogleButton = () => {
+      if (!clientId || !window.google || !googleButtonRef.current) return;
+
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleCredential,
+      });
+      googleButtonRef.current.innerHTML = "";
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        type: "icon",
+        theme: "filled_blue",
+        size: "large",
+        shape: "circle",
+
+        // Pill type (ugly af lmfao)
+        // theme: "outline",
+        // size: "large",
+        // shape: "pill",
+        // width: 360,
+      });
+    };
+
+    if (window.google) {
+      renderGoogleButton();
+    } else {
+      script?.addEventListener("load", renderGoogleButton, { once: true });
+    }
+
+    return () => script?.removeEventListener("load", renderGoogleButton);
+  }, [handleGoogleCredential]);
 
   const handleVerifyAccount = async () => {
     setError("");
@@ -148,6 +217,23 @@ export default function Login() {
           {!isSubmitting && <ArrowRight className="h-4 w-4" />}
         </button>
       </form>
+      {hasGoogleClientId && (
+        <>
+          <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+            <span className="h-px flex-1 bg-slate-200" />
+            <span>or continue with</span>
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+          <div className="relative flex min-h-10 justify-center">
+            <div ref={googleButtonRef} aria-label="Continue with Google" />
+            {isGoogleSubmitting && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-white/80 text-sm font-semibold text-slate-600">
+                <LoaderCircle className="animate-spin" />
+              </div>
+            )}
+          </div>
+        </>
+      )}
       <p className="mt-8 text-center text-sm text-slate-500">
         Don&apos;t have an account?{" "}
         <Link

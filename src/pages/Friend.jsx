@@ -27,6 +27,7 @@ export default function Friend() {
   const activeTab = location.pathname.endsWith("/followers")
     ? "followers"
     : "following";
+  const isViewingOwnProfile = username === currentUser?.username;
 
   const loadUsers = useCallback(async () => {
     if (!username) return;
@@ -263,9 +264,7 @@ export default function Friend() {
                       title={
                         followStates[user.id]
                           ? `Unfollow ${user.name || user.username || "user"}`
-                          : activeTab === "followers"
-                            ? `Follow back ${user.name || user.username || "user"}`
-                            : `Follow ${user.name || user.username || "user"}`
+                          : `${activeTab === "followers" && isViewingOwnProfile ? "Follow back" : "Follow"} ${user.name || user.username || "user"}`
                       }
                       className={`group shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-wait disabled:opacity-60 ${
                         followStates[user.id]
@@ -277,7 +276,7 @@ export default function Friend() {
                         ? "Updating..."
                         : followStates[user.id]
                           ? <><span className="group-hover:hidden">Following</span><span className="hidden group-hover:inline">Unfollow</span></>
-                          : activeTab === "followers"
+                          : activeTab === "followers" && isViewingOwnProfile
                             ? "Follow back"
                             : "Follow"}
                     </button>
