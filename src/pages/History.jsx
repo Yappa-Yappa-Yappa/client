@@ -1,5 +1,9 @@
-import React from "react";
+import UnderConstruction from "../components/ui/UnderConstruction";
 
 export default function History() {
-  return <div>History</div>;
+  return (
+    <div>
+      <UnderConstruction />
+    </div>
+  );
 }

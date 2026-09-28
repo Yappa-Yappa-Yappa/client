@@ -100,7 +100,19 @@ export default function Chat() {
     socket.on("message:new", (message) => {
       setConversations((current) => [...current.map((conversation) => conversation.id === message.conversationId ? { ...conversation, lastMessage: message } : conversation)].sort((a, b) => new Date(b.lastMessage?.createdAt || b.createdAt).getTime() - new Date(a.lastMessage?.createdAt || a.createdAt).getTime()));
       if (message.conversationId === activeIdRef.current) {
-        setMessages((current) => current.some((item) => item.id === message.id) ? current : [...current, message]);
+        setMessages((current) => {
+          const pendingIndex = message.clientMessageId
+            ? current.findIndex((item) => item.clientMessageId === message.clientMessageId)
+            : -1;
+          if (pendingIndex >= 0) {
+            const next = [...current];
+            next[pendingIndex] = message;
+            return next;
+          }
+          return current.some((item) => item.id === message.id)
+            ? current
+            : [...current, message];
+        });
       }
     });
     return () => {
@@ -123,8 +135,23 @@ export default function Chat() {
   const sendMessage = () => {
     const content = input.trim();
     if (!content || !activeId || !socketRef.current?.connected) return;
-    socketRef.current.emit("message:send", { conversationId: activeId, content }, (response) => {
-      if (!response?.ok) setError(response?.error || "Could not send message.");
+    const clientMessageId = globalThis.crypto?.randomUUID?.() || `local-${Date.now()}-${Math.random()}`;
+    const optimisticMessage = {
+      id: clientMessageId,
+      clientMessageId,
+      conversationId: activeId,
+      senderId: currentUser?.id,
+      content,
+      createdAt: new Date().toISOString(),
+    };
+    setMessages((current) => [...current, optimisticMessage]);
+    setConversations((current) => [...current.map((conversation) => conversation.id === activeId ? { ...conversation, lastMessage: optimisticMessage } : conversation)].sort((a, b) => new Date(b.lastMessage?.createdAt || b.createdAt).getTime() - new Date(a.lastMessage?.createdAt || a.createdAt).getTime()));
+    socketRef.current.emit("message:send", { conversationId: activeId, content, clientMessageId }, (response) => {
+      if (!response?.ok) {
+        setMessages((current) => current.filter((message) => message.clientMessageId !== clientMessageId));
+        loadConversations();
+        setError(response?.error || "Could not send message.");
+      }
     });
     setInput("");
   };

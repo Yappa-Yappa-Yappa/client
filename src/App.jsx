@@ -16,6 +16,7 @@ import Trending from "./pages/Trending";
 import Profile from "./pages/Profile";
 import Notification from "./pages/Notification";
 import PostDetail from "./pages/PostDetail";
+import NotFound from "./errors/NotFound";
 
 export default function App() {
   return (
@@ -57,6 +58,9 @@ export default function App() {
         {/* Profile */}
         <Route path="profile/:username" element={<Profile />} />
       </Route>
+
+      {/* Fallback for unknown public and protected URLs */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

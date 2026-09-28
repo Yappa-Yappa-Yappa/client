@@ -122,7 +122,7 @@ export default function Register() {
 
   return (
     <AuthShell
-      title={step === "otp" ? "Verify your email" : "Create your account"}
+      title={step === "otp" ? "Prove you're not a polite bot" : "Come join the yap"}
       description={
         step === "otp"
           ? "One last step and you’re ready to start yapping."

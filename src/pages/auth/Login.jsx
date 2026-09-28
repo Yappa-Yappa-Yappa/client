@@ -54,8 +54,8 @@ export default function Login() {
 
   return (
     <AuthShell
-      title="Welcome back"
-      description="Real yap, brighter tomorrows. Pick up where you left off on Yappa Yappa."
+      title="The yaps missed you"
+      description="Your account is still here, waiting patiently like a tab you forgot to close."
     >
       <div className="mb-8">
         <p className="mb-3 text-sm font-semibold text-indigo-600">
