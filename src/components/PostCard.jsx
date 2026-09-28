@@ -54,7 +54,8 @@ export default function PostCard({
   const postId = post._id || post.id;
   const authorId = post.userId || post.user?.id || post.authorId;
   const isOwnPost = Boolean(currentUser?.id && authorId === currentUser.id);
-  const authorName = post.user?.name || post.authorName || post.author || "Yapper";
+  const authorName =
+    post.user?.name || post.authorName || post.author || "Yapper";
   const avatarUrl = post.user?.imageUrl;
   const username =
     post.user?.username ||
@@ -100,7 +101,11 @@ export default function PostCard({
         >
           <div className="w-10 h-10 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={authorName} className="h-full w-full object-cover" />
+              <img
+                src={avatarUrl}
+                alt={authorName}
+                className="h-full w-full object-cover"
+              />
             ) : (
               authorName[0]?.toUpperCase()
             )}
@@ -239,10 +244,17 @@ export default function PostCard({
               : "hover:text-rose-500 dark:hover:text-rose-400"
           } disabled:opacity-50`}
         >
-          <Heart className={`w-4 h-4 ${post.isLiked ? "fill-current text-rose-500" : ""}`} />
+          <Heart
+            className={`w-4 h-4 ${post.isLiked ? "fill-current text-rose-500" : ""}`}
+          />
           <span>{post._count?.likes ?? post.likes ?? 0}</span>
         </button>
-        <button onClick={() => navigate(`/post/${postId}`, { state: { from: "/home" } })} className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+        <button
+          onClick={() =>
+            navigate(`/post/${postId}`, { state: { from: "/home" } })
+          }
+          className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
           <MessageSquare className="w-4 h-4" />
           <span>{post._count?.comments || post.comments || 0}</span>
         </button>
@@ -254,7 +266,9 @@ export default function PostCard({
           className="ml-auto flex items-center gap-2 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
         >
           <Share2 className="w-4 h-4" />
-          {shareStatus && <span className="text-[11px] font-medium">{shareStatus}</span>}
+          {shareStatus && (
+            <span className="text-[11px] font-medium">{shareStatus}</span>
+          )}
         </button>
       </div>
     </article>

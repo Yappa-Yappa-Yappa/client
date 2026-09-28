@@ -38,6 +38,24 @@ const formatRelativeTime = (dateValue) => {
 
 export default function Feed() {
   const navigate = useNavigate();
+
+  const openPost = (postId) => {
+    navigate(`/post/${postId}`, { state: { from: "/home" } });
+  };
+
+  const handlePostClick = (event, postId) => {
+    // Leave buttons, links, inputs, and image interactions to their own handlers.
+    if (event.target.closest("button, a, input, textarea, select")) return;
+    openPost(postId);
+  };
+
+  const handlePostKeyDown = (event, postId) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openPost(postId);
+  };
   const [postText, setPostText] = useState("");
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -483,7 +501,11 @@ export default function Feed() {
           return (
             <article
               key={postId}
-              className="p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200 shadow-sm"
+              onClick={(event) => handlePostClick(event, postId)}
+              onKeyDown={(event) => handlePostKeyDown(event, postId)}
+              tabIndex={0}
+              role="link"
+              className="cursor-pointer p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 transition-shadow duration-200 shadow-sm hover:shadow-md"
             >
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-3">
@@ -606,7 +628,10 @@ export default function Feed() {
                   {postImages.map((src, idx) => (
                     <div
                       key={idx}
-                      onClick={() => openModal(postImages, idx)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openModal(postImages, idx);
+                      }}
                       className={`cursor-pointer overflow-hidden group bg-neutral-100 dark:bg-neutral-950 transition-colors ${
                         postImages.length === 1
                           ? ""
@@ -651,9 +676,7 @@ export default function Feed() {
                 </button>
 
                 <button
-                  onClick={() =>
-                    navigate(`/post/${postId}`, { state: { from: "/home" } })
-                  }
+                  onClick={() => openPost(postId)}
                   className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" />
