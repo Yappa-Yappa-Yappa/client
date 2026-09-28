@@ -122,7 +122,9 @@ export default function Register() {
 
   return (
     <AuthShell
-      title={step === "otp" ? "Prove you're not a polite bot" : "Come join the yap"}
+      title={
+        step === "otp" ? "Prove you're not a polite bot" : "Come join the yap"
+      }
       description={
         step === "otp"
           ? "One last step and you’re ready to start yapping."
@@ -171,6 +173,38 @@ export default function Register() {
               setShowPassword={setShowPassword}
               onChange={(value) => updateField("password", value)}
             />
+            <ul className="space-y-1 text-xs font-bold text-slate-500">
+              <li
+                className={
+                  formData.password.length >= 8 ? "text-emerald-600" : ""
+                }
+              >
+                ✓ At least 8 characters
+              </li>
+              <li
+                className={
+                  /[a-zA-Z]/.test(formData.password) ? "text-emerald-600" : ""
+                }
+              >
+                ✓ At least one letter
+              </li>
+              <li
+                className={
+                  /[0-9]/.test(formData.password) ? "text-emerald-600" : ""
+                }
+              >
+                ✓ At least one number
+              </li>
+              <li
+                className={
+                  /[^a-zA-Z0-9]/.test(formData.password)
+                    ? "text-emerald-600"
+                    : ""
+                }
+              >
+                ✓ At least one special character
+              </li>
+            </ul>
             <PasswordInput
               label="Confirm password"
               value={formData.confirmPassword}
