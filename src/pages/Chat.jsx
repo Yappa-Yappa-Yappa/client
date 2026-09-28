@@ -1,4 +1,13 @@
-import { ArrowDown, MessageCircle, PanelLeft, RefreshCw, Send } from "lucide-react";
+import {
+  ArrowDown,
+  Check,
+  CheckCheck,
+  LoaderCircle,
+  MessageCircle,
+  PanelLeft,
+  RefreshCw,
+  Send,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
@@ -8,6 +17,13 @@ import { useAuth } from "../hooks/useAuth";
 const socketUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/api\/?$/, "");
 
 const formatTime = (value) => new Date(value).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+const getMessageStatus = (message) => {
+  if (message.status === "sending") return "sending";
+  if (message.seenAt) return "seen";
+  if (message.deliveredAt) return "delivered";
+  return "sent";
+};
 
 export default function Chat() {
   const { accessToken, user: currentUser } = useAuth();
@@ -109,9 +125,36 @@ export default function Chat() {
       if (activeIdRef.current) socket.emit("conversation:join", { conversationId: activeIdRef.current });
     });
     socket.on("disconnect", () => setConnected(false));
+    socket.on("message:status", ({ messageId, status, deliveredAt, seenAt }) => {
+      setMessages((current) =>
+        current.map((message) =>
+          message.id === messageId
+            ? { ...message, status, deliveredAt, seenAt }
+            : message,
+        ),
+      );
+      setConversations((current) =>
+        current.map((conversation) =>
+          conversation.lastMessage?.id === messageId
+            ? {
+                ...conversation,
+                lastMessage: {
+                  ...conversation.lastMessage,
+                  status,
+                  deliveredAt,
+                  seenAt,
+                },
+              }
+            : conversation,
+        ),
+      );
+    });
     socket.on("message:new", (message) => {
       const isActiveConversation = message.conversationId === activeIdRef.current;
       const isOwnMessage = message.senderId === currentUser?.id;
+      if (!isOwnMessage) {
+        socket.emit("message:delivered", { messageId: message.id });
+      }
       setConversations((current) => [...current.map((conversation) => conversation.id === message.conversationId ? {
         ...conversation,
         lastMessage: message,
@@ -166,16 +209,34 @@ export default function Chat() {
       senderId: currentUser?.id,
       content,
       createdAt: new Date().toISOString(),
+      status: "sending",
     };
     setMessages((current) => [...current, optimisticMessage]);
     setConversations((current) => [...current.map((conversation) => conversation.id === activeId ? { ...conversation, lastMessage: optimisticMessage, unreadCount: 0 } : conversation)].sort((a, b) => new Date(b.lastMessage?.createdAt || b.createdAt).getTime() - new Date(a.lastMessage?.createdAt || a.createdAt).getTime()));
-    socketRef.current.emit("message:send", { conversationId: activeId, content, clientMessageId }, (response) => {
-      if (!response?.ok) {
-        setMessages((current) => current.filter((message) => message.clientMessageId !== clientMessageId));
-        loadConversations();
-        setError(response?.error || "Could not send message.");
-      }
-    });
+    socketRef.current.emit(
+      "message:send",
+      { conversationId: activeId, content, clientMessageId },
+      (response) => {
+        if (!response?.ok) {
+          setMessages((current) =>
+            current.filter((message) => message.clientMessageId !== clientMessageId),
+          );
+          loadConversations();
+          setError(response?.error || "Could not send message.");
+          return;
+        }
+
+        if (response.message) {
+          setMessages((current) =>
+            current.map((message) =>
+              message.clientMessageId === clientMessageId
+                ? { ...response.message, clientMessageId, status: "sent" }
+                : message,
+            ),
+          );
+        }
+      },
+    );
     setInput("");
   };
 
@@ -186,7 +247,7 @@ export default function Chat() {
         <div className="max-h-full overflow-y-auto p-2">{loading ? <p className="p-3 text-sm text-neutral-500">Loading conversations…</p> : conversations.length === 0 ? <p className="p-3 text-sm text-neutral-500">Open someone’s profile to start a chat.</p> : conversations.map((conversation) => <button key={conversation.id} onClick={() => selectConversation(conversation.id)} className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${activeId === conversation.id ? "bg-indigo-500/10" : "hover:bg-black/5 dark:hover:bg-white/5"}`}><div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600 dark:text-indigo-300">{conversation.participant?.imageUrl ? <img src={conversation.participant.imageUrl} alt={conversation.participant.name} className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center">{(conversation.participant?.name || "Y")[0]}</span>}</div><span className="min-w-0 flex-1"><strong className="block truncate text-sm">{conversation.participant?.name || "Yapper"}</strong><span className="block truncate text-xs text-neutral-500">{conversation.lastMessage?.content || "No messages yet"}</span></span></button>)}</div>
       </aside>
       <section className="flex min-h-0 min-w-0 flex-1 flex-col">
-        {!activeConversation ? <div className="flex flex-1 flex-col items-center justify-center p-6 text-center"><MessageCircle className="h-10 w-10 text-indigo-500/60" /><h2 className="mt-3 font-semibold">Choose a conversation</h2><p className="mt-1 text-sm text-neutral-500">Start a conversation from someone’s profile.</p></div> : <><header className="flex items-center gap-3 border-b border-black/10 p-4 dark:border-neutral-800"><button onClick={() => setShowConversationList(true)} className="rounded-lg p-2 text-neutral-400 hover:bg-black/5 md:hidden" aria-label="Show conversations"><PanelLeft className="h-4 w-4" /></button><div><p className="font-bold">{activeConversation.participant?.name || "Yapper"}</p><p className="text-xs text-neutral-500">@{activeConversation.participant?.username || "yapper"}</p></div></header><div className="flex-1 overflow-y-auto p-4">{messagesLoading ? <p className="text-sm text-neutral-500">Loading messages…</p> : messages.length === 0 ? <p className="py-10 text-center text-sm text-neutral-500">No messages yet. Say hello.</p> : messages.map((message) => <div key={message.id} className={`mb-3 flex ${message.senderId === currentUser?.id ? "justify-end" : "justify-start"}`}><div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${message.senderId === currentUser?.id ? "bg-indigo-600 text-white" : "bg-neutral-100 dark:bg-neutral-800"}`}><p className="whitespace-pre-wrap">{message.content}</p><span className="mt-1 block text-[10px] opacity-60">{formatTime(message.createdAt)}</span></div></div>)}<div ref={bottomRef} /></div><form onSubmit={(event) => { event.preventDefault(); sendMessage(); }} className="flex gap-2 border-t border-black/10 p-3 dark:border-neutral-800"><input value={input} onChange={(event) => setInput(event.target.value)} maxLength={2000} placeholder={connected ? "Type a message…" : "Reconnecting…"} disabled={!connected} className="min-w-0 flex-1 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700" /><button type="submit" disabled={!input.trim() || !connected} className="rounded-xl bg-indigo-600 p-2.5 text-white disabled:opacity-50" aria-label="Send message"><Send className="h-4 w-4" /></button></form></>}
+        {!activeConversation ? <div className="flex flex-1 flex-col items-center justify-center p-6 text-center"><MessageCircle className="h-10 w-10 text-indigo-500/60" /><h2 className="mt-3 font-semibold">Choose a conversation</h2><p className="mt-1 text-sm text-neutral-500">Start a conversation from someone’s profile.</p></div> : <><header className="flex items-center gap-3 border-b border-black/10 p-4 dark:border-neutral-800"><button onClick={() => setShowConversationList(true)} className="rounded-lg p-2 text-neutral-400 hover:bg-black/5 md:hidden" aria-label="Show conversations"><PanelLeft className="h-4 w-4" /></button><div><p className="font-bold">{activeConversation.participant?.name || "Yapper"}</p><p className="text-xs text-neutral-500">@{activeConversation.participant?.username || "yapper"}</p></div></header><div className="flex-1 overflow-y-auto p-4">{messagesLoading ? <p className="text-sm text-neutral-500">Loading messages…</p> : messages.length === 0 ? <p className="py-10 text-center text-sm text-neutral-500">No messages yet. Say hello.</p> : messages.map((message) => { const isOwnMessage = message.senderId === currentUser?.id; const status = getMessageStatus(message); return <div key={message.id} className={`mb-3 flex ${isOwnMessage ? "justify-end" : "justify-start"}`}><div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${isOwnMessage ? "bg-indigo-600 text-white" : "bg-neutral-100 dark:bg-neutral-800"}`}><p className="whitespace-pre-wrap">{message.content}</p><span className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-60"><span>{formatTime(message.createdAt)}</span>{isOwnMessage && (status === "sending" ? <LoaderCircle className="h-3 w-3 animate-spin" aria-label="Sending" /> : status === "seen" ? <CheckCheck className="h-3 w-3 text-indigo-200" aria-label="Seen" /> : status === "delivered" ? <CheckCheck className="h-3 w-3" aria-label="Delivered" /> : <Check className="h-3 w-3" aria-label="Sent" />)}</span></div></div>; })}<div ref={bottomRef} /></div><form onSubmit={(event) => { event.preventDefault(); sendMessage(); }} className="flex gap-2 border-t border-black/10 p-3 dark:border-neutral-800"><input value={input} onChange={(event) => setInput(event.target.value)} maxLength={2000} placeholder={connected ? "Type a message…" : "Reconnecting…"} disabled={!connected} className="min-w-0 flex-1 rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700" /><button type="submit" disabled={!input.trim() || !connected} className="rounded-xl bg-indigo-600 p-2.5 text-white disabled:opacity-50" aria-label="Send message"><Send className="h-4 w-4" /></button></form></>}
         {error && <div className="flex items-center justify-between bg-rose-500/10 px-4 py-2 text-xs text-rose-500"><span>{error}</span><button onClick={() => setError("")}><ArrowDown className="h-3.5 w-3.5 rotate-45" /></button></div>}
       </section>
     </div>
