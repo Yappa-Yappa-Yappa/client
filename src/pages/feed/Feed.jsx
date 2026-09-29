@@ -13,6 +13,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChartColumn,
 } from "lucide-react";
 import { deleteFeed, editFeed, getFeeds, postFeed } from "../../api/post";
 import { getLikesByPost, likePost, unlikePost } from "../../api/like";
@@ -681,6 +682,11 @@ export default function Feed() {
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>{post._count?.comments || post.comments || 0}</span>
+                </button>
+
+                <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  <ChartColumn className="w-4 h-4" />
+                  <span>1M</span>
                 </button>
 
                 <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors ml-auto">

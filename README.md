@@ -1,102 +1,96 @@
-# React 19 + Vite + Tailwind CSS v3
+# Yappa Client
 
-A lightweight starter template using React 19, Vite, and Tailwind CSS v3.
+The Yappa frontend is a React 19 single-page application powered by Vite, Tailwind CSS, and React Router.
 
 ## Requirements
 
-- Node.js 18+
-- npm (or yarn, pnpm)
+- Node.js 18 or newer
+- The Yappa server running locally or at a deployed API URL
 
-## Clone and install
+## Setup
+
+Install dependencies from this folder:
 
 ```bash
-git clone <YOUR_REPO_URL>
-cd REACT_STRUCTURE
 npm install
 ```
 
-## Run development server
+Create a local environment file:
+
+```bash
+cp .env.example .env
+```
+
+On Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Configure the values in `.env`:
+
+```env
+VITE_BACKEND_URL=http://localhost:6969
+VITE_GOOGLE_CLIENT_ID=your-google-web-client-id.apps.googleusercontent.com
+```
+
+Only variables prefixed with `VITE_` are available to browser code. Never place private keys or client secrets in this file.
+
+## Development
+
+Start the Vite development server:
 
 ```bash
 npm run dev
 ```
 
-## Build for production
+Vite will print the local frontend URL, usually `http://localhost:5173`.
+
+## Production build
 
 ```bash
 npm run build
-```
-
-## Preview build
-
-```bash
 npm run preview
 ```
 
-## Start Your Own Project
+The build output is generated in `dist/`.
 
-1. Remove the current Git history:
+## Available scripts
 
-```bash
-rm -rf .git
-```
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Build the frontend for production |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
 
-2. Initialize a new repository and push to your remote:
+## Source structure
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin <YOUR_NEW_REPO_URL>
-git push -u origin main
-```
-
-## Recommended (Better Way)
-
-Use GitHub's **"Use this template"** feature to create a new repository from this project. This creates a clean repo without preserving this project's commit history.
-
-## Project structure
-
-```
+```text
 src/
-├─ api/                   # axios calls, endpoints
-├─ assets/
-│  ├─ fonts/              # custom typefaces
-│  ├─ icons/              # svg icons
-│  └─ images/             # static images
-├─ components/
-│  ├─ layout/             # navbar, sidebar, footer
-│  ├─ sections/           # page-level sections
-│  ├─ ui/                 # buttons, inputs, modals
-│  └─ ProtectedRoute.jsx  # auth guard
-├─ contexts/              # global state, auth, theme
-├─ errors/                # error boundaries, 404
-├─ hooks/                 # custom react hooks
-├─ pages/                 # route-level views
-├─ utils/                 # helper functions
-├─ App.jsx                # routes definition
-└─ main.jsx               # app entry point
+├── api/         # HTTP API helpers
+├── assets/      # Fonts, icons, and static images
+├── components/  # Reusable UI and layout components
+├── contexts/    # Shared application state and theme
+├── errors/      # Error and fallback views
+├── hooks/       # Reusable React hooks
+├── pages/       # Route-level screens
+├── utils/       # Shared frontend helpers
+├── App.jsx      # Application routes
+└── main.jsx     # React entry point
 ```
 
-## Deployment note
+## Backend connection
 
-For Vercel static deployments, add this rewrite to `vercel.json`:
+The frontend uses `VITE_BACKEND_URL` for API requests. Start the backend separately from the `server/` folder:
 
-```json
-{
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-}
+```bash
+cd ../server
+npm run dev
 ```
 
-## Notes
+The backend also provides Socket.IO for real-time chat updates. Make sure the backend CORS configuration allows the frontend origin.
 
-- Tailwind is configured via PostCSS.
-- React Router v7 is used for client-side routing.
+## Google login
 
-## License
-
-MIT
-
-## Author
-
-Mizu
+`VITE_GOOGLE_CLIENT_ID` is a public Google OAuth client ID and may be used by the frontend. Google client secrets must remain in the backend environment only.
