@@ -241,7 +241,9 @@ export default function Profile() {
     setIsMessageLoading(true);
     try {
       const response = await openDirectConversation(profile.id);
-      navigate("/chat", { state: { conversationId: response.data.id } });
+      navigate("/chat", {
+        state: { conversationId: response.data.id, chatRoom: true },
+      });
     } catch (err) {
       console.error("Failed to open conversation:", err);
     } finally {

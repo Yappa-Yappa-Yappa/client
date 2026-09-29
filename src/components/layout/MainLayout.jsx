@@ -38,7 +38,9 @@ export default function MainLayout() {
       {/* Main Content Area with Contextual Sticky Header */}
       <div
         id="main-scroll-container"
-        className={`flex h-full min-w-0 flex-1 flex-col pb-16 md:pb-0 ${
+        className={`flex h-full min-w-0 flex-1 flex-col ${
+          location.pathname === "/chat" ? "pb-0" : "pb-16"
+        } md:pb-0 ${
           location.pathname === "/chat" ? "overflow-hidden" : "overflow-y-auto"
         }`}
       >
@@ -57,7 +59,7 @@ export default function MainLayout() {
 
         {/* Page Content Rendered via Outlet */}
         <main
-          className={`flex-1 min-h-0 w-full ${
+          className={`relative z-0 flex-1 min-h-0 w-full ${
             location.pathname === "/chat"
               ? "max-w-none p-0"
               : "mx-auto max-w-4xl p-4 sm:p-6 md:pb-6"
@@ -66,7 +68,7 @@ export default function MainLayout() {
           <Outlet />
           {location.pathname !== "/chat" && (
             <div
-              className="h-[calc(6rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
+              className="h-[calc(7rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
               aria-hidden="true"
             />
           )}

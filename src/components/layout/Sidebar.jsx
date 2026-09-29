@@ -12,19 +12,42 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useRef } from "react";
 import { io } from "socket.io-client";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { getUnreadConversationCount } from "../../api/conversation";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
 
 const socketUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/api\/?$/, "");
+const mobileGlassClass =
+  "border border-white/60 bg-white/55 backdrop-blur-2xl backdrop-saturate-150 dark:border-white/20 dark:bg-neutral-900/55";
 
 export default function Sidebar() {
+  const location = useLocation();
   const { user, accessToken } = useAuth();
   const { unreadCount } = useNotifications();
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
   const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef(null);
+  const isMobileChatRoom =
+    location.pathname === "/chat" && location.state?.chatRoom === true;
+  const moreRouteActive =
+    location.pathname.startsWith("/friend/") ||
+    ["/favorite", "/history", "/trend"].includes(location.pathname);
+
+  useEffect(() => {
+    if (!moreOpen) return undefined;
+
+    const handleOutsideTap = (event) => {
+      if (!moreRef.current?.contains(event.target)) {
+        setMoreOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleOutsideTap);
+    return () => document.removeEventListener("pointerdown", handleOutsideTap);
+  }, [moreOpen]);
 
   useEffect(() => {
     if (!accessToken) return undefined;
@@ -167,82 +190,105 @@ export default function Sidebar() {
         </nav>
       </aside>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-6 border-t border-black/10 bg-white px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-neutral-950 md:hidden">
-        {[
-          { icon: Home, label: "Home", path: "/home" },
-          { icon: Search, label: "Search", path: "/search" },
-          { icon: MessageCircle, label: "Chat", path: "/chat" },
-          { icon: Bell, label: "Alerts", path: "/notification" },
-          { icon: User, label: "Profile", path: `/profile/${user.username}` },
-        ].map(({ icon: Icon, label, path }) => (
-          <NavLink
-            key={label}
-            to={path}
-            className={({ isActive }) =>
-              `relative flex min-w-0 flex-col items-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
-                isActive
-                  ? "text-indigo-600 dark:text-indigo-400"
-                  : "text-neutral-500 dark:text-neutral-400"
-              }`
-            }
-          >
-            <span className="relative">
-              <Icon className="h-5 w-5" />
-              {label === "Alerts" && unreadCount > 0 && (
-                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold leading-none text-white">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-              {label === "Chat" && chatUnreadCount > 0 && (
-                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold leading-none text-white">
-                  {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
-                </span>
-              )}
-            </span>
-            <span className="truncate">{label}</span>
-          </NavLink>
-        ))}
+      {!isMobileChatRoom && (
+        <div
+          ref={moreRef}
+          className="pointer-events-none fixed inset-x-3 bottom-3 z-50 md:hidden"
+        >
+        <nav
+          className={`relative pointer-events-auto grid min-h-16 grid-cols-6 overflow-visible rounded-full px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_10px_30px_rgba(0,0,0,0.14)] ${mobileGlassClass}`}
+        >
+          {[
+            { icon: Home, label: "Home", path: "/home" },
+            { icon: Search, label: "Search", path: "/search" },
+            { icon: MessageCircle, label: "Chat", path: "/chat" },
+            { icon: Bell, label: "Alerts", path: "/notification" },
+            { icon: User, label: "Profile", path: `/profile/${user.username}` },
+          ].map(({ icon: Icon, label, path }) => (
+            <NavLink
+              key={label}
+              to={path}
+              className={({ isActive }) =>
+                `group relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
+                  isActive
+                    ? "active text-indigo-600 dark:text-indigo-400"
+                    : "text-neutral-500 dark:text-neutral-400"
+                }`
+              }
+            >
+              <span className="relative">
+                <Icon className="h-5 w-5 transition-transform duration-200 group-[.active]:scale-125" />
+                {label === "Alerts" && unreadCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold leading-none text-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+                {label === "Chat" && chatUnreadCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold leading-none text-white">
+                    {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
+                  </span>
+                )}
+              </span>
+              <span className="hidden duration-200 truncate group-[.active]:block">
+                {label}
+              </span>
+            </NavLink>
+          ))}
 
-        <div className="relative flex min-w-0 flex-col items-center">
-          {moreOpen && (
-            <div className="absolute bottom-16 right-1 min-w-40 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
-              {[
-                {
-                  icon: Users,
-                  label: "Yappers",
-                  path: `/friend/${user.username}/following`,
-                },
-                { icon: Star, label: "Favorite", path: "/favorite" },
-                { icon: History, label: "History", path: "/history" },
-                { icon: TrendingUp, label: "Trending", path: "/trend" },
-              ].map(({ icon: Icon, label, path }) => (
-                <NavLink
-                  key={label}
-                  to={path}
-                  onClick={() => setMoreOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </NavLink>
-              ))}
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => setMoreOpen((open) => !open)}
-            className={`flex w-full min-w-0 flex-col items-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
-              moreOpen
-                ? "text-indigo-600 dark:text-indigo-400"
-                : "text-neutral-500 dark:text-neutral-400"
-            }`}
-            aria-label="More navigation options"
-          >
-            <MoreHorizontal className="h-5 w-5" />
-            <span>More</span>
-          </button>
+          <div className="relative flex min-w-0 flex-col items-center justify-center">
+            <button
+              type="button"
+              onClick={() => setMoreOpen((open) => !open)}
+              className={`group flex w-full min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
+                moreOpen || moreRouteActive
+                  ? "active text-indigo-600 dark:text-indigo-400"
+                  : "text-neutral-500 dark:text-neutral-400"
+              }`}
+              aria-label="More navigation options"
+            >
+              <MoreHorizontal
+                className={`h-5 w-5 transition-transform duration-200 ${
+                  moreOpen || moreRouteActive ? "scale-125" : ""
+                }`}
+              />
+              <span className={moreOpen || moreRouteActive ? "" : "sr-only"}>
+                More
+              </span>
+            </button>
+          </div>
+        </nav>
+
+        <div
+          aria-hidden={!moreOpen}
+          className={`absolute bottom-[4.5rem] right-1 min-w-40 origin-bottom-right overflow-hidden rounded-2xl p-1 shadow-[0_10px_30px_rgba(0,0,0,0.14)] transition-[opacity,transform] duration-200 ease-out ${mobileGlassClass} ${
+            moreOpen
+              ? "pointer-events-auto scale-100 opacity-100"
+              : "pointer-events-none scale-95 opacity-0"
+          }`}
+        >
+          {[
+            {
+              icon: Users,
+              label: "Yappers",
+              path: `/friend/${user.username}/following`,
+            },
+            { icon: Star, label: "Favorite", path: "/favorite" },
+            { icon: History, label: "History", path: "/history" },
+            { icon: TrendingUp, label: "Trending", path: "/trend" },
+          ].map(({ icon: Icon, label, path }) => (
+            <NavLink
+              key={label}
+              to={path}
+              onClick={() => setMoreOpen(false)}
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </NavLink>
+          ))}
         </div>
-      </nav>
+        </div>
+      )}
     </>
   );
 }
