@@ -10,7 +10,7 @@ import {
   Share2,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import LinkifiedText from "./LinkifiedText";
@@ -95,6 +95,23 @@ export default function PostCard({
     }
   };
 
+  useEffect(() => {
+    if (!openMenuPostId) return;
+
+    const handleOutsideMenuClick = (event) => {
+      if (
+        !event.target.closest("[data-post-menu]") &&
+        !event.target.closest("[data-post-menu-trigger]")
+      ) {
+        setOpenMenuPostId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideMenuClick);
+    return () =>
+      document.removeEventListener("mousedown", handleOutsideMenuClick);
+  }, [openMenuPostId, setOpenMenuPostId]);
+
   return (
     <article className="p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200 shadow-sm">
       <div className="flex items-center justify-between mb-2.5">
@@ -128,6 +145,7 @@ export default function PostCard({
             {formatRelativeTime(post.createdAt)}
           </span>
           <button
+            data-post-menu-trigger
             onClick={() =>
               setOpenMenuPostId((currentId) =>
                 currentId === postId ? null : postId,
@@ -140,7 +158,10 @@ export default function PostCard({
             <MoreVertical className="w-4 h-4" />
           </button>
           {openMenuPostId === postId && (
-            <div className="absolute right-0 top-8 z-10 min-w-36 overflow-hidden rounded-xl border border-black/10 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-xl">
+            <div
+              data-post-menu
+              className="absolute right-0 top-8 z-10 min-w-36 overflow-hidden rounded-xl border border-black/10 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-xl"
+            >
               {isOwnPost ? (
                 <>
                   <button

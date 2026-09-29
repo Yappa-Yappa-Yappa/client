@@ -4,7 +4,12 @@ export default function ImageLightbox({ images, currentIndex, onClose, onPreviou
   if (!images?.length) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
       <button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-white transition-colors"

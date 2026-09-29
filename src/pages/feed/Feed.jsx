@@ -97,6 +97,23 @@ export default function Feed() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeModal]);
 
+  useEffect(() => {
+    if (!openMenuPostId) return;
+
+    const handleOutsideMenuClick = (event) => {
+      if (
+        !event.target.closest("[data-post-menu]") &&
+        !event.target.closest("[data-post-menu-trigger]")
+      ) {
+        setOpenMenuPostId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideMenuClick);
+    return () =>
+      document.removeEventListener("mousedown", handleOutsideMenuClick);
+  }, [openMenuPostId]);
+
   const fetchPosts = useCallback(
     async (pageNum = 1) => {
       if (pageNum > 1 && loadingMoreRef.current) return;
@@ -579,6 +596,7 @@ export default function Feed() {
                     {formatRelativeTime(post.createdAt)}
                   </span>
                   <button
+                    data-post-menu-trigger
                     onClick={() =>
                       setOpenMenuPostId((currentId) =>
                         currentId === postId ? null : postId,
@@ -591,7 +609,10 @@ export default function Feed() {
                     <MoreVertical className="w-4 h-4" />
                   </button>
                   {openMenuPostId === postId && (
-                    <div className="absolute right-0 top-8 z-10 min-w-36 overflow-hidden rounded-xl border border-black/10 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-xl">
+                    <div
+                      data-post-menu
+                      className="absolute right-0 top-8 z-10 min-w-36 overflow-hidden rounded-xl border border-black/10 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-xl"
+                    >
                       {isOwnPost ? (
                         <>
                           <button
@@ -779,7 +800,12 @@ export default function Feed() {
 
       {/* Full Screen Image Modal */}
       {activeModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md transition-opacity">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md transition-opacity"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeModal();
+          }}
+        >
           <button
             onClick={closeModal}
             className="absolute top-4 right-4 p-2 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-white transition-colors"
