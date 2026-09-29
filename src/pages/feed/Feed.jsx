@@ -4,7 +4,6 @@ import {
   Send,
   Heart,
   MessageSquare,
-  Share2,
   Trash2,
   MoreVertical,
   Pencil,
@@ -14,6 +13,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ChartColumn,
+  Repeat2,
+  Share2,
+  Flag,
 } from "lucide-react";
 import { deleteFeed, editFeed, getFeeds, postFeed } from "../../api/post";
 import { getLikesByPost, likePost, unlikePost } from "../../api/like";
@@ -71,6 +73,7 @@ export default function Feed() {
   const [editText, setEditText] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [shareStatus, setShareStatus] = useState("");
 
   // Lightbox Modal State
   const [activeModal, setActiveModal] = useState({
@@ -164,6 +167,41 @@ export default function Feed() {
 
     const previews = updatedFiles.map((file) => URL.createObjectURL(file));
     setImagePreviews(previews);
+  };
+
+  const handleShare = async (sharedPost) => {
+    const sharedPostId = sharedPost._id || sharedPost.id;
+    const sharedAuthorName =
+      sharedPost.user?.name ||
+      sharedPost.authorName ||
+      sharedPost.author ||
+      "Yapper";
+
+    const shareUrl = `${window.location.origin}/post/${sharedPostId}`;
+    const shareData = {
+      title: `${sharedAuthorName}'s yap on Yappa Yappa`,
+      text:
+        sharedPost.content?.slice(0, 120) ||
+        "Check out this yap on Yappa Yappa.",
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        setShareStatus("Shared");
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareStatus("Link copied");
+      }
+      window.setTimeout(() => setShareStatus(""), 2200);
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        setShareStatus("Could not share");
+        console.error("Share failed:", error);
+      }
+      window.setTimeout(() => setShareStatus(""), 2200);
+    }
   };
 
   const handleRemoveImage = (index) => {
@@ -575,13 +613,27 @@ export default function Feed() {
                           </button>
                         </>
                       ) : (
-                        <button
-                          onClick={() => setOpenMenuPostId(null)}
-                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10"
-                        >
-                          <Bookmark className="w-3.5 h-3.5" />
-                          Save post
-                        </button>
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => handleShare(post)}
+                            aria-label="Share post"
+                            title={shareStatus || "Share post"}
+                            className="group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                          >
+                            <Share2 className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
+                            {shareStatus && (
+                              <span className="max-w-24 truncate text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">
+                                {shareStatus}
+                              </span>
+                            )}
+                            {!shareStatus && <span>Share post</span>}
+                          </button>
+                          <button className="group relative flex min-h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 active:scale-[.98] dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400">
+                            <Flag className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
+                            <span>Report post</span>
+                          </button>
+                        </div>
                       )}
                     </div>
                   )}
@@ -655,17 +707,27 @@ export default function Feed() {
                 </div>
               )}
 
-              <div className="flex items-center gap-8 pt-3 border-t border-black/5 dark:border-neutral-800/60 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+              <div className="flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400">
+                <button
+                  onClick={() => openPost(postId)}
+                  aria-label="View comments"
+                  className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>{post._count?.comments || post.comments || 0}</span>
+                </button>
+
                 {/* Heart Button */}
                 <button
                   onClick={() =>
                     handleLikeToggle(postId, Boolean(post.isLiked))
                   }
                   disabled={likingPostIds.has(postId)}
-                  className={`flex items-center gap-2 transition-colors active:scale-95 ${
+                  aria-label={post.isLiked ? "Unlike post" : "Like post"}
+                  className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/60 ${
                     post.isLiked
                       ? "text-rose-500"
-                      : "hover:text-rose-500 dark:hover:text-rose-400"
+                      : "hover:bg-rose-500/10 hover:text-rose-500 dark:hover:bg-rose-400/10 dark:hover:text-rose-400"
                   } disabled:opacity-50`}
                 >
                   <Heart
@@ -677,20 +739,31 @@ export default function Feed() {
                 </button>
 
                 <button
-                  onClick={() => openPost(postId)}
-                  className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  aria-label="View post analytics"
+                  className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
                 >
-                  <MessageSquare className="w-4 h-4" />
-                  <span>{post._count?.comments || post.comments || 0}</span>
-                </button>
-
-                <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   <ChartColumn className="w-4 h-4" />
                   <span>1M</span>
                 </button>
 
-                <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors ml-auto">
-                  <Share2 className="w-4 h-4" />
+                <button
+                  aria-label="Repost"
+                  className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                >
+                  <Repeat2 className="w-4 h-4" />
+                  <span>
+                    {post.repostCount ??
+                      post.reposts ??
+                      post._count?.reposts ??
+                      0}
+                  </span>
+                </button>
+
+                <button
+                  aria-label="Save post"
+                  className="flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                >
+                  <Bookmark className="w-4 h-4" />
                 </button>
               </div>
             </article>

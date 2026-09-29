@@ -1,10 +1,12 @@
 import {
   Bookmark,
   ChartColumn,
+  Flag,
   Heart,
   MessageSquare,
   MoreVertical,
   Pencil,
+  Repeat2,
   Share2,
   Trash2,
 } from "lucide-react";
@@ -160,13 +162,27 @@ export default function PostCard({
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => setOpenMenuPostId(null)}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 dark:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10"
-                >
-                  <Bookmark className="w-3.5 h-3.5" />
-                  Save post
-                </button>
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    aria-label="Share post"
+                    title={shareStatus || "Share post"}
+                    className="group relative flex min-h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 active:scale-[.98] dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                  >
+                    <Share2 className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
+                    {shareStatus && (
+                      <span className="absolute bottom-full right-0 z-20 mb-2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-[10px] font-semibold text-white shadow-lg dark:bg-white dark:text-neutral-900">
+                        {shareStatus}
+                      </span>
+                    )}
+                    {!shareStatus && <span>Share post</span>}
+                  </button>
+                  <button className="group relative flex min-h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 active:scale-[.98] dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400">
+                    <Flag className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
+                    <span>Report post</span>
+                  </button>
+                </div>
               )}
             </div>
           )}
@@ -235,14 +251,26 @@ export default function PostCard({
         </div>
       )}
 
-      <div className="flex items-center gap-8 pt-3 border-t border-black/5 dark:border-neutral-800/60 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+      <div className="flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400">
+        <button
+          onClick={() =>
+            navigate(`/post/${postId}`, { state: { from: "/home" } })
+          }
+          aria-label="View comments"
+          className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>{post._count?.comments || post.comments || 0}</span>
+        </button>
+
         <button
           onClick={() => handleLikeToggle(postId, Boolean(post.isLiked))}
           disabled={likingPostIds.has(postId)}
-          className={`flex items-center gap-2 transition-colors active:scale-95 ${
+          aria-label={post.isLiked ? "Unlike post" : "Like post"}
+          className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/60 ${
             post.isLiked
               ? "text-rose-500"
-              : "hover:text-rose-500 dark:hover:text-rose-400"
+              : "hover:bg-rose-500/10 hover:text-rose-500 dark:hover:bg-rose-400/10 dark:hover:text-rose-400"
           } disabled:opacity-50`}
         >
           <Heart
@@ -250,32 +278,30 @@ export default function PostCard({
           />
           <span>{post._count?.likes ?? post.likes ?? 0}</span>
         </button>
-        <button
-          onClick={() =>
-            navigate(`/post/${postId}`, { state: { from: "/home" } })
-          }
-          className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-        >
-          <MessageSquare className="w-4 h-4" />
-          <span>{post._count?.comments || post.comments || 0}</span>
-        </button>
 
-        <button className="flex items-center gap-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+        <button
+          aria-label="View post analytics"
+          className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+        >
           <ChartColumn className="w-4 h-4" />
           <span>1M</span>
         </button>
 
         <button
-          type="button"
-          onClick={handleShare}
-          aria-label="Share post"
-          title={shareStatus || "Share post"}
-          className="ml-auto flex items-center gap-2 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+          aria-label="Repost"
+          className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
         >
-          <Share2 className="w-4 h-4" />
-          {shareStatus && (
-            <span className="text-[11px] font-medium">{shareStatus}</span>
-          )}
+          <Repeat2 className="w-4 h-4" />
+          <span>
+            {post.repostCount ?? post.reposts ?? post._count?.reposts ?? 0}
+          </span>
+        </button>
+
+        <button
+          aria-label="Save post"
+          className="flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+        >
+          <Bookmark className="w-4 h-4" />
         </button>
       </div>
     </article>
