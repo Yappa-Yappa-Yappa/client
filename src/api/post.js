@@ -22,6 +22,11 @@ export const getFeedById = async (id) => {
   return res.data;
 };
 
+export const incrementView = async (id) => {
+  const res = await api.patch(`/posts/${id}`);
+  return res.data;
+};
+
 export const editFeed = async (id, data) => {
   const res = await api.put(`/posts/${id}`, data);
   return res.data;

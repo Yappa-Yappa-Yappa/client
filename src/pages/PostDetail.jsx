@@ -1,7 +1,7 @@
 import { ArrowLeft, MessageCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { getFeedById } from "../api/post";
+import { getFeedById, incrementView } from "../api/post";
 import CommentSection from "../components/CommentSection";
 import LinkifiedText from "../components/LinkifiedText";
 
@@ -14,12 +14,38 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const countedViewFor = useRef(null);
 
   useEffect(() => {
     getFeedById(id)
       .then((response) => setPost(response.data))
       .catch(() => setError("This yap is no longer available."))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    // Stop if there is no post ID or this post was already counted.
+    if (!id || countedViewFor.current === id) return;
+
+    // Remember that this post's view has been counted.
+    countedViewFor.current = id;
+
+    // Increment the view count on the server.
+    incrementView(id)
+      .then((response) => {
+        // Update the UI with the new count returned by the server.
+        setPost((currentPost) =>
+          currentPost
+            ? {
+                ...currentPost,
+                viewCount: response.data.viewCount,
+              }
+            : currentPost,
+        );
+      })
+      .catch(() => {
+        // Ignore view-count errors so they do not break the post page.
+      });
   }, [id]);
 
   if (loading)
