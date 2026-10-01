@@ -10,8 +10,6 @@ import {
   Bookmark,
   Loader2,
   X,
-  ChevronLeft,
-  ChevronRight,
   ChartColumn,
   Repeat2,
   Share2,
@@ -23,6 +21,9 @@ import { useAuth } from "../../hooks/useAuth";
 import FeedSkeleton from "../../components/FeedSkeleton";
 import LinkifiedText from "../../components/LinkifiedText";
 import { NavLink, useNavigate } from "react-router-dom";
+import { addFavorite, removeFavorite } from "../../api/favorite";
+import toast from "react-hot-toast";
+import ImageLightbox from "../../components/ImageLightbox";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -66,6 +67,7 @@ export default function Feed() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likingPostIds, setLikingPostIds] = useState(new Set());
+  const [favoritingPostIds, setFavoritingPostIds] = useState(new Set());
   const [error, setError] = useState(null);
   const { user } = useAuth();
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
@@ -84,18 +86,6 @@ export default function Feed() {
 
   const fileInputRef = useRef(null);
   const loadingMoreRef = useRef(false);
-
-  // Keyboard navigation for full-screen image lightbox
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!activeModal.isOpen) return;
-      if (e.key === "Escape") closeModal();
-      if (e.key === "ArrowLeft") prevImage();
-      if (e.key === "ArrowRight") nextImage();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeModal]);
 
   useEffect(() => {
     if (!openMenuPostId) return;
@@ -162,7 +152,7 @@ export default function Feed() {
         if (pageNum > 1) loadingMoreRef.current = false;
       }
     },
-    [user?.id],
+    [user],
   );
 
   useEffect(() => {
@@ -175,7 +165,9 @@ export default function Feed() {
     const selectedFiles = Array.from(e.target.files);
 
     if (selectedFiles.length + imageFiles.length > 5) {
-      alert("You can only upload a maximum of 5 images per post.");
+      toast("You can only upload a maximum of 5 images per post.", {
+        icon: "⚠️",
+      });
       return;
     }
 
@@ -272,11 +264,44 @@ export default function Feed() {
       setPosts((prevPosts) => [postWithAuthor, ...prevPosts]);
       setPostText("");
       clearAllImages();
+      toast.success("Your yap was published.");
     } catch (err) {
       console.error("Failed to create post:", err);
-      alert("Failed to publish your yap.");
+      toast.error("Failed to publish your yap.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFavorite = async (postId, isFavorited) => {
+    if (!postId || favoritingPostIds.has(postId)) return;
+
+    const previousPosts = posts;
+    setFavoritingPostIds((ids) => new Set(ids).add(postId));
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        (post._id || post.id) === postId
+          ? { ...post, isFavorited: !isFavorited }
+          : post,
+      ),
+    );
+
+    try {
+      if (isFavorited) await removeFavorite(postId);
+      else await addFavorite(postId);
+      toast.success(
+        isFavorited ? "Removed from favorites." : "Saved to favorites.",
+      );
+    } catch (err) {
+      console.error("Failed to update post favorite", err);
+      setPosts(previousPosts);
+      toast.error("Failed to update the post favorite.");
+    } finally {
+      setFavoritingPostIds((ids) => {
+        const nextIds = new Set(ids);
+        nextIds.delete(postId);
+        return nextIds;
+      });
     }
   };
 
@@ -286,9 +311,10 @@ export default function Feed() {
       setPosts((prevPosts) =>
         prevPosts.filter((post) => (post._id || post.id) !== id),
       );
+      toast.success("Post deleted.");
     } catch (err) {
       console.error("Failed to delete post:", err);
-      alert("Could not delete post.");
+      toast.error("Could not delete post.");
     }
   };
 
@@ -321,9 +347,10 @@ export default function Feed() {
         ),
       );
       cancelEditing();
+      toast.success("Yap updated.");
     } catch (err) {
       console.error("Failed to edit post:", err);
-      alert("Could not edit Yap.");
+      toast.error("Could not edit Yap.");
     }
   };
 
@@ -781,10 +808,26 @@ export default function Feed() {
                 </button>
 
                 <button
-                  aria-label="Save post"
-                  className="flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleFavorite(postId, Boolean(post.isFavorited));
+                  }}
+                  disabled={favoritingPostIds.has(postId)}
+                  aria-label={
+                    post.isFavorited
+                      ? "Remove post from favorites"
+                      : "Save post"
+                  }
+                  title={post.isFavorited ? "Remove from favorites" : "Save post"}
+                  className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
+                    post.isFavorited
+                      ? "text-indigo-600 dark:text-indigo-400"
+                      : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                  }`}
                 >
-                  <Bookmark className="w-4 h-4" />
+                  <Bookmark
+                    className={`w-4 h-4 ${post.isFavorited ? "fill-current" : ""}`}
+                  />
                 </button>
               </div>
             </article>
@@ -798,54 +841,13 @@ export default function Feed() {
         </div>
       )}
 
-      {/* Full Screen Image Modal */}
-      {activeModal.isOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md transition-opacity"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeModal();
-          }}
-        >
-          <button
-            onClick={closeModal}
-            className="absolute top-4 right-4 p-2 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-white transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-
-          {activeModal.images.length > 1 && (
-            <button
-              onClick={prevImage}
-              className="absolute left-4 p-3 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-white transition-colors"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-          )}
-
-          <div className="max-w-5xl max-h-[85vh] p-4 flex items-center justify-center">
-            <img
-              src={activeModal.images[activeModal.currentIndex]}
-              alt="Expanded view"
-              className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl"
-            />
-          </div>
-
-          {activeModal.images.length > 1 && (
-            <button
-              onClick={nextImage}
-              className="absolute right-4 p-3 rounded-full bg-neutral-900/80 hover:bg-neutral-800 text-white transition-colors"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          )}
-
-          {activeModal.images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-neutral-900/80 text-white text-xs font-semibold">
-              {activeModal.currentIndex + 1} / {activeModal.images.length}
-            </div>
-          )}
-        </div>
-      )}
+      <ImageLightbox
+        images={activeModal.images}
+        currentIndex={activeModal.currentIndex}
+        onClose={closeModal}
+        onPrevious={prevImage}
+        onNext={nextImage}
+      />
     </div>
   );
 }

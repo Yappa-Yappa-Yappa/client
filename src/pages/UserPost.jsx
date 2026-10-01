@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getLikesByPost, likePost, unlikePost } from "../api/like";
+import { addFavorite, removeFavorite } from "../api/favorite";
 import { deleteFeed, editFeed, getPostsByUser } from "../api/post";
 import ImageLightbox from "../components/ImageLightbox";
 import PostCard from "../components/PostCard";
 import UserPostSkeleton from "../components/UserPostSkeleton";
 import { useAuth } from "../hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function UserPost({ userId }) {
   const { user: currentUser } = useAuth();
@@ -14,6 +16,7 @@ export default function UserPost({ userId }) {
   const [editingPostId, setEditingPostId] = useState(null);
   const [editText, setEditText] = useState("");
   const [likingPostIds, setLikingPostIds] = useState(new Set());
+  const [favoritingPostIds, setFavoritingPostIds] = useState(new Set());
   const [activeModal, setActiveModal] = useState(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -168,6 +171,37 @@ export default function UserPost({ userId }) {
     }
   };
 
+  const handleFavoriteToggle = async (postId, isFavorited) => {
+    if (!postId || favoritingPostIds.has(postId)) return;
+
+    const previousPosts = posts;
+    setFavoritingPostIds((ids) => new Set(ids).add(postId));
+    setPosts((currentPosts) =>
+      currentPosts.map((post) =>
+        (post._id || post.id) === postId
+          ? { ...post, isFavorited: !isFavorited }
+          : post,
+      ),
+    );
+
+    try {
+      if (isFavorited) await removeFavorite(postId);
+      else await addFavorite(postId);
+      toast.success(
+        isFavorited ? "Removed from favorites." : "Saved to favorites.",
+      );
+    } catch (err) {
+      console.error("Failed to update post favorite:", err);
+      setPosts(previousPosts);
+    } finally {
+      setFavoritingPostIds((ids) => {
+        const nextIds = new Set(ids);
+        nextIds.delete(postId);
+        return nextIds;
+      });
+    }
+  };
+
   const openModal = (images, currentIndex) =>
     setActiveModal({ images, currentIndex });
   const closeModal = () => setActiveModal(null);
@@ -212,6 +246,8 @@ export default function UserPost({ userId }) {
               handleDelete={handleDelete}
               handleLikeToggle={handleLikeToggle}
               likingPostIds={likingPostIds}
+              handleFavoriteToggle={handleFavoriteToggle}
+              favoritingPostIds={favoritingPostIds}
               openModal={openModal}
             />
           ))

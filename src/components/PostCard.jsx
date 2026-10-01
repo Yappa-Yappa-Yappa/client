@@ -50,6 +50,8 @@ export default function PostCard({
   handleDelete,
   handleLikeToggle,
   likingPostIds,
+  handleFavoriteToggle,
+  favoritingPostIds,
   openModal,
 }) {
   const navigate = useNavigate();
@@ -319,10 +321,23 @@ export default function PostCard({
         </button>
 
         <button
-          aria-label="Save post"
-          className="flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+          onClick={() =>
+            handleFavoriteToggle(postId, Boolean(post.isFavorited))
+          }
+          disabled={favoritingPostIds?.has(postId)}
+          aria-label={
+            post.isFavorited ? "Remove post from favorites" : "Save post"
+          }
+          title={post.isFavorited ? "Remove from favorites" : "Save post"}
+          className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
+            post.isFavorited
+              ? "text-indigo-600 dark:text-indigo-400"
+              : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+          }`}
         >
-          <Bookmark className="w-4 h-4" />
+          <Bookmark
+            className={`w-4 h-4 ${post.isFavorited ? "fill-current" : ""}`}
+          />
         </button>
       </div>
     </article>

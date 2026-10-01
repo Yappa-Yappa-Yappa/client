@@ -1,11 +1,32 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function ImageLightbox({ images, currentIndex, onClose, onPrevious, onNext }) {
+  useEffect(() => {
+    if (!images?.length) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "ArrowLeft" && images.length > 1) onPrevious();
+      if (event.key === "ArrowRight" && images.length > 1) onNext();
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [images, onClose, onNext, onPrevious]);
+
   if (!images?.length) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -26,11 +47,11 @@ export default function ImageLightbox({ images, currentIndex, onClose, onPreviou
           <ChevronLeft className="w-6 h-6" />
         </button>
       )}
-      <div className="max-w-5xl max-h-[85vh] p-4 flex items-center justify-center">
+      <div className="flex max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] items-center justify-center">
         <img
           src={images[currentIndex]}
           alt="Expanded attachment"
-          className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl"
+          className="max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] object-contain rounded-xl shadow-2xl"
         />
       </div>
       {images.length > 1 && (
@@ -47,6 +68,7 @@ export default function ImageLightbox({ images, currentIndex, onClose, onPreviou
           {currentIndex + 1} / {images.length}
         </div>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }
