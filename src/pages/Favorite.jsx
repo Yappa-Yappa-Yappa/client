@@ -2,7 +2,7 @@ import { Bookmark, Clock3, Image as ImageIcon, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFavorites, removeFavorite } from "../api/favorite";
-import toast from "react-hot-toast";
+import { showSuccessToast } from "../utils/toast";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -56,7 +56,7 @@ export default function Favorite() {
       setFavorites((currentFavorites) =>
         currentFavorites.filter((item) => item.post?.id !== postId),
       );
-      toast.success("Removed from favorites.");
+      showSuccessToast("Removed from favorites.");
     } catch (err) {
       console.error("Failed to remove favorite:", err);
       setError("We couldn't remove that favorite. Please try again.");

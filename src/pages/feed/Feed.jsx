@@ -22,8 +22,12 @@ import FeedSkeleton from "../../components/FeedSkeleton";
 import LinkifiedText from "../../components/LinkifiedText";
 import { NavLink, useNavigate } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../../api/favorite";
-import toast from "react-hot-toast";
 import ImageLightbox from "../../components/ImageLightbox";
+import {
+  showErrorToast,
+  showSuccessToast,
+  showWarningToast,
+} from "../../utils/toast";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -165,9 +169,7 @@ export default function Feed() {
     const selectedFiles = Array.from(e.target.files);
 
     if (selectedFiles.length + imageFiles.length > 5) {
-      toast("You can only upload a maximum of 5 images per post.", {
-        icon: "⚠️",
-      });
+      showWarningToast("You can only upload a maximum of 5 images per post.");
       return;
     }
 
@@ -264,10 +266,10 @@ export default function Feed() {
       setPosts((prevPosts) => [postWithAuthor, ...prevPosts]);
       setPostText("");
       clearAllImages();
-      toast.success("Your yap was published.");
+      showSuccessToast("Your yap was published.");
     } catch (err) {
       console.error("Failed to create post:", err);
-      toast.error("Failed to publish your yap.");
+      showErrorToast("Failed to publish your yap.");
     } finally {
       setIsSubmitting(false);
     }
@@ -289,13 +291,13 @@ export default function Feed() {
     try {
       if (isFavorited) await removeFavorite(postId);
       else await addFavorite(postId);
-      toast.success(
+      showSuccessToast(
         isFavorited ? "Removed from favorites." : "Saved to favorites.",
       );
     } catch (err) {
       console.error("Failed to update post favorite", err);
       setPosts(previousPosts);
-      toast.error("Failed to update the post favorite.");
+      showErrorToast("Failed to update the post favorite.");
     } finally {
       setFavoritingPostIds((ids) => {
         const nextIds = new Set(ids);
@@ -311,10 +313,10 @@ export default function Feed() {
       setPosts((prevPosts) =>
         prevPosts.filter((post) => (post._id || post.id) !== id),
       );
-      toast.success("Post deleted.");
+      showSuccessToast("Post deleted.");
     } catch (err) {
       console.error("Failed to delete post:", err);
-      toast.error("Could not delete post.");
+      showErrorToast("Could not delete post.");
     }
   };
 
@@ -347,10 +349,10 @@ export default function Feed() {
         ),
       );
       cancelEditing();
-      toast.success("Yap updated.");
+      showSuccessToast("Yap updated.");
     } catch (err) {
       console.error("Failed to edit post:", err);
-      toast.error("Could not edit Yap.");
+      showErrorToast("Could not edit Yap.");
     }
   };
 

@@ -9,6 +9,7 @@ export default function AppShell() {
     <BrowserRouter>
       <Toaster
         position="bottom-right"
+        containerClassName="app-toaster"
         toastOptions={{
           duration: 3500,
           style: {

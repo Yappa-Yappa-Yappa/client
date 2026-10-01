@@ -6,7 +6,7 @@ import ImageLightbox from "../components/ImageLightbox";
 import PostCard from "../components/PostCard";
 import UserPostSkeleton from "../components/UserPostSkeleton";
 import { useAuth } from "../hooks/useAuth";
-import toast from "react-hot-toast";
+import { showSuccessToast } from "../utils/toast";
 
 export default function UserPost({ userId }) {
   const { user: currentUser } = useAuth();
@@ -187,7 +187,7 @@ export default function UserPost({ userId }) {
     try {
       if (isFavorited) await removeFavorite(postId);
       else await addFavorite(postId);
-      toast.success(
+      showSuccessToast(
         isFavorited ? "Removed from favorites." : "Saved to favorites.",
       );
     } catch (err) {

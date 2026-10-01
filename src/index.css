@@ -11,6 +11,12 @@ html, body, #root {
   @apply font-instrumentsans;
 }
 
+@media (max-width: 767px) {
+  .app-toaster {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom)) !important;
+  }
+}
+
 :root {
   /* LIGHT MODE - Soft Lilac & Rose Glass */
   --bg-main: #FAF8FC;          /* Warm Creamy Lavender Tint */
