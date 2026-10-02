@@ -5,8 +5,9 @@
 This repository is a React 19 single-page client built with Vite and Tailwind CSS.
 
 - `src/main.jsx` bootstraps the application; `src/App.jsx` defines routing.
-- `src/pages/` contains route-level screens, currently grouped into `auth/` and `feed/`.
+- `src/pages/` contains route-level screens, with authentication pages under `auth/`, the feed under `feed/`, and other screens at the pages root.
 - `src/components/` contains reusable UI and layout components, including route guards in the root.
+- `src/errors/` contains fallback and error views used by the router.
 - `src/api/` contains Axios configuration and endpoint modules; `src/contexts/` and `src/hooks/` contain shared auth state and hooks.
 - `src/index.css`, `tailwind.config.js`, and `postcss.config.js` define styling.
 - `public/` contains static files served unchanged, such as icons and the favicon.
