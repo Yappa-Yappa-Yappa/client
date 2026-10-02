@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -29,8 +29,19 @@ export default function Register() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
   const navigate = useNavigate();
   const { setSession } = useAuth();
+
+  useEffect(() => {
+    if (resendCountdown === 0) return undefined;
+
+    const timer = window.setInterval(() => {
+      setResendCountdown((current) => Math.max(current - 1, 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [resendCountdown]);
 
   const updateField = (field, value) =>
     setFormData({ ...formData, [field]: value });
@@ -50,6 +61,7 @@ export default function Register() {
         password: formData.password,
       });
       setStep("otp");
+      setResendCountdown(60);
     } catch (err) {
       setError(err.response?.data?.message || "Unable to create your account.");
     } finally {
@@ -109,10 +121,13 @@ export default function Register() {
   };
 
   const handleResend = async () => {
+    if (resendCountdown > 0) return;
+
     setError("");
     setIsResending(true);
     try {
       await requestOtp(formData.email);
+      setResendCountdown(60);
     } catch (err) {
       setError(err.response?.data?.message || "Could not resend the code.");
     } finally {
@@ -293,10 +308,14 @@ export default function Register() {
             <button
               type="button"
               onClick={handleResend}
-              disabled={isResending}
+              disabled={isResending || resendCountdown > 0}
               className="font-bold text-indigo-600 hover:text-indigo-500 disabled:opacity-50"
             >
-              {isResending ? "Sending..." : "Resend code"}
+              {isResending
+                ? "Sending..."
+                : resendCountdown > 0
+                  ? `Resend in ${resendCountdown}s`
+                  : "Resend code"}
             </button>
           </p>
         </>

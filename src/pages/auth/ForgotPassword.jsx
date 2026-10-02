@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { requestPasswordReset } from "../../api/auth";
@@ -9,6 +9,18 @@ export default function ForgotPassword() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
+
+  useEffect(() => {
+    if (resendCountdown === 0) return undefined;
+
+    const timer = window.setInterval(() => {
+      setResendCountdown((current) => Math.max(current - 1, 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [resendCountdown]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,6 +34,7 @@ export default function ForgotPassword() {
         response.data?.message ||
           "If an account exists for that email, we sent a reset link.",
       );
+      setResendCountdown(60);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -29,6 +42,29 @@ export default function ForgotPassword() {
       );
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendCountdown > 0) return;
+
+    setError("");
+    setIsResending(true);
+
+    try {
+      const response = await requestPasswordReset(email);
+      setMessage(
+        response.data?.message ||
+          "If an account exists for that email, we sent a reset link.",
+      );
+      setResendCountdown(60);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "We could not resend the reset link. Please try again.",
+      );
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -71,6 +107,18 @@ export default function ForgotPassword() {
             Check your inbox
           </div>
           {message}
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={isResending || resendCountdown > 0}
+            className="mt-3 block font-bold text-emerald-800 underline underline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isResending
+              ? "Sending..."
+              : resendCountdown > 0
+                ? `Resend email in ${resendCountdown}s`
+                : "Resend email"}
+          </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
