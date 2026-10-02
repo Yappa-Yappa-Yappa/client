@@ -1,6 +1,15 @@
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Bookmark,
+  ChartColumn,
+  Heart,
+  MessageCircle,
+  Repeat2,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { addFavorite, removeFavorite } from "../api/favorite";
+import { likePost, unlikePost } from "../api/like";
 import { getFeedById, incrementView } from "../api/post";
 import CommentSection from "../components/CommentSection";
 import LinkifiedText from "../components/LinkifiedText";
@@ -15,6 +24,46 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const countedViewFor = useRef(null);
+
+  const toggleLike = async () => {
+    if (!post) return;
+    const isLiked = Boolean(post.isLiked);
+    const currentCount = post._count?.likes || 0;
+    setPost((current) => ({
+      ...current,
+      isLiked: !isLiked,
+      _count: {
+        ...current._count,
+        likes: Math.max(0, currentCount + (isLiked ? -1 : 1)),
+      },
+    }));
+
+    try {
+      if (isLiked) await unlikePost(post.id);
+      else await likePost(post.id);
+    } catch {
+      setPost((current) => ({
+        ...current,
+        isLiked,
+        _count: { ...current._count, likes: currentCount },
+      }));
+      setError("Could not update the post like.");
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!post) return;
+    const isFavorited = Boolean(post.isFavorited);
+    setPost((current) => ({ ...current, isFavorited: !isFavorited }));
+
+    try {
+      if (isFavorited) await removeFavorite(post.id);
+      else await addFavorite(post.id);
+    } catch {
+      setPost((current) => ({ ...current, isFavorited }));
+      setError("Could not update the post bookmark.");
+    }
+  };
 
   useEffect(() => {
     getFeedById(id)
@@ -121,8 +170,53 @@ export default function PostDetail() {
             ))}
           </div>
         )}
-        <div className="mt-4 flex items-center gap-2 border-t border-black/5 pt-3 text-xs text-neutral-500 dark:border-neutral-800">
-          <MessageCircle className="h-4 w-4" /> Join the conversation
+        <div className="mt-4 flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+          <button
+            type="button"
+            onClick={() =>
+              document
+                .getElementById("comments")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+            aria-label="View comments"
+            className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span>{post._count?.comments || 0}</span>
+          </button>
+          <button
+            type="button"
+            onClick={toggleLike}
+            aria-label={post.isLiked ? "Unlike post" : "Like post"}
+            className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${post.isLiked ? "text-rose-500" : ""}`}
+          >
+            <Heart className={`h-4 w-4 ${post.isLiked ? "fill-current" : ""}`} />
+            <span>{post._count?.likes || 0}</span>
+          </button>
+          <button
+            type="button"
+            aria-label="View post activity"
+            className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+          >
+            <ChartColumn className="h-4 w-4" />
+            <span>{post.viewCount || 0}</span>
+          </button>
+          <button
+            type="button"
+            aria-label="Repost post"
+            className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+          >
+            <Repeat2 className="h-4 w-4" />
+            <span>{post.repostCount || 0}</span>
+          </button>
+          <button
+            type="button"
+            onClick={toggleFavorite}
+            aria-label={post.isFavorited ? "Remove post bookmark" : "Bookmark post"}
+            className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${post.isFavorited ? "text-indigo-600 dark:text-indigo-400" : ""}`}
+          >
+            <Bookmark className={`h-4 w-4 ${post.isFavorited ? "fill-current" : ""}`} />
+          </button>
         </div>
       </article>
       <CommentSection postId={post.id} />

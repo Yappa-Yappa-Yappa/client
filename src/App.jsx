@@ -16,6 +16,7 @@ import Trending from "./pages/Trending";
 import Profile from "./pages/Profile";
 import Notification from "./pages/Notification";
 import PostDetail from "./pages/PostDetail";
+import CommentThread from "./pages/CommentThread";
 import NotFound from "./errors/NotFound";
 import Favorite from "./pages/Favorite";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -54,6 +55,7 @@ export default function App() {
         <Route path="search" element={<Search />} />
         <Route path="notification" element={<Notification />} />
         <Route path="post/:id" element={<PostDetail />} />
+        <Route path="comment/:id" element={<CommentThread />} />
         <Route path="chat" element={<Chat />} />
         <Route path="friend/:username/followers" element={<Friend />} />
         <Route path="friend/:username/following" element={<Friend />} />

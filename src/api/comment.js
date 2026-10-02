@@ -5,7 +5,15 @@ export const getCommentsByPost = async (postId) => {
   return res.data;
 };
 
-export const createComment = async (postId, content) => {
-  const res = await api.post(`/posts/${postId}/comments`, { content });
+export const getCommentThread = async (commentId) => {
+  const res = await api.get(`/comments/${commentId}/thread`);
+  return res.data;
+};
+
+export const createComment = async (postId, content, parentId = null) => {
+  const res = await api.post(`/posts/${postId}/comments`, {
+    content,
+    ...(parentId ? { parentId } : {}),
+  });
   return res.data;
 };
