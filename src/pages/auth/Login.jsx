@@ -234,6 +234,16 @@ export default function Login() {
           </div>
         </>
       )}
+
+      <div className="flex justify-center items-center">
+        <Link
+          to="/forgot-password"
+          className="mt-6 mb-2 text-center text-sm text-indigo-600 hover:underline font-bold"
+        >
+          Forgot password?
+        </Link>
+      </div>
+
       <p className="mt-8 text-center text-sm text-slate-500">
         Don&apos;t have an account?{" "}
         <Link

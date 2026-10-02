@@ -18,6 +18,8 @@ import Notification from "./pages/Notification";
 import PostDetail from "./pages/PostDetail";
 import NotFound from "./errors/NotFound";
 import Favorite from "./pages/Favorite";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 export default function App() {
   return (
@@ -32,6 +34,8 @@ export default function App() {
       >
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
 
       {/* Protected App Routes */}
