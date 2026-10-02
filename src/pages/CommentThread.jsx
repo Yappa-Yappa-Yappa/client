@@ -60,7 +60,15 @@ export default function CommentThread() {
     try {
       setLoading(true);
       const response = await getCommentThread(id);
-      setThread(response.data);
+      const data = response.data;
+      const uniqueReplies = Array.from(
+        new Map(
+          (data.replies || [])
+            .filter((reply) => reply.id !== data.comment?.id)
+            .map((reply) => [reply.id, reply]),
+        ).values(),
+      );
+      setThread({ ...data, replies: uniqueReplies });
       setError("");
     } catch (requestError) {
       setError(
@@ -335,7 +343,7 @@ export default function CommentThread() {
               </p>
             )}
             <div
-              className="mt-3 flex items-center justify-between gap-1 border-t border-black/5 pt-2 text-xs font-semibold text-neutral-500 dark:border-neutral-700/60 dark:text-neutral-400"
+              className="relative -ml-[48px] mt-3 flex w-[calc(100%+48px)] items-center justify-between gap-1 border-t border-black/5 pt-2 text-xs font-semibold text-neutral-500 dark:border-neutral-700/60 dark:text-neutral-400"
               onClick={(event) => event.stopPropagation()}
             >
               <button
