@@ -85,7 +85,7 @@ export default function RightSidebar() {
   };
 
   return (
-    <aside className="sticky top-4 mr-4 mt-4 hidden h-fit shrink-0 self-start space-y-4 lg:block lg:w-[280px] xl:mr-6 xl:w-[320px]">
+    <aside className="fixed right-0 top-0 z-20 hidden h-screen w-[280px] space-y-4 overflow-y-auto border-l border-black/10 px-4 pb-6 pt-4 lg:block dark:border-white/10 xl:w-[320px] xl:px-6">
       <form
         onSubmit={handleSearch}
         className="flex items-center gap-3 rounded-full border border-black/10 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.05]"
@@ -133,7 +133,8 @@ export default function RightSidebar() {
                   {post.content || "A popular yap with the community"}
                 </p>
                 <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
-                  {post._count?.likes || 0} likes · {post._count?.comments || 0} comments
+                  {post._count?.likes || 0} likes · {post._count?.comments || 0}{" "}
+                  comments
                 </p>
               </Link>
             ))}
@@ -217,7 +218,9 @@ export default function RightSidebar() {
                   ) : suggestion.isFollowing ? (
                     <>
                       <span className="group-hover:hidden">Following</span>
-                      <span className="hidden group-hover:inline">Unfollow</span>
+                      <span className="hidden group-hover:inline">
+                        Unfollow
+                      </span>
                     </>
                   ) : (
                     "Follow"

@@ -45,7 +45,7 @@ export default function MainLayout() {
           location.pathname === "/chat" ? "pb-0" : "pb-16"
         } md:pb-0 ${
           location.pathname === "/chat" ? "overflow-hidden" : "overflow-y-auto"
-        }`}
+        } ${location.pathname === "/chat" ? "" : "lg:pr-[280px] xl:pr-[310px]"}`}
       >
         {/* Subtle Sticky Header */}
         <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-black/5 bg-white/40 px-4 py-3 backdrop-blur-xl dark:border-white/5 dark:bg-black/20 sm:px-6 sm:py-4">
