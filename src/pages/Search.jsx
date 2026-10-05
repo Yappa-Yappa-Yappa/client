@@ -6,7 +6,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { searchUserOrPost } from "../api/search";
 
 const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
@@ -31,13 +31,22 @@ const renderLinkifiedText = (text) =>
   });
 
 export default function Search() {
-  const [query, setQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const queryFromUrl = searchParams.get("q") || "";
+  const [query, setQuery] = useState(queryFromUrl);
   const [searchedQuery, setSearchedQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [results, setResults] = useState({ users: [], posts: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // URL searches can be submitted from the persistent right sidebar while
+    // this page is already mounted.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQuery(queryFromUrl);
+  }, [queryFromUrl]);
 
   const runSearch = useCallback(async (value) => {
     const trimmedQuery = value.trim();

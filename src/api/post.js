@@ -36,3 +36,11 @@ export const deleteFeed = async (id) => {
   const res = await api.delete(`/posts/${id}`);
   return res.data;
 };
+
+export const getTrendingPosts = async (limit = 3) => {
+  const res = await api.get("/posts/trending", {
+    params: { limit },
+  });
+
+  return res.data;
+};

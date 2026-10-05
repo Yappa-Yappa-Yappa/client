@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import RightSidebar from "./RightSidebar";
 import ThemeToggle from "../ThemeToggle";
 import Logout from "../../pages/auth/Logout";
 
@@ -57,22 +58,26 @@ export default function MainLayout() {
           </div>
         </header>
 
-        {/* Page Content Rendered via Outlet */}
-        <main
-          className={`relative z-0 flex-1 min-h-0 w-full ${
-            location.pathname === "/chat"
-              ? "max-w-none p-0"
-              : "mx-auto max-w-4xl p-4 sm:p-6 md:pb-6"
-          }`}
-        >
-          <Outlet />
-          {location.pathname !== "/chat" && (
-            <div
-              className="h-[calc(7rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
-              aria-hidden="true"
-            />
-          )}
-        </main>
+        <div className="flex min-h-0 min-w-0 flex-1">
+          {/* Page Content Rendered via Outlet */}
+          <main
+            className={`relative z-0 min-h-0 min-w-0 flex-1 ${
+              location.pathname === "/chat"
+                ? "max-w-none p-0"
+                : "mx-auto w-full max-w-4xl p-4 sm:p-6 md:pb-6"
+            }`}
+          >
+            <Outlet />
+            {location.pathname !== "/chat" && (
+              <div
+                className="h-[calc(7rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
+                aria-hidden="true"
+              />
+            )}
+          </main>
+
+          {location.pathname !== "/chat" && <RightSidebar />}
+        </div>
       </div>
     </div>
   );

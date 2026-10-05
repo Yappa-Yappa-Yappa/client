@@ -3,7 +3,7 @@ import {
   Image as ImageIcon,
   Send,
   Heart,
-  MessageSquare,
+  MessageCircle,
   Trash2,
   MoreVertical,
   Pencil,
@@ -763,7 +763,7 @@ export default function Feed() {
                   aria-label="View comments"
                   className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
                 >
-                  <MessageSquare className="h-4 w-4" />
+                  <MessageCircle className="h-4 w-4" />
                   <span>{post._count?.comments || post.comments || 0}</span>
                 </button>
 
@@ -820,7 +820,9 @@ export default function Feed() {
                       ? "Remove post from favorites"
                       : "Save post"
                   }
-                  title={post.isFavorited ? "Remove from favorites" : "Save post"}
+                  title={
+                    post.isFavorited ? "Remove from favorites" : "Save post"
+                  }
                   className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
                     post.isFavorited
                       ? "text-indigo-600 dark:text-indigo-400"

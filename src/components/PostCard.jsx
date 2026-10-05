@@ -3,7 +3,7 @@ import {
   ChartColumn,
   Flag,
   Heart,
-  MessageSquare,
+  MessageCircle,
   MoreVertical,
   Pencil,
   Repeat2,
@@ -282,7 +282,7 @@ export default function PostCard({
           aria-label="View comments"
           className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
         >
-          <MessageSquare className="w-4 h-4" />
+          <MessageCircle className="w-4 h-4" />
           <span>{post._count?.comments || post.comments || 0}</span>
         </button>
 
