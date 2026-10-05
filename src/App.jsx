@@ -7,7 +7,7 @@ import Register from "./pages/auth/Register";
 import MainLayout from "./components/layout/MainLayout";
 
 // Page Imports
-import Feed from "./pages/feed/Feed";
+import Feed from "./pages/Feed";
 import Search from "./pages/Search";
 import Chat from "./pages/Chat";
 import Friend from "./pages/Friend";
@@ -22,6 +22,7 @@ import Favorite from "./pages/Favorite";
 import Suggestions from "./pages/Suggestions";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import Setting from "./pages/Setting";
 
 export default function App() {
   return (
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="trend" element={<Trending />} />
         <Route path="suggestions" element={<Suggestions />} />
         <Route path="favorite" element={<Favorite />} />
+        <Route path="setting" element={<Setting />} />
 
         {/* Profile */}
         <Route path="profile/:username" element={<Profile />} />

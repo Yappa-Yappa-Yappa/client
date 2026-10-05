@@ -5,6 +5,7 @@ import {
   MessageCircle,
   MoreHorizontal,
   Search,
+  Settings,
   Star,
   TrendingUp,
   User,
@@ -127,6 +128,11 @@ export default function Sidebar() {
       icon: <User className="w-6 h-6 shrink-0" />,
       label: "Profile",
       path: `/profile/${user.username}`,
+    },
+    {
+      icon: <Settings className="w-6 h-6 shrink-0" />,
+      label: "Setting",
+      path: "/setting",
     },
   ];
 
@@ -313,6 +319,7 @@ export default function Sidebar() {
               { icon: Star, label: "Favorite", path: "/favorite" },
               { icon: History, label: "History", path: "/history" },
               { icon: TrendingUp, label: "Trending", path: "/trend" },
+              { icon: Settings, label: "Settings", path: "/setting" },
             ].map(({ icon: Icon, label, path }) => (
               <NavLink
                 key={label}

@@ -4,7 +4,7 @@ import {
   CornerUpLeft,
   Ellipsis,
   Heart,
-  MessageSquare,
+  MessageCircle,
   Pencil,
   Repeat2,
   Send,
@@ -142,7 +142,10 @@ export default function CommentSection({ postId }) {
               isLiked: !isLiked,
               _count: {
                 ...item._count,
-                likes: Math.max(0, (item._count?.likes || 0) + (isLiked ? -1 : 1)),
+                likes: Math.max(
+                  0,
+                  (item._count?.likes || 0) + (isLiked ? -1 : 1),
+                ),
               },
             }
           : item,
@@ -161,7 +164,10 @@ export default function CommentSection({ postId }) {
                 isLiked,
                 _count: {
                   ...item._count,
-                  likes: Math.max(0, (item._count?.likes || 0) + (isLiked ? 1 : -1)),
+                  likes: Math.max(
+                    0,
+                    (item._count?.likes || 0) + (isLiked ? 1 : -1),
+                  ),
                 },
               }
             : item,
@@ -185,9 +191,7 @@ export default function CommentSection({ postId }) {
     } catch {
       setComments((current) =>
         current.map((item) =>
-          item.id === comment.id
-            ? { ...item, isFavorited }
-            : item,
+          item.id === comment.id ? { ...item, isFavorited } : item,
         ),
       );
       setError("Could not update that comment bookmark.");
@@ -195,7 +199,10 @@ export default function CommentSection({ postId }) {
   };
 
   return (
-    <section id="comments" className="mt-4 border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+    <section
+      id="comments"
+      className="mt-4 border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60"
+    >
       <h2 className="text-sm font-bold">
         Comments{" "}
         <span className="font-normal text-neutral-500">
@@ -246,189 +253,203 @@ export default function CommentSection({ postId }) {
               >
                 <div className="flex gap-3">
                   <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center text-xs font-bold text-indigo-600 dark:text-indigo-300">
-                  {author.imageUrl ? (
-                    <img
-                      src={author.imageUrl}
-                      alt={author.name || "Yapper"}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-full items-center justify-center">
-                      {(author.name || "Y")[0].toUpperCase()}
-                    </span>
-                  )}
+                    {author.imageUrl ? (
+                      <img
+                        src={author.imageUrl}
+                        alt={author.name || "Yapper"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-full items-center justify-center">
+                        {(author.name || "Y")[0].toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <div className="relative min-w-0 flex-1 px-0 py-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-bold">
-                      {author.name || "Yapper"}
-                    </span>
-                    <span className="text-[11px] text-neutral-500">
-                      {relativeTime(comment.createdAt)}
-                    </span>
-                  </div>
-                  {comment.parent?.user?.username && (
-                    <p className="mt-1 text-[11px] text-indigo-500">
-                      Replying to @{comment.parent.user.username}
-                    </p>
-                  )}
-                  <div className="flex w-full items-start justify-between gap-2">
-                    {editingCommentId === comment.id ? (
-                      <div className="flex min-w-0 flex-1 flex-col gap-2">
-                        <textarea
-                          onClick={(event) => event.stopPropagation()}
-                          value={editContent}
-                          onChange={(event) =>
-                            setEditContent(event.target.value)
-                          }
-                          maxLength={500}
-                          rows={2}
-                          autoFocus
-                          className="w-full resize-none overflow-hidden break-words rounded-lg border border-indigo-500/40 bg-transparent px-2 py-1.5 text-sm outline-none"
-                        />
-                        <div className="flex justify-end gap-2">
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              cancelEditing();
-                            }}
-                            className="rounded-lg px-2 py-1 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleEdit(comment.id);
-                            }}
-                            disabled={!editContent.trim()}
-                            className="rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white disabled:opacity-50"
-                          >
-                            Save
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="mt-1 min-w-0 whitespace-pre-wrap break-words text-sm text-neutral-700 dark:text-neutral-300">
-                        {comment.content}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-bold">
+                        {author.name || "Yapper"}
+                      </span>
+                      <span className="text-[11px] text-neutral-500">
+                        {relativeTime(comment.createdAt)}
+                      </span>
+                    </div>
+                    {comment.parent?.user?.username && (
+                      <p className="mt-1 text-[11px] text-indigo-500">
+                        Replying to @{comment.parent.user.username}
                       </p>
                     )}
-                    {isOwnComment && editingCommentId !== comment.id && (
-                      <div className="relative shrink-0">
-                        <button
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setOpenCommentMenuId((currentId) =>
-                              currentId === comment.id ? null : comment.id,
-                            );
-                          }}
-                          aria-label="Comment options"
-                          className="rounded-lg p-1.5 text-neutral-400 hover:bg-black/5 hover:text-neutral-700 dark:hover:bg-white/10 dark:hover:text-neutral-200"
-                        >
-                          <Ellipsis className="h-4 w-4" />
-                        </button>
-                        {openCommentMenuId === comment.id && (
-                          <div className="absolute right-0 top-8 z-10 min-w-28 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+                    <div className="flex w-full items-start justify-between gap-2">
+                      {editingCommentId === comment.id ? (
+                        <div className="flex min-w-0 flex-1 flex-col gap-2">
+                          <textarea
+                            onClick={(event) => event.stopPropagation()}
+                            value={editContent}
+                            onChange={(event) =>
+                              setEditContent(event.target.value)
+                            }
+                            maxLength={500}
+                            rows={2}
+                            autoFocus
+                            className="w-full resize-none overflow-hidden break-words rounded-lg border border-indigo-500/40 bg-transparent px-2 py-1.5 text-sm outline-none"
+                          />
+                          <div className="flex justify-end gap-2">
                             <button
                               type="button"
                               onClick={(event) => {
                                 event.stopPropagation();
-                                startEditing(comment);
+                                cancelEditing();
                               }}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+                              className="rounded-lg px-2 py-1 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
                             >
-                              <Pencil className="h-3.5 w-3.5" />
-                              Edit
+                              Cancel
                             </button>
                             <button
                               type="button"
                               onClick={(event) => {
                                 event.stopPropagation();
-                                setOpenCommentMenuId(null);
-                                handleDelete(comment.id);
+                                handleEdit(comment.id);
                               }}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
+                              disabled={!editContent.trim()}
+                              className="rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white disabled:opacity-50"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              Delete
+                              Save
                             </button>
                           </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                        </div>
+                      ) : (
+                        <p className="mt-1 min-w-0 whitespace-pre-wrap break-words text-sm text-neutral-700 dark:text-neutral-300">
+                          {comment.content}
+                        </p>
+                      )}
+                      {isOwnComment && editingCommentId !== comment.id && (
+                        <div className="relative shrink-0">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setOpenCommentMenuId((currentId) =>
+                                currentId === comment.id ? null : comment.id,
+                              );
+                            }}
+                            aria-label="Comment options"
+                            className="rounded-lg p-1.5 text-neutral-400 hover:bg-black/5 hover:text-neutral-700 dark:hover:bg-white/10 dark:hover:text-neutral-200"
+                          >
+                            <Ellipsis className="h-4 w-4" />
+                          </button>
+                          {openCommentMenuId === comment.id && (
+                            <div className="absolute right-0 top-8 z-10 min-w-28 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  startEditing(comment);
+                                }}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setOpenCommentMenuId(null);
+                                  handleDelete(comment.id);
+                                }}
+                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div
-                    className="mt-3 flex items-center justify-between gap-1 border-t border-black/5 pt-2 text-xs font-semibold text-neutral-500 dark:border-neutral-700/60 dark:text-neutral-400"
-                    onClick={(event) => event.stopPropagation()}
+                  className="mt-3 flex items-center justify-between gap-1 border-t border-black/5 pt-2 text-xs font-semibold text-neutral-500 dark:border-neutral-700/60 dark:text-neutral-400"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(`/comment/${comment.id}`, {
+                        state: { from: `/post/${postId}` },
+                      })
+                    }
+                    aria-label="Reply to comment"
+                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
                   >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigate(`/comment/${comment.id}`, {
-                          state: { from: `/post/${postId}` },
-                        })
-                      }
-                      aria-label="Reply to comment"
-                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                    >
-                      <CornerUpLeft className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        navigate(`/comment/${comment.id}`, {
-                          state: { from: `/post/${postId}` },
-                        })
-                      }
-                      aria-label="View comment thread"
-                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      <span>{comment._count?.replies || 0}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleCommentLike(comment)}
-                      aria-label={comment.isLiked ? "Unlike comment" : "Like comment"}
-                      className={`flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${comment.isLiked ? "text-rose-500" : ""}`}
-                    >
-                      <Heart className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`} />
-                      <span>{comment._count?.likes || 0}</span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="View comment activity"
-                      title="Comment activity coming soon"
-                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                    >
-                      <ChartColumn className="h-4 w-4" />
-                      <span>{comment.viewCount || 0}</span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Repost comment"
-                      title="Comment reposts coming soon"
-                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                    >
-                      <Repeat2 className="h-4 w-4" />
-                      <span>{comment.repostCount || 0}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleCommentFavorite(comment)}
-                      aria-label={comment.isFavorited ? "Remove comment bookmark" : "Bookmark comment"}
-                      title={comment.isFavorited ? "Remove bookmark" : "Bookmark comment"}
-                      className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${comment.isFavorited ? "text-indigo-600 dark:text-indigo-400" : ""}`}
-                    >
-                      <Bookmark className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`} />
-                    </button>
-                  </div>
+                    <CornerUpLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(`/comment/${comment.id}`, {
+                        state: { from: `/post/${postId}` },
+                      })
+                    }
+                    aria-label="View comment thread"
+                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    <span>{comment._count?.replies || 0}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleCommentLike(comment)}
+                    aria-label={
+                      comment.isLiked ? "Unlike comment" : "Like comment"
+                    }
+                    className={`flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${comment.isLiked ? "text-rose-500" : ""}`}
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`}
+                    />
+                    <span>{comment._count?.likes || 0}</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="View comment activity"
+                    title="Comment activity coming soon"
+                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                  >
+                    <ChartColumn className="h-4 w-4" />
+                    <span>{comment.viewCount || 0}</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Repost comment"
+                    title="Comment reposts coming soon"
+                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                  >
+                    <Repeat2 className="h-4 w-4" />
+                    <span>{comment.repostCount || 0}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleCommentFavorite(comment)}
+                    aria-label={
+                      comment.isFavorited
+                        ? "Remove comment bookmark"
+                        : "Bookmark comment"
+                    }
+                    title={
+                      comment.isFavorited
+                        ? "Remove bookmark"
+                        : "Bookmark comment"
+                    }
+                    className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${comment.isFavorited ? "text-indigo-600 dark:text-indigo-400" : ""}`}
+                  >
+                    <Bookmark
+                      className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`}
+                    />
+                  </button>
                 </div>
+              </div>
             );
           })
         )}
