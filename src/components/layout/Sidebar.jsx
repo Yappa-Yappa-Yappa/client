@@ -14,7 +14,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { io } from "socket.io-client";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { getUnreadConversationCount } from "../../api/conversation";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
@@ -144,9 +144,12 @@ export default function Sidebar() {
 
         {/* Brand Header */}
         <div className="px-3 mb-8 relative z-10">
-          <h1 className="text-2xl font-lacquer tracking-wide text-indigo-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-neutral-200 dark:to-indigo-300">
+          <Link
+            to="/home"
+            className="text-2xl font-lacquer tracking-wide text-indigo-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-neutral-200 dark:to-indigo-300"
+          >
             Yappa Yappa
-          </h1>
+          </Link>
         </div>
 
         {/* Navigation Links */}
@@ -195,98 +198,102 @@ export default function Sidebar() {
           ref={moreRef}
           className="pointer-events-none fixed inset-x-3 bottom-3 z-50 md:hidden"
         >
-        <nav
-          className={`relative pointer-events-auto grid min-h-16 grid-cols-6 overflow-visible rounded-full px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_10px_30px_rgba(0,0,0,0.14)] ${mobileGlassClass}`}
-        >
-          {[
-            { icon: Home, label: "Home", path: "/home" },
-            { icon: Search, label: "Search", path: "/search" },
-            { icon: MessageCircle, label: "Chat", path: "/chat" },
-            { icon: Bell, label: "Alerts", path: "/notification" },
-            { icon: User, label: "Profile", path: `/profile/${user.username}` },
-          ].map(({ icon: Icon, label, path }) => (
-            <NavLink
-              key={label}
-              to={path}
-              className={({ isActive }) =>
-                `group relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
-                  isActive
+          <nav
+            className={`relative pointer-events-auto grid min-h-16 grid-cols-6 overflow-visible rounded-full px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_10px_30px_rgba(0,0,0,0.14)] ${mobileGlassClass}`}
+          >
+            {[
+              { icon: Home, label: "Home", path: "/home" },
+              { icon: Search, label: "Search", path: "/search" },
+              { icon: MessageCircle, label: "Chat", path: "/chat" },
+              { icon: Bell, label: "Alerts", path: "/notification" },
+              {
+                icon: User,
+                label: "Profile",
+                path: `/profile/${user.username}`,
+              },
+            ].map(({ icon: Icon, label, path }) => (
+              <NavLink
+                key={label}
+                to={path}
+                className={({ isActive }) =>
+                  `group relative flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
+                    isActive
+                      ? "active text-indigo-600 dark:text-indigo-400"
+                      : "text-neutral-500 dark:text-neutral-400"
+                  }`
+                }
+              >
+                <span className="relative">
+                  <Icon className="h-5 w-5 transition-transform duration-200 group-[.active]:scale-125" />
+                  {label === "Alerts" && unreadCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold leading-none text-white">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                  {label === "Chat" && chatUnreadCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold leading-none text-white">
+                      {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
+                    </span>
+                  )}
+                </span>
+                <span className="hidden duration-200 truncate group-[.active]:block">
+                  {label}
+                </span>
+              </NavLink>
+            ))}
+
+            <div className="relative flex min-w-0 flex-col items-center justify-center">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((open) => !open)}
+                className={`group flex w-full min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
+                  moreOpen || moreRouteActive
                     ? "active text-indigo-600 dark:text-indigo-400"
                     : "text-neutral-500 dark:text-neutral-400"
-                }`
-              }
-            >
-              <span className="relative">
-                <Icon className="h-5 w-5 transition-transform duration-200 group-[.active]:scale-125" />
-                {label === "Alerts" && unreadCount > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold leading-none text-white">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-                {label === "Chat" && chatUnreadCount > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold leading-none text-white">
-                    {chatUnreadCount > 9 ? "9+" : chatUnreadCount}
-                  </span>
-                )}
-              </span>
-              <span className="hidden duration-200 truncate group-[.active]:block">
-                {label}
-              </span>
-            </NavLink>
-          ))}
-
-          <div className="relative flex min-w-0 flex-col items-center justify-center">
-            <button
-              type="button"
-              onClick={() => setMoreOpen((open) => !open)}
-              className={`group flex w-full min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
-                moreOpen || moreRouteActive
-                  ? "active text-indigo-600 dark:text-indigo-400"
-                  : "text-neutral-500 dark:text-neutral-400"
-              }`}
-              aria-label="More navigation options"
-            >
-              <MoreHorizontal
-                className={`h-5 w-5 transition-transform duration-200 ${
-                  moreOpen || moreRouteActive ? "scale-125" : ""
                 }`}
-              />
-              <span className={moreOpen || moreRouteActive ? "" : "sr-only"}>
-                More
-              </span>
-            </button>
-          </div>
-        </nav>
+                aria-label="More navigation options"
+              >
+                <MoreHorizontal
+                  className={`h-5 w-5 transition-transform duration-200 ${
+                    moreOpen || moreRouteActive ? "scale-125" : ""
+                  }`}
+                />
+                <span className={moreOpen || moreRouteActive ? "" : "sr-only"}>
+                  More
+                </span>
+              </button>
+            </div>
+          </nav>
 
-        <div
-          aria-hidden={!moreOpen}
-          className={`absolute bottom-[4.5rem] right-1 min-w-40 origin-bottom-right overflow-hidden rounded-2xl p-1 shadow-[0_10px_30px_rgba(0,0,0,0.14)] transition-[opacity,transform] duration-200 ease-out ${mobileGlassClass} ${
-            moreOpen
-              ? "pointer-events-auto scale-100 opacity-100"
-              : "pointer-events-none scale-95 opacity-0"
-          }`}
-        >
-          {[
-            {
-              icon: Users,
-              label: "Yappers",
-              path: `/friend/${user.username}/following`,
-            },
-            { icon: Star, label: "Favorite", path: "/favorite" },
-            { icon: History, label: "History", path: "/history" },
-            { icon: TrendingUp, label: "Trending", path: "/trend" },
-          ].map(({ icon: Icon, label, path }) => (
-            <NavLink
-              key={label}
-              to={path}
-              onClick={() => setMoreOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </NavLink>
-          ))}
-        </div>
+          <div
+            aria-hidden={!moreOpen}
+            className={`absolute bottom-[4.5rem] right-1 min-w-40 origin-bottom-right overflow-hidden rounded-2xl p-1 shadow-[0_10px_30px_rgba(0,0,0,0.14)] transition-[opacity,transform] duration-200 ease-out ${mobileGlassClass} ${
+              moreOpen
+                ? "pointer-events-auto scale-100 opacity-100"
+                : "pointer-events-none scale-95 opacity-0"
+            }`}
+          >
+            {[
+              {
+                icon: Users,
+                label: "Yappers",
+                path: `/friend/${user.username}/following`,
+              },
+              { icon: Star, label: "Favorite", path: "/favorite" },
+              { icon: History, label: "History", path: "/history" },
+              { icon: TrendingUp, label: "Trending", path: "/trend" },
+            ].map(({ icon: Icon, label, path }) => (
+              <NavLink
+                key={label}
+                to={path}
+                onClick={() => setMoreOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </NavLink>
+            ))}
+          </div>
         </div>
       )}
     </>
