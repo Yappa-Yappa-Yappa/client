@@ -1,39 +1,11 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import RightSidebar from "./RightSidebar";
-import ThemeToggle from "../ThemeToggle";
-import Logout from "../../pages/auth/Logout";
 
 export default function MainLayout() {
   const location = useLocation();
   const isProfilePage = location.pathname.startsWith("/profile/");
   const isFriendPage = location.pathname.startsWith("/friend/");
-
-  // Helper to display current section title based on route
-  const getPageTitle = (path) => {
-    switch (path) {
-      case "/home":
-        return "Home Feed";
-      case "/search":
-        return "Explore & Search";
-      case "/notification":
-        return "Notification Box";
-      case "/chat":
-        return "Yaps & Messages";
-      case "/friend":
-        return "Community Yappers";
-      case "/favorite":
-        return "Favorites Yaps";
-      case "/history":
-        return "Activity History";
-      case "/trend":
-        return "Trending Topics";
-      case "/suggestions":
-        return "Who to Follow";
-      default:
-        return "Yappa Yappa";
-    }
-  };
 
   return (
     <div
@@ -60,41 +32,22 @@ export default function MainLayout() {
               : "lg:pr-[280px] xl:pr-[320px]"
           }`}
         >
-          {/* Subtle Sticky Header */}
-          {location.pathname !== "/chat" && (
-            <header
-              className={`sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-black/5 bg-white/40 py-3 backdrop-blur-xl dark:border-white/5 dark:bg-black/20 sm:py-4 ${
-                location.pathname === "/home" ? "px-4" : "px-4 sm:px-6"
-              }`}
-            >
-              <h2 className="truncate text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 sm:text-base">
-                {getPageTitle(location.pathname)}
-              </h2>
-
-              <div className="flex items-center gap-3">
-                {/* Quick Actions */}
-                <ThemeToggle />
-                <Logout />
-              </div>
-            </header>
-          )}
-
           <div className="flex min-h-0 min-w-0 flex-1">
             {/* Page Content Rendered via Outlet */}
             <main
-              className={`relative min-h-0 min-w-0 flex-1 ${
+              className={`relative min-h-0 min-w-0 flex-1 border-x border-black/10 dark:border-neutral-800 ${
                 location.pathname === "/chat"
-                ? "max-w-none p-0"
-                : location.pathname === "/notification"
-                  ? "mx-auto w-full max-w-4xl p-0"
-                  : isProfilePage
+                  ? "max-w-none p-0"
+                  : location.pathname === "/notification"
                     ? "mx-auto w-full max-w-4xl p-0"
-                    : ["/home", "/search", "/trend"].includes(
-                          location.pathname,
-                        ) ||
-                        isFriendPage
+                    : isProfilePage
                       ? "mx-auto w-full max-w-4xl p-0"
-                  : "mx-auto w-full max-w-4xl p-0 sm:p-6 md:pb-6"
+                      : ["/home", "/trend"].includes(location.pathname) ||
+                          isFriendPage
+                        ? "mx-auto w-full max-w-4xl p-0"
+                        : location.pathname === "/search"
+                          ? "mx-auto w-full max-w-none p-0"
+                          : "mx-auto w-full max-w-4xl p-0 sm:p-6 md:pb-6"
               }`}
             >
               <Outlet />

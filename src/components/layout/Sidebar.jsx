@@ -18,6 +18,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { getUnreadConversationCount } from "../../api/conversation";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
+import Logout from "../../pages/auth/Logout";
 
 const socketUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/api\/?$/, "");
 const mobileGlassClass =
@@ -134,9 +135,9 @@ export default function Sidebar() {
       <aside
         className="sticky top-0 z-20 hidden h-screen w-[76px] shrink-0 self-start select-none flex-col px-2 py-6 transition-all duration-300 md:flex lg:w-[220px] lg:px-4
       /* Light Mode */
-      bg-neutral-100 border-r border-black/10 text-neutral-900
+      bg-neutral-100 text-neutral-900
       /* Dark Mode */
-      dark:bg-[#050508] dark:border-r dark:border-white/10 dark:text-neutral-100
+      dark:bg-[#050508] dark:text-neutral-100
       backdrop-blur-xl"
       >
         {/* Ambient Lighting Glows */}
@@ -192,6 +193,35 @@ export default function Sidebar() {
             </NavLink>
           ))}
         </nav>
+
+        <div className="relative z-10 mt-auto border-t border-black/10 pt-4 dark:border-white/10">
+          <Logout
+            ariaLabel="Open account menu"
+            username={user.username}
+            className="group flex w-full items-center justify-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-black/5 dark:hover:bg-white/5 lg:justify-start lg:px-2"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-500/20 font-bold text-indigo-600 dark:text-indigo-300">
+              {user.imageUrl ? (
+                <img
+                  src={user.imageUrl}
+                  alt={user.name || "Profile"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                (user.name || user.username || "Y")[0].toUpperCase()
+              )}
+            </span>
+            <span className="hidden min-w-0 flex-1 lg:block">
+              <strong className="block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                {user.name || "Yapper"}
+              </strong>
+              <span className="block truncate text-xs text-neutral-500">
+                @{user.username || "yapper"}
+              </span>
+            </span>
+            <MoreHorizontal className="hidden h-5 w-5 shrink-0 text-neutral-500 lg:block" />
+          </Logout>
+        </div>
       </aside>
 
       {!isMobileChatRoom && (

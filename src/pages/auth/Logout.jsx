@@ -1,35 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { NavLink, useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, Loader2, UserRound, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { LogOut, Loader2, X } from "lucide-react";
 
-export default function Logout() {
+export default function Logout({
+  children,
+  className,
+  ariaLabel = "Logout",
+  username,
+}) {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const [isOpen, setIsOpen] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const menuRef = useRef(null);
-  const { user } = useAuth();
-
-  const currentUser = user?.user || user?.data || user || {};
-  const displayName = currentUser.name || currentUser.username || "Yapper";
-  const avatarUrl =
-    currentUser.imageUrl || currentUser.avatar || currentUser.avatarUrl;
-  const userInitial = displayName[0]?.toUpperCase() || "Y";
+  const accountMenuRef = useRef(null);
 
   useEffect(() => {
+    if (!isAccountMenuOpen) return undefined;
+
     const handleOutsideClick = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsOpen(false);
+      if (!accountMenuRef.current?.contains(event.target)) {
+        setIsAccountMenuOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, []);
+    document.addEventListener("pointerdown", handleOutsideClick);
+    return () => document.removeEventListener("pointerdown", handleOutsideClick);
+  }, [isAccountMenuOpen]);
 
   const handleLogout = async () => {
     try {
@@ -45,61 +45,41 @@ export default function Logout() {
   };
 
   return (
-    <>
-      <div ref={menuRef} className="relative">
-        <button
-          onClick={() => setIsOpen((open) => !open)}
-          className="flex items-center gap-2 rounded-full p-1.5 pr-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-          aria-label="Open profile menu"
-          aria-expanded={isOpen}
-        >
-          <div className="w-9 h-9 rounded-full overflow-hidden bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center font-bold text-indigo-500 dark:text-indigo-400 text-xs shrink-0">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={displayName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span>{userInitial}</span>
-            )}
-          </div>
-          <ChevronDown
-            className={`w-4 h-4 text-neutral-400 transition-transform ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-
-        {isOpen && (
-          <div className="absolute right-0 top-12 z-30 min-w-48 overflow-hidden rounded-xl border border-black/10 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-xl">
-            <div className="border-b border-black/5 px-3 py-2.5 dark:border-white/10">
-              <p className="truncate text-xs font-semibold text-neutral-900 dark:text-neutral-100">
-                {displayName}
-              </p>
-              <p className="text-[11px] text-neutral-500">Account menu</p>
-            </div>
-            <NavLink
-              to={`/profile/${currentUser.username}`}
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-3 py-2.5 text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
-            >
-              <UserRound className="w-4 h-4" />
-              Profile
-            </NavLink>
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                setIsLogoutConfirmOpen(true);
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs text-red-500 hover:bg-red-500/10"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
-          </div>
+    <div ref={accountMenuRef} className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setIsAccountMenuOpen((open) => !open)}
+        className={
+          className ||
+          "flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-500 transition-colors hover:bg-red-500/10"
+        }
+        aria-label={ariaLabel}
+        aria-expanded={isAccountMenuOpen}
+      >
+        {children || (
+          <>
+            <LogOut className="h-4 w-4 shrink-0" />
+            <span className="inline md:hidden lg:inline">Logout</span>
+          </>
         )}
-      </div>
+      </button>
+
+      {isAccountMenuOpen && (
+        <div className="absolute bottom-[calc(100%+0.5rem)] left-0 z-50 w-64 rounded-2xl border border-black/10 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-neutral-900">
+          <button
+            type="button"
+            onClick={() => {
+              setIsAccountMenuOpen(false);
+              setIsLogoutConfirmOpen(true);
+            }}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-neutral-900 transition-colors hover:bg-black/5 dark:text-neutral-100 dark:hover:bg-white/10"
+          >
+            <span>
+              Log out <span className="font-normal">@{username || "yapper"}</span>
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Centered Modal Overlay via React Portal */}
       {isLogoutConfirmOpen &&
@@ -160,6 +140,6 @@ export default function Logout() {
           </div>,
           document.body,
         )}
-    </>
+    </div>
   );
 }

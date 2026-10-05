@@ -332,7 +332,7 @@ export default function Chat() {
             <RefreshCw className="h-4 w-4" />
           </button>
         </div>
-        <div className="max-h-full overflow-y-auto p-2">
+        <div className="max-h-full overflow-y-auto px-2 pt-2 pb-20 md:p-2">
           {loading ? (
             <p className="p-3 text-sm text-neutral-500">
               Loading conversations…

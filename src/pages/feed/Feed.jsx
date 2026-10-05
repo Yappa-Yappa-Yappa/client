@@ -20,7 +20,7 @@ import { getLikesByPost, likePost, unlikePost } from "../../api/like";
 import { useAuth } from "../../hooks/useAuth";
 import FeedSkeleton from "../../components/FeedSkeleton";
 import LinkifiedText from "../../components/LinkifiedText";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../../api/favorite";
 import ImageLightbox from "../../components/ImageLightbox";
 import {
@@ -454,6 +454,21 @@ export default function Feed() {
 
   return (
     <div className="w-full mx-auto space-y-0">
+      <div className="sticky top-0 z-10 flex h-[53px] w-full items-stretch border-b border-black/10 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-[#050508]/70">
+        <Link
+          to="/home"
+          className="relative flex flex-1 items-center justify-center text-sm font-semibold text-neutral-900 transition-colors hover:bg-black/5 dark:text-neutral-100 dark:hover:bg-white/5"
+        >
+          For you
+          <span className="absolute inset-x-1/4 bottom-0 h-1 rounded-full bg-indigo-500" />
+        </Link>
+        <Link
+          to="/home?tab=following"
+          className="flex flex-1 items-center justify-center text-sm font-semibold text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-white/5 dark:hover:text-neutral-100"
+        >
+          Following
+        </Link>
+      </div>
       {/* Hidden File Input */}
       <input
         type="file"
@@ -467,13 +482,28 @@ export default function Feed() {
       {/* Create Post Input Card */}
       <div className="p-4 bg-white/70 dark:bg-neutral-900/80 border border-black/10 dark:border-neutral-800 backdrop-blur-xl shadow-sm dark:shadow-xl transition-colors">
         <form onSubmit={handlePostSubmit}>
-          <textarea
-            value={postText}
-            onChange={(e) => setPostText(e.target.value)}
-            placeholder="What's happening? Start yapping..."
-            rows={3}
-            className="w-full bg-transparent resize-none outline-none text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 leading-relaxed"
-          />
+          <div className="flex items-start gap-3">
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600 dark:text-indigo-300">
+              {user?.imageUrl ? (
+                <img
+                  src={user.imageUrl}
+                  alt={user.name || "Profile"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="flex h-full items-center justify-center">
+                  {(user?.name || user?.username || "Y")[0].toUpperCase()}
+                </span>
+              )}
+            </div>
+            <textarea
+              value={postText}
+              onChange={(e) => setPostText(e.target.value)}
+              placeholder="What's happening? Start yapping..."
+              rows={3}
+              className="min-w-0 flex-1 resize-none bg-transparent text-base leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+            />
+          </div>
 
           {/* Multi-Image Upload Previews */}
           {imagePreviews.length > 0 && (
