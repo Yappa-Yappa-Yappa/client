@@ -453,7 +453,7 @@ export default function Profile() {
             </div>
           ) : profile.bio ? (
             <div className="group relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 text-sm border border-black/5 dark:border-neutral-800 transition-colors">
-              <p className="leading-relaxed">{profile.bio}</p>
+              <p className="whitespace-pre-line leading-relaxed">{profile.bio}</p>
               {isOwnProfile && (
                 <button
                   onClick={startEditingBio}

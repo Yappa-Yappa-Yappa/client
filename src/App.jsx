@@ -19,6 +19,7 @@ import PostDetail from "./pages/PostDetail";
 import CommentThread from "./pages/CommentThread";
 import NotFound from "./errors/NotFound";
 import Favorite from "./pages/Favorite";
+import Suggestions from "./pages/Suggestions";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="friend/:username/following" element={<Friend />} />
         <Route path="history" element={<History />} />
         <Route path="trend" element={<Trending />} />
+        <Route path="suggestions" element={<Suggestions />} />
         <Route path="favorite" element={<Favorite />} />
 
         {/* Profile */}

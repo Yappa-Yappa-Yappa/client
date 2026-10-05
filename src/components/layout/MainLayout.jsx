@@ -26,6 +26,8 @@ export default function MainLayout() {
         return "Activity History";
       case "/trend":
         return "Trending Topics";
+      case "/suggestions":
+        return "Who to Follow";
       default:
         return "Yappa Yappa";
     }

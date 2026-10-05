@@ -19,3 +19,10 @@ export const getFollowing = async (username) => {
   const res = await api.get(`/follows/${username}/following`);
   return res.data;
 };
+
+export const getSuggested = async (limit = 5) => {
+  const res = await api.get(`/follows/suggestions`, {
+    params: { limit },
+  });
+  return res.data;
+};
