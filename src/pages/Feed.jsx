@@ -15,19 +15,19 @@ import {
   Share2,
   Flag,
 } from "lucide-react";
-import { deleteFeed, editFeed, getFeeds, postFeed } from "../../api/post";
-import { getLikesByPost, likePost, unlikePost } from "../../api/like";
-import { useAuth } from "../../hooks/useAuth";
-import FeedSkeleton from "../../components/FeedSkeleton";
-import LinkifiedText from "../../components/LinkifiedText";
+import { deleteFeed, editFeed, getFeeds, postFeed } from "../api/post";
+import { getLikesByPost, likePost, unlikePost } from "../api/like";
+import { useAuth } from "../hooks/useAuth";
+import FeedSkeleton from "../components/FeedSkeleton";
+import LinkifiedText from "../components/LinkifiedText";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { addFavorite, removeFavorite } from "../../api/favorite";
-import ImageLightbox from "../../components/ImageLightbox";
+import { addFavorite, removeFavorite } from "../api/favorite";
+import ImageLightbox from "../components/ImageLightbox";
 import {
   showErrorToast,
   showSuccessToast,
   showWarningToast,
-} from "../../utils/toast";
+} from "../utils/toast";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
