@@ -117,7 +117,7 @@ export default function EditProfileModal({
           onSubmit={save}
           className="overflow-y-auto"
         >
-          <div className="relative h-36 bg-indigo-500 sm:h-44">
+          <div className="relative h-36 bg-indigo-500 sm:h-44 border-[0.5px] border-black">
             {profile.bgUrl && (
               <img
                 src={profile.bgUrl}

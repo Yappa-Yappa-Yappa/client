@@ -63,7 +63,7 @@ export default function MainLayout() {
         <div className="flex min-h-0 min-w-0 flex-1">
           {/* Page Content Rendered via Outlet */}
           <main
-            className={`relative z-0 min-h-0 min-w-0 flex-1 ${
+            className={`relative min-h-0 min-w-0 flex-1 ${
               location.pathname === "/chat"
                 ? "max-w-none p-0"
                 : "mx-auto w-full max-w-4xl p-4 sm:p-6 md:pb-6"
