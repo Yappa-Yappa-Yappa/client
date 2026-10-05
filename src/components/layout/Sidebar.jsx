@@ -132,7 +132,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className="relative hidden h-screen w-[220px] shrink-0 select-none flex-col px-4 py-6 transition-colors duration-300 md:flex z-20
+        className="relative z-20 hidden h-screen w-[76px] shrink-0 select-none flex-col px-2 py-6 transition-all duration-300 md:flex lg:w-[220px] lg:px-4
       /* Light Mode */
       bg-white/70 border-r border-black/10 text-neutral-900
       /* Dark Mode */
@@ -143,23 +143,24 @@ export default function Sidebar() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-36 bg-indigo-500/10 dark:bg-indigo-600/20 rounded-full blur-[70px] pointer-events-none" />
 
         {/* Brand Header */}
-        <div className="px-3 mb-8 relative z-10">
+        <div className="relative z-10 mb-8 px-0 text-center lg:px-3 lg:text-left">
           <Link
             to="/home"
             className="text-2xl font-lacquer tracking-wide text-indigo-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-neutral-200 dark:to-indigo-300"
           >
-            Yappa Yappa
+            <span className="hidden lg:inline">Yappa Yappa</span>
+            <span className="lg:hidden">Y</span>
           </Link>
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex flex-col gap-1.5 px-1 relative z-10">
+        <nav className="relative z-10 flex flex-col gap-1.5 px-0 lg:px-1">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `group px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-between ${
+                `group flex items-center justify-center rounded-xl px-2 py-2.5 text-sm font-medium transition-all duration-200 lg:justify-between lg:px-4 ${
                   isActive
                     ? /* Active State */
                       "bg-indigo-600/10 text-indigo-600 border border-indigo-500/20 font-semibold shadow-sm " +
@@ -171,23 +172,23 @@ export default function Sidebar() {
               }
             >
               {/* Group icon and text together */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-0 lg:gap-3">
                 {item.icon}
-                <span>{item.label}</span>
+                <span className="hidden lg:inline">{item.label}</span>
                 {item.label === "Notification" && unreadCount > 0 && (
-                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-center text-[10px] font-bold leading-none text-white">
+                  <span className="ml-auto hidden h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-center text-[10px] font-bold leading-none text-white lg:flex">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
                 {item.label === "Yap" && chatUnreadCount > 0 && (
-                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1.5 text-center text-[10px] font-bold leading-none text-white">
+                  <span className="ml-auto hidden h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1.5 text-center text-[10px] font-bold leading-none text-white lg:flex">
                     {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
                   </span>
                 )}
               </div>
 
               {/* Active Indicator Dot */}
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 opacity-0 group-[.active]:opacity-100 transition-opacity" />
+              <span className="hidden h-1.5 w-1.5 rounded-full bg-indigo-500 opacity-0 transition-opacity group-[.active]:opacity-100 lg:block" />
             </NavLink>
           ))}
         </nav>
