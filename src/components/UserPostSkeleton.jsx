@@ -1,7 +1,7 @@
 export default function UserPostSkeleton() {
   return (
     <div
-      className="w-full animate-pulse space-y-3 rounded-2xl border border-black/10 bg-white/60 p-5 dark:border-neutral-800
+      className="w-full animate-pulse space-y-3 border border-black/10 bg-white/60 p-5 dark:border-neutral-800
       dark:bg-neutral-900/60"
     >
       <div className="flex items-center gap-3">

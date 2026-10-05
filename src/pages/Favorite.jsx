@@ -67,16 +67,16 @@ export default function Favorite() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-4">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-neutral-200 dark:bg-neutral-800" />
-        <div className="h-36 animate-pulse rounded-2xl bg-neutral-200 dark:bg-neutral-800" />
-        <div className="h-36 animate-pulse rounded-2xl bg-neutral-200 dark:bg-neutral-800" />
+      <div className="mx-auto max-w-2xl space-y-4 px-4 sm:px-0">
+        <div className="h-8 w-48 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
+        <div className="h-36 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
+        <div className="h-36 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl px-4 sm:px-0">
       <div className="mb-5 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
           <Bookmark className="h-5 w-5 fill-current" />
@@ -115,7 +115,7 @@ export default function Favorite() {
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-0">
           {favorites.map((favorite) => {
             const post = favorite.post;
             if (!post) return null;
@@ -128,7 +128,7 @@ export default function Favorite() {
             return (
               <article
                 key={favorite.id || postId}
-                className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 shadow-sm transition-shadow hover:shadow-md dark:border-neutral-800/80 dark:bg-neutral-900/60"
+                className="overflow-hidden border border-black/10 bg-white/60 shadow-sm transition-shadow hover:shadow-md dark:border-neutral-800/80 dark:bg-neutral-900/60"
               >
                 <button
                   type="button"

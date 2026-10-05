@@ -346,7 +346,7 @@ export default function Chat() {
               <button
                 key={conversation.id}
                 onClick={() => selectConversation(conversation.id)}
-                className={`flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${activeId === conversation.id ? "bg-indigo-500/10" : "hover:bg-black/5 dark:hover:bg-white/5"}`}
+                className={`flex w-full items-center gap-3 p-3 text-left transition ${activeId === conversation.id ? "bg-indigo-500/10" : "hover:bg-black/5 dark:hover:bg-white/5"}`}
               >
                 <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600 dark:text-indigo-300">
                   {conversation.participant?.imageUrl ? (

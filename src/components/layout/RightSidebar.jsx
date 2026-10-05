@@ -85,7 +85,7 @@ export default function RightSidebar() {
   };
 
   return (
-    <aside className="fixed right-0 top-0 z-20 hidden h-screen w-[280px] space-y-4 overflow-y-auto border-l border-black/10 px-4 pb-6 pt-4 lg:block dark:border-white/10 xl:w-[320px] xl:px-6">
+    <aside className="fixed right-[max(0px,calc((100vw-1280px)/2))] top-0 z-20 hidden h-screen w-[280px] space-y-4 overflow-y-auto border-l border-black/10 px-4 pb-6 pt-4 lg:block dark:border-white/10 xl:w-[320px] xl:px-6">
       <form
         onSubmit={handleSearch}
         className="flex items-center gap-3 rounded-full border border-black/10 bg-white/70 px-4 py-3 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.05]"

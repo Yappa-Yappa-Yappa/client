@@ -1,7 +1,7 @@
 export default function ProfileSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-2xl animate-pulse">
-      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+    <div className="mx-auto w-full animate-pulse">
+      <div className="overflow-hidden border border-black/10 bg-white/60 dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="h-36 bg-neutral-200 dark:bg-neutral-800 sm:h-44" />
 
         <div className="px-6 pb-6">
@@ -21,11 +21,11 @@ export default function ProfileSkeleton() {
         <div className="m-6 h-16 rounded-xl bg-neutral-200 dark:bg-neutral-800" />
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="-mt-px space-y-0">
         {[1, 2].map((post) => (
           <div
             key={post}
-            className="space-y-3 rounded-2xl border border-black/10 bg-white/60 p-5 dark:border-neutral-800 dark:bg-neutral-900/60"
+            className="space-y-3 border border-black/10 bg-white/60 p-5 dark:border-neutral-800 dark:bg-neutral-900/60"
           >
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-neutral-200 dark:bg-neutral-800" />

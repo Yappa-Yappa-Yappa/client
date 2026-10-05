@@ -99,13 +99,13 @@ export default function PostDetail() {
 
   if (loading)
     return (
-      <div className="mx-auto max-w-2xl animate-pulse rounded-2xl bg-neutral-200 p-8 dark:bg-neutral-900">
+      <div className="mx-auto max-w-2xl animate-pulse bg-neutral-200 p-8 dark:bg-neutral-900">
         <div className="h-5 w-32 rounded bg-neutral-300 dark:bg-neutral-800" />
       </div>
     );
   if (error || !post)
     return (
-      <div className="mx-auto max-w-2xl rounded-2xl border border-black/10 p-8 text-center dark:border-neutral-800">
+      <div className="mx-auto max-w-2xl border border-black/10 p-8 text-center dark:border-neutral-800">
         <p className="text-sm text-neutral-500">{error || "Post not found."}</p>
         <Link
           to="/home"
@@ -124,7 +124,7 @@ export default function PostDetail() {
       >
         <ArrowLeft className="h-4 w-4" /> {backLabel}
       </Link>
-      <article className="rounded-2xl border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+      <article className="border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600">
             {post.user?.imageUrl ? (
@@ -165,7 +165,7 @@ export default function PostDetail() {
                 key={image.id || image.url}
                 src={image.url}
                 alt="Post attachment"
-                className="max-h-96 w-full rounded-xl object-cover"
+                className="max-h-96 w-full object-cover"
               />
             ))}
           </div>

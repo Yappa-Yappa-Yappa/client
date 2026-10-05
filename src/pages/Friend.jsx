@@ -51,10 +51,7 @@ export default function Friend() {
       setUsers(nextUsers);
       setFollowStates(
         Object.fromEntries(
-          nextUsers.map((user) => [
-            user.id,
-            Boolean(user.isFollowing),
-          ]),
+          nextUsers.map((user) => [user.id, Boolean(user.isFollowing)]),
         ),
       );
       setCount(result.count || 0);
@@ -96,7 +93,8 @@ export default function Friend() {
       }));
     } catch (requestError) {
       setActionError(
-        requestError.response?.data?.message || "Could not update follow status.",
+        requestError.response?.data?.message ||
+          "Could not update follow status.",
       );
     } finally {
       setFollowLoadingId(null);
@@ -115,8 +113,8 @@ export default function Friend() {
   }, [searchText, users]);
 
   return (
-    <section className="mx-auto w-full max-w-2xl">
-      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+    <section className="w-full">
+      <div className="overflow-hidden border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="flex items-center gap-3 border-b border-black/10 px-5 py-4 dark:border-neutral-800">
           <Link
             to={`/profile/${username}`}
@@ -224,11 +222,11 @@ export default function Friend() {
               No users match “{searchText}”.
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-0">
               {filteredUsers.map((user) => (
                 <div
                   key={user.id}
-                  className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                  className="flex items-center gap-3 p-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
                 >
                   <Link
                     to={`/profile/${user.username}`}
@@ -272,13 +270,20 @@ export default function Friend() {
                           : "bg-indigo-600 text-white shadow-sm hover:bg-indigo-500"
                       }`}
                     >
-                      {followLoadingId === user.id
-                        ? "Updating..."
-                        : followStates[user.id]
-                          ? <><span className="group-hover:hidden">Following</span><span className="hidden group-hover:inline">Unfollow</span></>
-                          : activeTab === "followers" && isViewingOwnProfile
-                            ? "Follow back"
-                            : "Follow"}
+                      {followLoadingId === user.id ? (
+                        "Updating..."
+                      ) : followStates[user.id] ? (
+                        <>
+                          <span className="group-hover:hidden">Following</span>
+                          <span className="hidden group-hover:inline">
+                            Unfollow
+                          </span>
+                        </>
+                      ) : activeTab === "followers" && isViewingOwnProfile ? (
+                        "Follow back"
+                      ) : (
+                        "Follow"
+                      )}
                     </button>
                   )}
                 </div>

@@ -256,8 +256,8 @@ export default function Profile() {
     return <div className="text-center py-10">Failed to load profile.</div>;
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+    <div className="mx-auto w-full">
+      <div className="overflow-hidden border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="group relative h-36 overflow-hidden bg-indigo-500 sm:h-44">
           {profile.bgUrl && (
             <img
@@ -452,8 +452,10 @@ export default function Profile() {
               </div>
             </div>
           ) : profile.bio ? (
-            <div className="group relative flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 text-sm border border-black/5 dark:border-neutral-800 transition-colors">
-              <p className="whitespace-pre-line leading-relaxed">{profile.bio}</p>
+            <div className="group relative flex items-center justify-between gap-3 px-4 py-3 bg-neutral-100 dark:bg-neutral-800/80 text-neutral-700 dark:text-neutral-300 text-sm border border-black/5 dark:border-neutral-800 transition-colors">
+              <p className="whitespace-pre-line leading-relaxed">
+                {profile.bio}
+              </p>
               {isOwnProfile && (
                 <button
                   onClick={startEditingBio}

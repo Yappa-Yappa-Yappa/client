@@ -195,7 +195,7 @@ export default function CommentSection({ postId }) {
   };
 
   return (
-    <section id="comments" className="mt-4 rounded-2xl border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+    <section id="comments" className="mt-4 border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
       <h2 className="text-sm font-bold">
         Comments{" "}
         <span className="font-normal text-neutral-500">

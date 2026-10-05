@@ -19,11 +19,11 @@ const formatDate = (date) =>
 
 function TrendingSkeleton() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-0">
       {[1, 2, 3].map((item) => (
         <div
           key={item}
-          className="animate-pulse rounded-2xl border border-black/5 bg-white/60 p-4 dark:border-white/10 dark:bg-white/[0.04]"
+          className="animate-pulse border border-black/5 bg-white/60 p-4 dark:border-white/10 dark:bg-white/[0.04]"
         >
           <div className="h-3 w-28 rounded bg-neutral-200 dark:bg-neutral-800" />
           <div className="mt-3 h-4 w-full rounded bg-neutral-200 dark:bg-neutral-800" />
@@ -61,8 +61,8 @@ export default function Trending() {
   }, []);
 
   return (
-    <section className="mx-auto w-full max-w-3xl space-y-6">
-      <div className="relative overflow-hidden rounded-3xl border border-indigo-500/15 bg-gradient-to-br from-indigo-500/10 via-white/70 to-fuchsia-500/10 p-6 shadow-sm dark:border-indigo-400/15 dark:from-indigo-500/15 dark:via-white/[0.04] dark:to-fuchsia-500/10 sm:p-8">
+    <section className="w-full space-y-6">
+      <div className="relative overflow-hidden border border-indigo-500/15 bg-gradient-to-br from-indigo-500/10 via-white/70 to-fuchsia-500/10 p-6 shadow-sm dark:border-indigo-400/15 dark:from-indigo-500/15 dark:via-white/[0.04] dark:to-fuchsia-500/10 sm:p-8">
         <div className="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-indigo-400/20 blur-3xl" />
         <div className="relative flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400 to-rose-500 text-white shadow-lg shadow-rose-500/20">
@@ -97,11 +97,11 @@ export default function Trending() {
       )}
 
       {!loading && !error && trending.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-0">
           {trending.map((post, index) => (
             <article
               key={post.id}
-              className="group rounded-2xl border border-black/10 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-indigo-400/30"
+              className="group border border-black/10 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-indigo-400/30"
             >
               <div className="flex items-start gap-3">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-sm font-bold text-indigo-600 dark:bg-indigo-400/10 dark:text-indigo-300">
@@ -142,7 +142,7 @@ export default function Trending() {
                     <img
                       src={post.images[0].url}
                       alt=""
-                      className="mt-3 max-h-52 w-full rounded-xl object-cover"
+                      className="mt-3 max-h-52 w-full object-cover"
                     />
                   )}
 

@@ -115,7 +115,7 @@ export default function PostCard({
   }, [openMenuPostId, setOpenMenuPostId]);
 
   return (
-    <article className="p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200 shadow-sm">
+    <article className="p-5 bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200">
       <div className="flex items-center justify-between mb-2.5">
         <NavLink
           to={`/profile/${post.user?.username || username}`}
@@ -245,7 +245,7 @@ export default function PostCard({
 
       {postImages.length > 0 && (
         <div
-          className={`grid gap-1.5 mb-3 rounded-2xl overflow-hidden border border-black/10 dark:border-neutral-800 ${getGridClass(postImages.length)}`}
+          className={`grid gap-1.5 mb-3 overflow-hidden border border-black/10 dark:border-neutral-800 ${getGridClass(postImages.length)}`}
         >
           {postImages.map((src, index) => (
             <button

@@ -67,7 +67,8 @@ export default function Search() {
     } catch (requestError) {
       setResults({ users: [], posts: [] });
       setError(
-        requestError.response?.data?.message || "Could not complete your search.",
+        requestError.response?.data?.message ||
+          "Could not complete your search.",
       );
     } finally {
       setLoading(false);
@@ -96,8 +97,8 @@ export default function Search() {
   const hasResults = visibleUsers.length > 0 || visiblePosts.length > 0;
 
   return (
-    <section className="mx-auto w-full max-w-3xl">
-      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
+    <section className="w-full">
+      <div className="overflow-hidden border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="border-b border-black/10 p-5 dark:border-neutral-800">
           <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
             Explore & Search
@@ -107,23 +108,23 @@ export default function Search() {
           </p>
 
           <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-black/10 bg-transparent px-3 dark:border-neutral-700">
-              <SearchIcon className="h-4 w-4 shrink-0 text-neutral-400" />
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search people or posts..."
-                className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none placeholder:text-neutral-400"
-              />
-              {query && (
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
-                  aria-label="Clear search"
-                >
-                  <X className="h-4 w-4" />
-                  </button>
-                )}
+            <SearchIcon className="h-4 w-4 shrink-0 text-neutral-400" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search people or posts..."
+              className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none placeholder:text-neutral-400"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -191,7 +192,9 @@ export default function Search() {
                             />
                           ) : (
                             <span className="flex h-full items-center justify-center">
-                              {(user.name || user.username || "Y")[0].toUpperCase()}
+                              {(user.name ||
+                                user.username ||
+                                "Y")[0].toUpperCase()}
                             </span>
                           )}
                         </div>

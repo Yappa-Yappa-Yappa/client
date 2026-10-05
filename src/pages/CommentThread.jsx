@@ -5,7 +5,7 @@ import {
   CornerUpLeft,
   Ellipsis,
   Heart,
-  MessageSquare,
+  MessageCircle,
   Pencil,
   Repeat2,
   Send,
@@ -33,9 +33,7 @@ const relativeTime = (value) => {
 const replaceComment = (thread, commentId, updater) => ({
   ...thread,
   comment:
-    thread.comment.id === commentId
-      ? updater(thread.comment)
-      : thread.comment,
+    thread.comment.id === commentId ? updater(thread.comment) : thread.comment,
   replies: thread.replies.map((reply) =>
     reply.id === commentId ? updater(reply) : reply,
   ),
@@ -259,8 +257,7 @@ export default function CommentThread() {
 
   const renderComment = (comment, isThreadRoot = false) => {
     const author = comment.user || {};
-    const isOwnComment =
-      author.id === user?.id || comment.userId === user?.id;
+    const isOwnComment = author.id === user?.id || comment.userId === user?.id;
     const isEditing = editingCommentId === comment.id;
 
     return (
@@ -367,7 +364,7 @@ export default function CommentThread() {
                 aria-label="View comment thread"
                 className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
               >
-                <MessageSquare className="h-4 w-4" />
+                <MessageCircle className="h-4 w-4" />
                 <span>{comment._count?.replies || 0}</span>
               </button>
               <button
@@ -376,7 +373,9 @@ export default function CommentThread() {
                 aria-label={comment.isLiked ? "Unlike comment" : "Like comment"}
                 className={`flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${comment.isLiked ? "text-rose-500" : ""}`}
               >
-                <Heart className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`} />
+                <Heart
+                  className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`}
+                />
                 <span>{comment._count?.likes || 0}</span>
               </button>
               <button
@@ -400,11 +399,19 @@ export default function CommentThread() {
               <button
                 type="button"
                 onClick={() => toggleCommentFavorite(comment)}
-                aria-label={comment.isFavorited ? "Remove comment bookmark" : "Bookmark comment"}
-                title={comment.isFavorited ? "Remove bookmark" : "Bookmark comment"}
+                aria-label={
+                  comment.isFavorited
+                    ? "Remove comment bookmark"
+                    : "Bookmark comment"
+                }
+                title={
+                  comment.isFavorited ? "Remove bookmark" : "Bookmark comment"
+                }
                 className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${comment.isFavorited ? "text-indigo-600 dark:text-indigo-400" : ""}`}
               >
-                <Bookmark className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`} />
+                <Bookmark
+                  className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`}
+                />
               </button>
               {isOwnComment && !isEditing && (
                 <div

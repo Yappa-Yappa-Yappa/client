@@ -453,7 +453,7 @@ export default function Feed() {
   }, [page, hasMore, loading, fetchPosts]);
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4">
+    <div className="w-full mx-auto space-y-0">
       {/* Hidden File Input */}
       <input
         type="file"
@@ -465,7 +465,7 @@ export default function Feed() {
       />
 
       {/* Create Post Input Card */}
-      <div className="p-4 rounded-2xl bg-white/70 dark:bg-neutral-900/80 border border-black/10 dark:border-neutral-800 backdrop-blur-xl shadow-sm dark:shadow-xl transition-colors">
+      <div className="p-4 bg-white/70 dark:bg-neutral-900/80 border border-black/10 dark:border-neutral-800 backdrop-blur-xl shadow-sm dark:shadow-xl transition-colors">
         <form onSubmit={handlePostSubmit}>
           <textarea
             value={postText}
@@ -521,11 +521,9 @@ export default function Feed() {
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-semibold transition-colors disabled:opacity-40"
             >
-              <ImageIcon className="w-4 h-4" />
-              <span>
-                {imageFiles.length > 0
-                  ? `${imageFiles.length}/5 Media`
-                  : "Media"}
+              <span className="flex items-center gap-1">
+                <ImageIcon className="h-4 w-4" />
+                {imageFiles.length > 0 && `${imageFiles.length}/5`}
               </span>
             </button>
 
@@ -562,7 +560,7 @@ export default function Feed() {
       )}
 
       {/* Feed List */}
-      <div className="space-y-3">
+      <div className="space-y-0">
         {posts.map((post) => {
           const postId = post._id || post.id;
           const authorId = post.userId || post.user?.id || post.authorId;
@@ -590,7 +588,7 @@ export default function Feed() {
               onKeyDown={(event) => handlePostKeyDown(event, postId)}
               tabIndex={0}
               role="link"
-              className="cursor-pointer p-5 rounded-2xl bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 transition-shadow duration-200 shadow-sm hover:shadow-md"
+              className="cursor-pointer p-5 bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 transition-shadow duration-200"
             >
               <div className="flex items-center justify-between mb-2.5">
                 <div className="flex items-center gap-3">

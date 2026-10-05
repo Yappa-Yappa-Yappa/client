@@ -132,11 +132,11 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className="relative z-20 hidden h-screen w-[76px] shrink-0 select-none flex-col px-2 py-6 transition-all duration-300 md:flex lg:w-[220px] lg:px-4
+        className="sticky top-0 z-20 hidden h-screen w-[76px] shrink-0 self-start select-none flex-col px-2 py-6 transition-all duration-300 md:flex lg:w-[220px] lg:px-4
       /* Light Mode */
-      bg-white/70 border-r border-black/10 text-neutral-900
+      bg-neutral-100 border-r border-black/10 text-neutral-900
       /* Dark Mode */
-      dark:bg-black/40 dark:border-r dark:border-white/10 dark:text-neutral-100
+      dark:bg-[#050508] dark:border-r dark:border-white/10 dark:text-neutral-100
       backdrop-blur-xl"
       >
         {/* Ambient Lighting Glows */}

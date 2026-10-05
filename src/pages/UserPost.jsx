@@ -216,7 +216,7 @@ export default function UserPost({ userId }) {
 
   if (loading) {
     return (
-      <div className="mt-5 space-y-4">
+      <div className="-mt-px space-y-0">
         <UserPostSkeleton />
         <UserPostSkeleton />
         <UserPostSkeleton />
@@ -226,7 +226,7 @@ export default function UserPost({ userId }) {
 
   return (
     <>
-      <div className="mt-5 space-y-4">
+      <div className="-mt-px space-y-0">
         {posts.length === 0 ? (
           <p className="text-center text-neutral-500">No posts yet.</p>
         ) : (
@@ -255,7 +255,7 @@ export default function UserPost({ userId }) {
         {hasMore && (
           <div ref={loadMoreRef} className="w-full py-4">
             {loadingMore && (
-              <div className="mt-5 space-y-4">
+              <div className="mt-5 space-y-0">
                 <UserPostSkeleton />
                 <UserPostSkeleton />
                 <UserPostSkeleton />

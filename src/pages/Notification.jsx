@@ -61,8 +61,8 @@ export default function Notification() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="w-full space-y-5">
+      <div className="flex items-center justify-between pt-6 px-4 sm:px-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">
             Stay in the loop
@@ -81,7 +81,7 @@ export default function Notification() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-sm text-rose-500">
+        <div className="mx-4 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-sm text-rose-500 sm:mx-6">
           {error}
           <button
             onClick={() => fetchNotifications()}
@@ -102,7 +102,7 @@ export default function Notification() {
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-0">
           {notifications.map((notification) => {
             const meta =
               notificationMeta[notification.type] || notificationMeta.LIKE;
@@ -111,7 +111,7 @@ export default function Notification() {
             return (
               <div
                 key={notification.id}
-                className={`group flex items-center gap-3 rounded-2xl border p-4 transition ${notification.isRead ? "border-black/10 bg-white/60 dark:border-neutral-800 dark:bg-neutral-900/60" : "border-indigo-500/20 bg-indigo-500/[0.07] dark:bg-indigo-500/10"}`}
+                className={`group flex items-center gap-3 border p-4 transition ${notification.isRead ? "border-black/10 bg-white/60 dark:border-neutral-800 dark:bg-neutral-900/60" : "border-indigo-500/20 bg-indigo-500/[0.07] dark:bg-indigo-500/10"}`}
               >
                 <button
                   onClick={() => openNotification(notification)}
