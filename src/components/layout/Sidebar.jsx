@@ -20,6 +20,7 @@ import { getUnreadConversationCount } from "../../api/conversation";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
 import Logout from "../../pages/auth/Logout";
+import ThemeToggle from "../ThemeToggle";
 
 const socketUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/api\/?$/, "");
 const mobileGlassClass =
@@ -133,6 +134,9 @@ export default function Sidebar() {
       icon: <Settings className="w-6 h-6 shrink-0" />,
       label: "Setting",
       path: "/setting",
+    },
+    {
+      icon: <ThemeToggle />,
     },
   ];
 

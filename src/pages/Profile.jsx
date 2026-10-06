@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Outlet, useNavigate, useParams } from "react-router-dom";
 import {
   getProfile,
   changeAvatar,
@@ -20,9 +20,9 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import UserPost from "./UserPost";
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import EditProfileModal from "../components/EditProfileModal";
+import ProfileTabs from "../components/ProfileTabs";
 
 const createCroppedImage = (imageSrc, pixelCrop) =>
   new Promise((resolve, reject) => {
@@ -576,7 +576,8 @@ export default function Profile() {
           isUploadingBackground={isUploadingBackground}
         />
       )}
-      <UserPost userId={profile.id} />
+      <ProfileTabs />
+      <Outlet context={{ profile }} />
     </div>
   );
 }

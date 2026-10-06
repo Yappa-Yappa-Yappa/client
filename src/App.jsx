@@ -23,6 +23,10 @@ import Suggestions from "./pages/Suggestions";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Setting from "./pages/Setting";
+import ProfilePosts from "./pages/profile/ProfilePosts";
+import ProfileReplies from "./pages/profile/ProfileReplies";
+import ProfileReposts from "./pages/profile/ProfileReposts";
+import ProfileMedia from "./pages/profile/ProfileMedia";
 
 export default function App() {
   return (
@@ -68,7 +72,12 @@ export default function App() {
         <Route path="setting" element={<Setting />} />
 
         {/* Profile */}
-        <Route path="profile/:username" element={<Profile />} />
+        <Route path="profile/:username" element={<Profile />}>
+          <Route index element={<ProfilePosts />} />
+          <Route path="replies" element={<ProfileReplies />} />
+          <Route path="reposts" element={<ProfileReposts />} />
+          <Route path="media" element={<ProfileMedia />} />
+        </Route>
       </Route>
 
       {/* Fallback for unknown public and protected URLs */}
