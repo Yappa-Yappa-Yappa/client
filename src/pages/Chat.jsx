@@ -13,6 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { getConversationMessages, getConversations } from "../api/conversation";
 import { useAuth } from "../hooks/useAuth";
+import ChatSkeleton from "../components/ChatSkeleton";
 
 const socketUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/api\/?$/, "");
 
@@ -334,9 +335,7 @@ export default function Chat() {
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-2 pt-2 pb-20 md:p-2">
           {loading ? (
-            <p className="p-3 text-sm text-neutral-500">
-              Loading conversations…
-            </p>
+            <ChatSkeleton variant="conversations" />
           ) : conversations.length === 0 ? (
             <p className="p-3 text-sm text-neutral-500">
               Open someone’s profile to start a chat.
@@ -407,7 +406,7 @@ export default function Chat() {
             <div className="min-h-0 flex-1 overflow-y-auto p-4">
               <div className="flex min-h-full flex-col justify-end">
               {messagesLoading ? (
-                <p className="text-sm text-neutral-500">Loading messages…</p>
+                <ChatSkeleton variant="messages" />
               ) : messages.length === 0 ? (
                 <p className="py-10 text-center text-sm text-neutral-500">
                   No messages yet. Say hello.
