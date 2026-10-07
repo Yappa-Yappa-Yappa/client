@@ -3,6 +3,7 @@ import {
   CheckCheck,
   Heart,
   MessageCircle,
+  Repeat2,
   Trash2,
   UserPlus,
 } from "lucide-react";
@@ -33,6 +34,11 @@ const notificationMeta = {
     icon: UserPlus,
     verb: "started following you",
     color: "text-emerald-500",
+  },
+  REPOST: {
+    icon: Repeat2,
+    verb: "reposted your yap",
+    color: "text-sky-500",
   },
 };
 
@@ -98,7 +104,7 @@ export default function Notification() {
           <Bell className="mx-auto h-8 w-8 text-neutral-400" />
           <h2 className="mt-3 font-semibold">You’re all caught up</h2>
           <p className="mt-1 text-sm text-neutral-500">
-            New likes, comments, and follows will appear here.
+            New likes, comments, follows, and reposts will appear here.
           </p>
         </div>
       ) : (
