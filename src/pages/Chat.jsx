@@ -342,16 +342,24 @@ export default function Chat() {
             </p>
           ) : (
             conversations.map((conversation) => (
-              <button
+              <div
                 key={conversation.id}
-                onClick={() => selectConversation(conversation.id)}
-                className={`flex w-full items-center gap-3 p-3 text-left transition ${activeId === conversation.id ? "bg-indigo-500/10" : "hover:bg-black/5 dark:hover:bg-white/5"}`}
+                className={`flex w-full items-center gap-3 rounded-xl p-3 transition ${activeId === conversation.id ? "bg-indigo-500/10" : "hover:bg-black/5 dark:hover:bg-white/5"}`}
               >
-                <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600 dark:text-indigo-300">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (conversation.participant?.username) {
+                      navigate(`/profile/${conversation.participant.username}`);
+                    }
+                  }}
+                  className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600 transition hover:ring-2 hover:ring-indigo-500/40 dark:text-indigo-300"
+                  aria-label={`Open ${conversation.participant?.name || "user"}'s profile`}
+                >
                   {conversation.participant?.imageUrl ? (
                     <img
                       src={conversation.participant.imageUrl}
-                      alt={conversation.participant.name}
+                      alt={conversation.participant.name || "Profile"}
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -359,16 +367,20 @@ export default function Chat() {
                       {(conversation.participant?.name || "Y")[0]}
                     </span>
                   )}
-                </div>
-                <span className="min-w-0 flex-1">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => selectConversation(conversation.id)}
+                  className="min-w-0 flex-1 text-left"
+                >
                   <strong className="block truncate text-sm">
                     {conversation.participant?.name || "Yapper"}
                   </strong>
                   <span className="block truncate text-xs text-neutral-500">
                     {conversation.lastMessage?.content || "No messages yet"}
                   </span>
-                </span>
-              </button>
+                </button>
+              </div>
             ))
           )}
         </div>
@@ -394,63 +406,93 @@ export default function Chat() {
               >
                 <PanelLeft className="h-4 w-4" />
               </button>
-              <div>
-                <p className="font-bold">
-                  {activeConversation.participant?.name || "Yapper"}
-                </p>
-                <p className="text-xs text-neutral-500">
-                  @{activeConversation.participant?.username || "yapper"}
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeConversation.participant?.username) {
+                    navigate(
+                      `/profile/${activeConversation.participant.username}`,
+                    );
+                  }
+                }}
+                className="min-w-0 text-left transition-opacity hover:opacity-75"
+                aria-label={`Open ${activeConversation.participant?.name || "user"}'s profile`}
+              >
+                <div className="flex space-x-2">
+                  <div className="w-11 h-11 overflow-hidden rounded-full bg-indigo-500/50">
+                    {activeConversation.participant?.imageUrl ? (
+                      <img
+                        src={activeConversation.participant.imageUrl}
+                        alt={activeConversation.participant.name || "Profile"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-full items-center justify-center font-bold text-indigo-700 dark:text-indigo-200">
+                        {(activeConversation.participant?.name || "Y")[0]}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="font-bold">
+                      {activeConversation.participant?.name || "Yapper"}
+                    </p>
+                    <p className="text-xs text-neutral-500">
+                      @{activeConversation.participant?.username || "yapper"}
+                    </p>
+                  </div>
+                </div>
+              </button>
             </header>
             <div className="min-h-0 flex-1 overflow-y-auto p-4">
               <div className="flex min-h-full flex-col justify-end">
-              {messagesLoading ? (
-                <ChatSkeleton variant="messages" />
-              ) : messages.length === 0 ? (
-                <p className="py-10 text-center text-sm text-neutral-500">
-                  No messages yet. Say hello.
-                </p>
-              ) : (
-                messages.map((message) => {
-                  const isOwnMessage = message.senderId === currentUser?.id;
-                  const status = getMessageStatus(message);
-                  return (
-                    <div
-                      key={message.id}
-                      className={`mb-3 flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
-                    >
+                {messagesLoading ? (
+                  <ChatSkeleton variant="messages" />
+                ) : messages.length === 0 ? (
+                  <p className="py-10 text-center text-sm text-neutral-500">
+                    No messages yet. Say hello.
+                  </p>
+                ) : (
+                  messages.map((message) => {
+                    const isOwnMessage = message.senderId === currentUser?.id;
+                    const status = getMessageStatus(message);
+                    return (
                       <div
-                        className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${isOwnMessage ? "bg-indigo-600 text-white" : "bg-neutral-100 dark:bg-neutral-800"}`}
+                        key={message.id}
+                        className={`mb-3 flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
                       >
-                        <p className="whitespace-pre-wrap">{message.content}</p>
-                        <span className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-60">
-                          <span>{formatTime(message.createdAt)}</span>
-                          {isOwnMessage &&
-                            (status === "sending" ? (
-                              <LoaderCircle
-                                className="h-3 w-3 animate-spin"
-                                aria-label="Sending"
-                              />
-                            ) : status === "seen" ? (
-                              <CheckCheck
-                                className="h-3 w-3 text-indigo-200"
-                                aria-label="Seen"
-                              />
-                            ) : status === "delivered" ? (
-                              <CheckCheck
-                                className="h-3 w-3"
-                                aria-label="Delivered"
-                              />
-                            ) : (
-                              <Check className="h-3 w-3" aria-label="Sent" />
-                            ))}
-                        </span>
+                        <div
+                          className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${isOwnMessage ? "bg-indigo-600 text-white" : "bg-neutral-100 dark:bg-neutral-800"}`}
+                        >
+                          <p className="whitespace-pre-wrap">
+                            {message.content}
+                          </p>
+                          <span className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-60">
+                            <span>{formatTime(message.createdAt)}</span>
+                            {isOwnMessage &&
+                              (status === "sending" ? (
+                                <LoaderCircle
+                                  className="h-3 w-3 animate-spin"
+                                  aria-label="Sending"
+                                />
+                              ) : status === "seen" ? (
+                                <CheckCheck
+                                  className="h-3 w-3 text-indigo-200"
+                                  aria-label="Seen"
+                                />
+                              ) : status === "delivered" ? (
+                                <CheckCheck
+                                  className="h-3 w-3"
+                                  aria-label="Delivered"
+                                />
+                              ) : (
+                                <Check className="h-3 w-3" aria-label="Sent" />
+                              ))}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })
-              )}
+                    );
+                  })
+                )}
                 <div ref={bottomRef} />
               </div>
             </div>
