@@ -13,7 +13,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { createComment, getCommentThread } from "../api/comment";
 import { favoriteComment, unfavoriteComment } from "../api/commentFavorite";
@@ -57,6 +57,7 @@ export default function CommentThread() {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editContent, setEditContent] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
+  const replyInputRef = useRef(null);
   const [activeImages, setActiveImages] = useState(null);
 
   const openImages = (images, currentIndex) =>
@@ -81,6 +82,13 @@ export default function CommentThread() {
       current.filter((image) => image.preview !== preview),
     );
   };
+
+  useEffect(() => {
+    if (!replyingTo) return;
+
+    const focusId = window.setTimeout(() => replyInputRef.current?.focus(), 0);
+    return () => window.clearTimeout(focusId);
+  }, [replyingTo]);
 
   const loadThread = useCallback(async () => {
     try {
@@ -524,6 +532,7 @@ export default function CommentThread() {
               >
                 <div className="min-w-0 flex-1">
                   <textarea
+                    ref={replyInputRef}
                     value={replyContent}
                     onChange={(event) => setReplyContent(event.target.value)}
                     maxLength={500}
