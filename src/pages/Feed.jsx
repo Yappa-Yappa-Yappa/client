@@ -22,7 +22,7 @@ import {
   getFollowingPosts,
   postFeed,
 } from "../api/post";
-import { getLikesByPost, likePost, unlikePost } from "../api/like";
+import { likePost, unlikePost } from "../api/like";
 import { useAuth } from "../hooks/useAuth";
 import FeedSkeleton from "../components/FeedSkeleton";
 import LinkifiedText from "../components/LinkifiedText";
@@ -131,31 +131,9 @@ export default function Feed({ feedType = "for-you" }) {
         setHasMore(pagination.page < pagination.totalPages);
         setPage(pagination.page);
 
-        const postsWithLikeState = await Promise.all(
-          newPosts.map(async (post) => {
-            const postId = post.id;
-            if (!postId || !user?.id) return post;
-
-            try {
-              const likesResponse = await getLikesByPost(postId);
-              const { count: likeCount, likes } = likesResponse?.data || {};
-
-              return {
-                ...post,
-                isLiked: (likes || []).some(
-                  (like) => like.user?.id === user.id,
-                ),
-                _count: { ...post._count, likes: likeCount },
-              };
-            } catch (err) {
-              console.error(`Failed to load likes for post ${postId}:`, err);
-              return post;
-            }
-          }),
-        );
         setPosts((prev) => {
-          if (pageNum === 1) return postsWithLikeState;
-          return [...prev, ...postsWithLikeState];
+          if (pageNum === 1) return newPosts;
+          return [...prev, ...newPosts];
         });
       } catch (err) {
         console.error("Failed to fetch posts:", err);
