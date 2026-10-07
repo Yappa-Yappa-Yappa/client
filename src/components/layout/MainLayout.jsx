@@ -10,13 +10,15 @@ export default function MainLayout() {
   return (
     <div
       id="main-scroll-container"
-      className={`h-screen w-screen overflow-x-hidden bg-neutral-100 text-neutral-900 transition-colors duration-300 dark:bg-[#050508] dark:text-neutral-100 ${
+      className={`${location.pathname === "/chat" ? "h-[100dvh]" : "h-screen"} w-screen overflow-x-hidden bg-neutral-100 text-neutral-900 transition-colors duration-300 dark:bg-[#050508] dark:text-neutral-100 ${
         location.pathname === "/chat" ? "overflow-y-hidden" : "overflow-y-auto"
       }`}
     >
       <div
-        className={`mx-auto flex min-h-screen w-full items-start ${
-          location.pathname === "/chat" ? "max-w-none" : "max-w-[1280px]"
+        className={`mx-auto flex w-full items-start ${
+          location.pathname === "/chat"
+            ? "max-w-none h-full min-h-0"
+            : "max-w-[1280px] min-h-screen"
         }`}
       >
         {/* Fixed Left Navigation */}
@@ -24,7 +26,7 @@ export default function MainLayout() {
 
         {/* Main Content Area with Contextual Sticky Header */}
         <div
-          className={`flex min-h-screen min-w-0 flex-1 flex-col ${
+          className={`flex min-h-0 min-w-0 flex-1 flex-col ${
             location.pathname === "/chat" ? "pb-0" : "pb-16"
           } md:pb-0 ${
             location.pathname === "/chat"
@@ -37,7 +39,7 @@ export default function MainLayout() {
             <main
               className={`relative min-h-0 min-w-0 flex-1 border-x border-black/10 dark:border-neutral-800 ${
                 location.pathname === "/chat"
-                  ? "max-w-none p-0"
+                  ? "h-full max-w-none overflow-hidden p-0"
                   : location.pathname === "/notification"
                     ? "mx-auto w-full max-w-4xl p-0"
                     : isProfilePage

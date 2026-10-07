@@ -313,9 +313,9 @@ export default function Chat() {
   };
 
   return (
-    <div className="relative flex h-full min-h-[420px] w-full overflow-hidden border-y border-black/10 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <div className="relative flex h-[100dvh] min-h-0 max-h-[100dvh] w-full overflow-hidden border-y border-black/10 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
       <aside
-        className={`${showConversationList ? "flex" : "hidden"} absolute inset-0 z-0 min-h-0 w-full shrink-0 flex-col bg-white dark:bg-neutral-900 md:relative md:flex md:w-72 md:bg-transparent md:dark:bg-transparent border-r border-black/10 dark:border-neutral-800`}
+        className={`${showConversationList ? "flex" : "hidden"} absolute inset-0 z-0 min-h-0 w-full shrink-0 flex-col overflow-hidden bg-white dark:bg-neutral-900 md:relative md:flex md:w-72 md:bg-transparent md:dark:bg-transparent border-r border-black/10 dark:border-neutral-800`}
       >
         <div className="flex items-center justify-between border-b border-black/10 p-4 dark:border-neutral-800">
           <div>
@@ -332,7 +332,7 @@ export default function Chat() {
             <RefreshCw className="h-4 w-4" />
           </button>
         </div>
-        <div className="max-h-full overflow-y-auto px-2 pt-2 pb-20 md:p-2">
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pt-2 pb-20 md:p-2">
           {loading ? (
             <p className="p-3 text-sm text-neutral-500">
               Loading conversations…
@@ -375,7 +375,7 @@ export default function Chat() {
         </div>
       </aside>
       <section
-        className={`${showConversationList ? "hidden md:flex" : "flex"} min-h-0 min-w-0 flex-1 flex-col`}
+        className={`${showConversationList ? "hidden md:flex" : "flex"} min-h-0 min-w-0 flex-1 flex-col overflow-hidden`}
       >
         {!activeConversation ? (
           <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
@@ -404,7 +404,8 @@ export default function Chat() {
                 </p>
               </div>
             </header>
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              <div className="flex min-h-full flex-col justify-end">
               {messagesLoading ? (
                 <p className="text-sm text-neutral-500">Loading messages…</p>
               ) : messages.length === 0 ? (
@@ -451,7 +452,8 @@ export default function Chat() {
                   );
                 })
               )}
-              <div ref={bottomRef} />
+                <div ref={bottomRef} />
+              </div>
             </div>
             <form
               onSubmit={(event) => {
