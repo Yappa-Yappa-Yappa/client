@@ -3,12 +3,14 @@ import {
   ChartColumn,
   CornerUpLeft,
   Ellipsis,
+  Image as ImageIcon,
   Heart,
   MessageCircle,
   Pencil,
   Repeat2,
   Send,
   Trash2,
+  X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +19,7 @@ import { favoriteComment, unfavoriteComment } from "../api/commentFavorite";
 import { deleteComment, updateComment } from "../api/commentActions";
 import { likeComment, unlikeComment } from "../api/commentLike";
 import { useAuth } from "../hooks/useAuth";
+import ImageLightbox from "./ImageLightbox";
 
 const relativeTime = (value) => {
   const seconds = Math.max(
@@ -34,6 +37,7 @@ export default function CommentSection({ postId }) {
   const navigate = useNavigate();
   const [comments, setComments] = useState([]);
   const [content, setContent] = useState("");
+  const [commentImages, setCommentImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
@@ -41,6 +45,30 @@ export default function CommentSection({ postId }) {
   const [error, setError] = useState("");
   const commentInputRef = useRef(null);
   const [openCommentMenuId, setOpenCommentMenuId] = useState(null);
+  const [activeImages, setActiveImages] = useState(null);
+
+  const openImages = (images, currentIndex) =>
+    setActiveImages({
+      images: images.map((image) => image.url || image),
+      currentIndex,
+    });
+
+  const addCommentImages = (event) => {
+    const selectedImages = Array.from(event.target.files || [])
+      .filter((file) => file.type.startsWith("image/"))
+      .slice(0, 3 - commentImages.length)
+      .map((file) => ({ file, preview: URL.createObjectURL(file) }));
+
+    setCommentImages((current) => [...current, ...selectedImages]);
+    event.target.value = "";
+  };
+
+  const removeCommentImage = (preview) => {
+    URL.revokeObjectURL(preview);
+    setCommentImages((current) =>
+      current.filter((image) => image.preview !== preview),
+    );
+  };
 
   const loadComments = useCallback(async () => {
     try {
@@ -61,14 +89,21 @@ export default function CommentSection({ postId }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const trimmedContent = content.trim();
-    if (!trimmedContent || submitting) return;
+    if ((!trimmedContent && commentImages.length === 0) || submitting) return;
 
     setSubmitting(true);
     setError("");
     try {
-      const response = await createComment(postId, trimmedContent);
+      const response = await createComment(
+        postId,
+        trimmedContent,
+        null,
+        commentImages.map((image) => image.file),
+      );
       setComments((current) => [...current, response.data]);
       setContent("");
+      commentImages.forEach((image) => URL.revokeObjectURL(image.preview));
+      setCommentImages([]);
       if (commentInputRef.current)
         commentInputRef.current.style.height = "auto";
     } catch (requestError) {
@@ -199,7 +234,8 @@ export default function CommentSection({ postId }) {
   };
 
   return (
-    <section
+    <>
+      <section
       id="comments"
       className="mt-4 border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60"
     >
@@ -209,21 +245,61 @@ export default function CommentSection({ postId }) {
           ({comments.length})
         </span>
       </h2>
-      <form onSubmit={handleSubmit} className="mt-4 flex items-end gap-2">
-        <textarea
-          ref={commentInputRef}
+      <form
+        onSubmit={handleSubmit}
+        className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end"
+      >
+        <div className="min-w-0 flex-1">
+          <textarea
+            id="comment-input"
+            ref={commentInputRef}
           value={content}
           onChange={handleContentChange}
           maxLength={500}
           rows={2}
           placeholder="Add a comment…"
-          className="w-full resize-none overflow-hidden rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700"
-        />
+            className="w-full resize-none overflow-hidden rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700"
+          />
+          {commentImages.length > 0 && (
+            <div className="mt-2 flex gap-2">
+              {commentImages.map((image) => (
+                <div key={image.preview} className="relative h-16 w-16">
+                  <img
+                    src={image.preview}
+                    alt="Comment preview"
+                    className="h-full w-full rounded-lg object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeCommentImage(image.preview)}
+                    className="absolute -right-1.5 -top-1.5 rounded-full bg-neutral-900 p-0.5 text-white"
+                    aria-label="Remove image"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {commentImages.length < 3 && (
+            <label className="mt-2 inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-neutral-500 hover:bg-indigo-500/10 hover:text-indigo-600">
+              <ImageIcon className="h-4 w-4" />
+              Add image/GIF
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={addCommentImages}
+                className="sr-only"
+              />
+            </label>
+          )}
+        </div>
         <button
           type="submit"
-          disabled={!content.trim() || submitting}
+          disabled={(!content.trim() && commentImages.length === 0) || submitting}
           aria-label="Post comment"
-          className="rounded-xl bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-500 disabled:opacity-50"
+          className="self-end rounded-xl bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-500 disabled:opacity-50 sm:self-auto"
         >
           <Send className="h-4 w-4" />
         </button>
@@ -280,6 +356,7 @@ export default function CommentSection({ postId }) {
                       </p>
                     )}
                     <div className="flex w-full items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
                       {editingCommentId === comment.id ? (
                         <div className="flex min-w-0 flex-1 flex-col gap-2">
                           <textarea
@@ -322,6 +399,29 @@ export default function CommentSection({ postId }) {
                           {comment.content}
                         </p>
                       )}
+                      {comment.images?.length > 0 && (
+                        <div className="mt-2 grid max-w-sm grid-cols-3 gap-2">
+                          {comment.images.map((image, index) => (
+                            <button
+                              type="button"
+                              key={image.id || image.url}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                openImages(comment.images, index);
+                              }}
+                              className="overflow-hidden rounded-lg"
+                              aria-label="Open comment image"
+                            >
+                              <img
+                                src={image.url}
+                                alt="Comment attachment"
+                                className="h-20 w-full object-cover transition hover:scale-105"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      </div>
                       {isOwnComment && editingCommentId !== comment.id && (
                         <div className="relative shrink-0">
                           <button
@@ -454,6 +554,29 @@ export default function CommentSection({ postId }) {
           })
         )}
       </div>
-    </section>
+      </section>
+      {activeImages && (
+        <ImageLightbox
+          images={activeImages.images}
+          currentIndex={activeImages.currentIndex}
+          onClose={() => setActiveImages(null)}
+          onPrevious={() =>
+            setActiveImages((current) => ({
+              ...current,
+              currentIndex:
+                (current.currentIndex - 1 + current.images.length) %
+                current.images.length,
+            }))
+          }
+          onNext={() =>
+            setActiveImages((current) => ({
+              ...current,
+              currentIndex:
+                (current.currentIndex + 1) % current.images.length,
+            }))
+          }
+        />
+      )}
+    </>
   );
 }

@@ -167,7 +167,7 @@ export default function PostCard({
       role="link"
       tabIndex={0}
       aria-label={`Open ${authorName}'s post`}
-      className="cursor-pointer p-5 bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200"
+      className="cursor-pointer border-x border-b border-black/10 bg-white/60 p-5 transition-all duration-200 hover:border-black/20 dark:border-neutral-800/80 dark:bg-neutral-900/60 dark:hover:border-neutral-700/80"
     >
       <div className="flex items-center justify-between mb-2.5">
         <NavLink

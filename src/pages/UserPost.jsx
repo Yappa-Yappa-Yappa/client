@@ -226,9 +226,13 @@ export default function UserPost({ userId, profileUsername }) {
 
   return (
     <>
-      <div className="-mt-px space-y-0">
+      <div className="space-y-px">
         {posts.length === 0 ? (
-          <p className="text-center text-neutral-500">No posts yet.</p>
+          <div className="flex min-h-36 items-center justify-center border-x border-b border-black/10 bg-white/60 px-6 py-8 text-center dark:border-neutral-800 dark:bg-neutral-900/60">
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              No posts yet.
+            </p>
+          </div>
         ) : (
           posts.map((post) => (
             <PostCard

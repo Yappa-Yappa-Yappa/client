@@ -100,6 +100,12 @@ export default function PostDetail() {
     }
   };
 
+  const focusCommentInput = () => {
+    const commentInput = document.getElementById("comment-input");
+    commentInput?.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => commentInput?.focus(), 300);
+  };
+
   useEffect(() => {
     const loadPost = async () => {
       try {
@@ -163,13 +169,16 @@ export default function PostDetail() {
 
   if (loading)
     return (
-      <div className="mx-auto max-w-2xl animate-pulse bg-neutral-200 p-8 dark:bg-neutral-900">
+      <div className="mx-auto max-w-2xl px-3 py-3 sm:px-0 sm:py-0">
+        <div className="animate-pulse bg-neutral-200 p-8 dark:bg-neutral-900">
         <div className="h-5 w-32 rounded bg-neutral-300 dark:bg-neutral-800" />
+        </div>
       </div>
     );
   if (error || !post)
     return (
-      <div className="mx-auto max-w-2xl border border-black/10 p-8 text-center dark:border-neutral-800">
+      <div className="mx-auto max-w-2xl px-3 py-3 sm:px-0 sm:py-0">
+        <div className="border border-black/10 p-8 text-center dark:border-neutral-800">
         <p className="text-sm text-neutral-500">{error || "Post not found."}</p>
         <Link
           to="/home"
@@ -177,11 +186,12 @@ export default function PostDetail() {
         >
           Back home
         </Link>
+        </div>
       </div>
     );
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4">
+    <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-3 sm:px-0 sm:py-0">
       <Link
         to={backPath}
         className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-500"
@@ -238,9 +248,7 @@ export default function PostDetail() {
           <button
             type="button"
             onClick={() =>
-              document
-                .getElementById("comments")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              focusCommentInput()
             }
             aria-label="View comments"
             className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"

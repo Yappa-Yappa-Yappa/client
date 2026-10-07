@@ -10,10 +10,17 @@ export const getCommentThread = async (commentId) => {
   return res.data;
 };
 
-export const createComment = async (postId, content, parentId = null) => {
-  const res = await api.post(`/posts/${postId}/comments`, {
-    content,
-    ...(parentId ? { parentId } : {}),
-  });
+export const createComment = async (
+  postId,
+  content,
+  parentId = null,
+  images = [],
+) => {
+  const formData = new FormData();
+  formData.append("content", content);
+  if (parentId) formData.append("parentId", parentId);
+  images.forEach((image) => formData.append("images", image));
+
+  const res = await api.post(`/posts/${postId}/comments`, formData);
   return res.data;
 };

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import RightSidebar from "./RightSidebar";
@@ -6,6 +7,11 @@ export default function MainLayout() {
   const location = useLocation();
   const isProfilePage = location.pathname.startsWith("/profile/");
   const isFriendPage = location.pathname.startsWith("/friend/");
+
+  useEffect(() => {
+    const scrollContainer = document.getElementById("main-scroll-container");
+    scrollContainer?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname]);
 
   return (
     <div
