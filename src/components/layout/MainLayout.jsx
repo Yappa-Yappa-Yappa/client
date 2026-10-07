@@ -42,7 +42,7 @@ export default function MainLayout() {
                     ? "mx-auto w-full max-w-4xl p-0"
                     : isProfilePage
                       ? "mx-auto w-full max-w-4xl p-0"
-                      : ["/home", "/trend"].includes(location.pathname) ||
+                      : ["/home", "/following", "/trend"].includes(location.pathname) ||
                           isFriendPage
                         ? "mx-auto w-full max-w-4xl p-0"
                         : location.pathname === "/search"

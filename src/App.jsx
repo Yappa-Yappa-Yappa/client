@@ -57,7 +57,8 @@ export default function App() {
         <Route index element={<Navigate to="/home" replace />} />
 
         {/* Sidebar Nav Links */}
-        <Route path="home" element={<Feed />} />
+        <Route path="home" element={<Feed feedType="for-you" />} />
+        <Route path="following" element={<Feed feedType="following" />} />
         <Route path="search" element={<Search />} />
         <Route path="notification" element={<Notification />} />
         <Route path="post/:id" element={<PostDetail />} />

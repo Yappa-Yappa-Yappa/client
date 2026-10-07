@@ -15,7 +15,13 @@ import {
   Share2,
   Flag,
 } from "lucide-react";
-import { deleteFeed, editFeed, getFeeds, postFeed } from "../api/post";
+import {
+  deleteFeed,
+  editFeed,
+  getFeeds,
+  getFollowingPosts,
+  postFeed,
+} from "../api/post";
 import { getLikesByPost, likePost, unlikePost } from "../api/like";
 import { useAuth } from "../hooks/useAuth";
 import FeedSkeleton from "../components/FeedSkeleton";
@@ -44,7 +50,7 @@ const formatRelativeTime = (dateValue) => {
   return `${Math.floor(seconds / 31536000)}y ago`;
 };
 
-export default function Feed() {
+export default function Feed({ feedType = "for-you" }) {
   const navigate = useNavigate();
 
   const openPost = (postId) => {
@@ -116,7 +122,10 @@ export default function Feed() {
       try {
         setLoading(true);
         setError(null);
-        const response = await getFeeds(pageNum, 20);
+        const response =
+          feedType === "following"
+            ? await getFollowingPosts(pageNum, 20)
+            : await getFeeds(pageNum, 20);
         const { posts: newPosts, pagination } = response.data;
 
         setHasMore(pagination.page < pagination.totalPages);
@@ -156,7 +165,7 @@ export default function Feed() {
         if (pageNum > 1) loadingMoreRef.current = false;
       }
     },
-    [user],
+    [user, feedType],
   );
 
   useEffect(() => {
@@ -457,16 +466,29 @@ export default function Feed() {
       <div className="sticky top-0 z-10 flex h-[53px] w-full items-stretch border-b border-black/10 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-[#050508]/70">
         <Link
           to="/home"
-          className="relative flex flex-1 items-center justify-center text-sm font-semibold text-neutral-900 transition-colors hover:bg-black/5 dark:text-neutral-100 dark:hover:bg-white/5"
+          className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
+            feedType === "for-you"
+              ? "text-neutral-900 dark:text-neutral-100"
+              : "text-neutral-500 dark:text-neutral-400"
+          }`}
         >
           For you
-          <span className="absolute inset-x-1/4 bottom-0 h-1 rounded-full bg-indigo-500" />
+          {feedType === "for-you" && (
+            <span className="absolute inset-x-1/4 bottom-0 h-1 rounded-full bg-indigo-500" />
+          )}
         </Link>
         <Link
-          to="/home?tab=following"
-          className="flex flex-1 items-center justify-center text-sm font-semibold text-neutral-500 transition-colors hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-white/5 dark:hover:text-neutral-100"
+          to="/following"
+          className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
+            feedType === "following"
+              ? "text-neutral-900 dark:text-neutral-100"
+              : "text-neutral-500 dark:text-neutral-400"
+          }`}
         >
           Following
+          {feedType === "following" && (
+            <span className="absolute inset-x-1/4 bottom-0 h-1 rounded-full bg-indigo-500" />
+          )}
         </Link>
       </div>
       {/* Hidden File Input */}
