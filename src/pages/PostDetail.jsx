@@ -23,7 +23,11 @@ export default function PostDetail() {
   const { user: currentUser } = useAuth();
   const backPath = location.state?.from || "/home";
   const backLabel =
-    backPath === "/notification" ? "Back to notifications" : "Back to home";
+    backPath === "/notification"
+      ? "Back to notifications"
+      : backPath.startsWith("/profile/")
+        ? "Back to profile"
+        : "Back to home";
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

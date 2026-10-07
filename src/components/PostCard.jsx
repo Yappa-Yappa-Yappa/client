@@ -54,6 +54,7 @@ export default function PostCard({
   handleFavoriteToggle,
   favoritingPostIds,
   openModal,
+  postDetailFrom = "/home",
 }) {
   const navigate = useNavigate();
   const [shareStatus, setShareStatus] = useState("");
@@ -125,6 +126,23 @@ export default function PostCard({
     }
   };
 
+  const openPostDetail = () => {
+    navigate(`/post/${postId}`, { state: { from: postDetailFrom } });
+  };
+
+  const handleCardClick = (event) => {
+    if (event.target.closest("button, a, input, textarea, select")) return;
+    openPostDetail();
+  };
+
+  const handleCardKeyDown = (event) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openPostDetail();
+  };
+
   useEffect(() => {
     if (!openMenuPostId) return;
 
@@ -143,7 +161,14 @@ export default function PostCard({
   }, [openMenuPostId, setOpenMenuPostId]);
 
   return (
-    <article className="p-5 bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200">
+    <article
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      role="link"
+      tabIndex={0}
+      aria-label={`Open ${authorName}'s post`}
+      className="cursor-pointer p-5 bg-white/60 dark:bg-neutral-900/60 border border-black/10 dark:border-neutral-800/80 hover:border-black/20 dark:hover:border-neutral-700/80 transition-all duration-200"
+    >
       <div className="flex items-center justify-between mb-2.5">
         <NavLink
           to={`/profile/${post.user?.username || username}`}
@@ -303,10 +328,8 @@ export default function PostCard({
       )}
 
       <div className="flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400">
-        <button
-          onClick={() =>
-            navigate(`/post/${postId}`, { state: { from: "/home" } })
-          }
+          <button
+          onClick={openPostDetail}
           aria-label="View comments"
           className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
         >

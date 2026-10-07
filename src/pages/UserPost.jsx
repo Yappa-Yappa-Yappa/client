@@ -8,7 +8,7 @@ import UserPostSkeleton from "../components/UserPostSkeleton";
 import { useAuth } from "../hooks/useAuth";
 import { showSuccessToast } from "../utils/toast";
 
-export default function UserPost({ userId }) {
+export default function UserPost({ userId, profileUsername }) {
   const { user: currentUser } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -249,6 +249,9 @@ export default function UserPost({ userId }) {
               handleFavoriteToggle={handleFavoriteToggle}
               favoritingPostIds={favoritingPostIds}
               openModal={openModal}
+              postDetailFrom={
+                profileUsername ? `/profile/${profileUsername}` : "/home"
+              }
             />
           ))
         )}
