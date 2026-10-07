@@ -153,6 +153,7 @@ export default function Sidebar() {
         <div className="relative z-10 mb-8 px-0 text-center lg:px-3 lg:text-left">
           <Link
             to="/home"
+            onClick={() => window.reload()}
             className="text-2xl font-lacquer tracking-wide text-indigo-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:via-neutral-200 dark:to-indigo-300"
           >
             <span className="hidden lg:inline">Yappa Yappa</span>

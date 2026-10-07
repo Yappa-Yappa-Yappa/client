@@ -167,6 +167,24 @@ export default function Feed({ feedType = "for-you" }) {
     setImagePreviews(previews);
   };
 
+  // // Handle user wanting to refresh the Feed
+  // const handleForYouClick = (event) => {
+  //   if (feedType === "for-you") {
+  //     event.preventDefault();
+  //     loadingMoreRef.current = false;
+  //     fetchPosts(1);
+  //   }
+  // };
+
+  // Handle user wanting to refresh the Following Feed
+  const handleFeedTabClick = (event, targetFeedType) => {
+    if (feedType !== targetFeedType) return;
+
+    event.preventDefault();
+    loadingMoreRef.current = false;
+    fetchPosts(1);
+  };
+
   const handleShare = async (sharedPost) => {
     const sharedPostId = sharedPost._id || sharedPost.id;
     const sharedAuthorName =
@@ -444,6 +462,7 @@ export default function Feed({ feedType = "for-you" }) {
       <div className="sticky top-0 z-10 flex h-[53px] w-full items-stretch border-b border-black/10 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-[#050508]/70">
         <Link
           to="/home"
+          onClick={(event) => handleFeedTabClick(event, "for-you")}
           className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
             feedType === "for-you"
               ? "text-neutral-900 dark:text-neutral-100"
@@ -457,6 +476,7 @@ export default function Feed({ feedType = "for-you" }) {
         </Link>
         <Link
           to="/following"
+          onClick={(event) => handleFeedTabClick(event, "following")}
           className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
             feedType === "following"
               ? "text-neutral-900 dark:text-neutral-100"
