@@ -75,7 +75,7 @@ export default function App() {
         {/* Profile */}
         <Route path="profile/:username" element={<Profile />}>
           <Route index element={<ProfilePosts />} />
-          <Route path="replies" element={<ProfileReplies />} />
+          <Route path="comments" element={<ProfileReplies />} />
           <Route path="reposts" element={<ProfileReposts />} />
           <Route path="media" element={<ProfileMedia />} />
         </Route>

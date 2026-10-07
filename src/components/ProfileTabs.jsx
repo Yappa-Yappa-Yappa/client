@@ -2,7 +2,7 @@ import { NavLink, useParams } from "react-router-dom";
 
 const tabs = [
   { label: "Posts", slug: "posts" },
-  { label: "Replies", slug: "replies" },
+  { label: "Comments", slug: "comments" },
   { label: "Reposts", slug: "reposts" },
   { label: "Media", slug: "media" },
 ];

@@ -35,3 +35,8 @@ export const getProfile = async (username) => {
   const res = await api.get(`/user/${username}`);
   return res.data;
 };
+
+export const getCommentsByUser = async (username) => {
+  const res = await api.get(`/user/${username}/comments`);
+  return res.data;
+};
