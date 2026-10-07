@@ -205,7 +205,7 @@ export default function Sidebar() {
           <Logout
             ariaLabel="Open account menu"
             username={user.username}
-            className="group flex w-full items-center justify-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-black/5 dark:hover:bg-white/5 lg:justify-start lg:px-2"
+            className="group flex w-full items-center justify-center gap-3 rounded-full px-2 py-2 text-left transition-colors hover:bg-black/5 dark:hover:bg-white/5 lg:justify-start lg:px-2"
           >
             <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-500/20 font-bold text-indigo-600 dark:text-indigo-300">
               {user.imageUrl ? (
