@@ -9,14 +9,18 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../api/favorite";
-import { likePost, unlikePost } from "../api/like";
+import { getLikesByPost, likePost, unlikePost } from "../api/like";
+import { repostPost, removeRepost, getRepostStatus } from "../api/repost";
+import { getFavorites } from "../api/favorite";
 import { getFeedById, incrementView } from "../api/post";
 import CommentSection from "../components/CommentSection";
 import LinkifiedText from "../components/LinkifiedText";
+import { useAuth } from "../hooks/useAuth";
 
 export default function PostDetail() {
   const { id } = useParams();
   const location = useLocation();
+  const { user: currentUser } = useAuth();
   const backPath = location.state?.from || "/home";
   const backLabel =
     backPath === "/notification" ? "Back to notifications" : "Back to home";
@@ -65,12 +69,68 @@ export default function PostDetail() {
     }
   };
 
+  const toggleRepost = async () => {
+    if (!post) return;
+
+    const isReposted = Boolean(post.isReposted);
+    const currentCount = post._count?.reposts || 0;
+    setPost((current) => ({
+      ...current,
+      isReposted: !isReposted,
+      _count: {
+        ...current._count,
+        reposts: Math.max(0, currentCount + (isReposted ? -1 : 1)),
+      },
+    }));
+
+    try {
+      if (isReposted) await removeRepost(post.id);
+      else await repostPost(post.id);
+    } catch {
+      setPost((current) => ({
+        ...current,
+        isReposted,
+        _count: { ...current._count, reposts: currentCount },
+      }));
+      setError("Could not update the repost.");
+    }
+  };
+
   useEffect(() => {
-    getFeedById(id)
-      .then((response) => setPost(response.data))
+    const loadPost = async () => {
+      try {
+        const [postResponse, likesResponse, favoritesResponse, repostResponse] =
+          await Promise.all([
+            getFeedById(id),
+            getLikesByPost(id),
+            getFavorites(),
+            getRepostStatus(id),
+          ]);
+
+        const likes = likesResponse.data?.likes || [];
+        const favorites = favoritesResponse.data || [];
+        const nextPost = postResponse.data;
+
+        setPost({
+          ...nextPost,
+          isLiked: likes.some(
+            (like) => like.user?.id === currentUser?.id,
+          ),
+          isFavorited: favorites.some(
+            (favorite) =>
+              favorite.postId === id || favorite.post?.id === id,
+          ),
+          isReposted: Boolean(repostResponse.data),
+        });
+      } catch {
+        setError("This yap is no longer available.");
+      }
+    };
+
+    loadPost()
       .catch(() => setError("This yap is no longer available."))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, currentUser?.id]);
 
   useEffect(() => {
     // Stop if there is no post ID or this post was already counted.
@@ -203,11 +263,12 @@ export default function PostDetail() {
           </button>
           <button
             type="button"
-            aria-label="Repost post"
-            className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+            onClick={toggleRepost}
+            aria-label={post.isReposted ? "Remove repost" : "Repost post"}
+            className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${post.isReposted ? "text-emerald-600 dark:text-emerald-400" : ""}`}
           >
             <Repeat2 className="h-4 w-4" />
-            <span>{post.repostCount || 0}</span>
+            <span>{post._count?.reposts || 0}</span>
           </button>
           <button
             type="button"

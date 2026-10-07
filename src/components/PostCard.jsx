@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { repostPost, removeRepost } from "../api/repost";
 import LinkifiedText from "./LinkifiedText";
 
 const formatRelativeTime = (dateValue) => {
@@ -56,6 +57,11 @@ export default function PostCard({
 }) {
   const navigate = useNavigate();
   const [shareStatus, setShareStatus] = useState("");
+  const [isReposted, setIsReposted] = useState(Boolean(post.isReposted));
+  const [repostCount, setRepostCount] = useState(
+    post._count?.reposts ?? post.repostCount ?? post.reposts ?? 0,
+  );
+  const [isReposting, setIsReposting] = useState(false);
   const postId = post._id || post.id;
   const authorId = post.userId || post.user?.id || post.authorId;
   const isOwnPost = Boolean(currentUser?.id && authorId === currentUser.id);
@@ -94,6 +100,28 @@ export default function PostCard({
     } catch (error) {
       if (error?.name !== "AbortError") setShareStatus("Could not share");
       window.setTimeout(() => setShareStatus(""), 2200);
+    }
+  };
+
+  const handleRepost = async () => {
+    if (isReposting) return;
+
+    const nextIsReposted = !isReposted;
+    setIsReposting(true);
+    setIsReposted(nextIsReposted);
+    setRepostCount((count) => Math.max(0, count + (nextIsReposted ? 1 : -1)));
+
+    try {
+      if (nextIsReposted) await repostPost(postId);
+      else await removeRepost(postId);
+    } catch (error) {
+      console.error("Failed to update repost state:", error);
+      setIsReposted(!nextIsReposted);
+      setRepostCount((count) =>
+        Math.max(0, count + (nextIsReposted ? -1 : 1)),
+      );
+    } finally {
+      setIsReposting(false);
     }
   };
 
@@ -311,13 +339,18 @@ export default function PostCard({
         </button>
 
         <button
-          aria-label="Repost"
-          className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+          onClick={handleRepost}
+          disabled={isReposting}
+          aria-label={isReposted ? "Remove repost" : "Repost"}
+          title={isReposted ? "Remove repost" : "Repost"}
+          className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
+            isReposted
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+          }`}
         >
           <Repeat2 className="w-4 h-4" />
-          <span>
-            {post.repostCount ?? post.reposts ?? post._count?.reposts ?? 0}
-          </span>
+          <span>{repostCount}</span>
         </button>
 
         <button

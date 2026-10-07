@@ -23,6 +23,7 @@ import {
   postFeed,
 } from "../api/post";
 import { likePost, unlikePost } from "../api/like";
+import { repostPost, removeRepost } from "../api/repost";
 import { useAuth } from "../hooks/useAuth";
 import FeedSkeleton from "../components/FeedSkeleton";
 import LinkifiedText from "../components/LinkifiedText";
@@ -78,6 +79,7 @@ export default function Feed({ feedType = "for-you" }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likingPostIds, setLikingPostIds] = useState(new Set());
   const [favoritingPostIds, setFavoritingPostIds] = useState(new Set());
+  const [repostingPostIds, setRepostingPostIds] = useState(new Set());
   const [error, setError] = useState(null);
   const { user } = useAuth();
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
@@ -305,6 +307,43 @@ export default function Feed({ feedType = "for-you" }) {
       showErrorToast("Failed to update the post favorite.");
     } finally {
       setFavoritingPostIds((ids) => {
+        const nextIds = new Set(ids);
+        nextIds.delete(postId);
+        return nextIds;
+      });
+    }
+  };
+
+  const handleRepost = async (postId, isReposted) => {
+    if (!postId || repostingPostIds.has(postId)) return;
+
+    const previousPosts = posts;
+    const currentPost = posts.find((post) => (post._id || post.id) === postId);
+    const currentCount = currentPost?._count?.reposts ?? 0;
+    const nextCount = Math.max(0, currentCount + (isReposted ? -1 : 1));
+
+    setRepostingPostIds((ids) => new Set(ids).add(postId));
+    setPosts((currentPosts) =>
+      currentPosts.map((post) =>
+        (post._id || post.id) === postId
+          ? {
+              ...post,
+              isReposted: !isReposted,
+              _count: { ...post._count, reposts: nextCount },
+            }
+          : post,
+      ),
+    );
+
+    try {
+      if (isReposted) await removeRepost(postId);
+      else await repostPost(postId);
+    } catch (err) {
+      console.error("Failed to update repost state:", err);
+      setPosts(previousPosts);
+      showErrorToast("Could not update repost.");
+    } finally {
+      setRepostingPostIds((ids) => {
         const nextIds = new Set(ids);
         nextIds.delete(postId);
         return nextIds;
@@ -845,8 +884,17 @@ export default function Feed({ feedType = "for-you" }) {
                 </button>
 
                 <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRepost(postId, Boolean(post.isReposted));
+                  }}
+                  disabled={repostingPostIds.has(postId)}
                   aria-label="Repost"
-                  className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                  className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
+                    post.isReposted
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                  }`}
                 >
                   <Repeat2 className="w-4 h-4" />
                   <span>
