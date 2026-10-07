@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Cropper from "react-easy-crop";
 import {
   Camera,
+  ArrowLeft,
   PenLine,
   Check,
   X,
@@ -251,12 +252,35 @@ export default function Profile() {
     }
   };
 
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/home");
+  };
+
   if (loading) return <ProfileSkeleton />;
   if (!profile)
     return <div className="text-center py-10">Failed to load profile.</div>;
 
   return (
     <div className="mx-auto w-full">
+      <div className="border-b border-black/10 bg-white/70 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-neutral-900/70">
+        <button
+          type="button"
+          onClick={goBack}
+          className="flex min-w-0 items-center gap-3 text-left transition-opacity hover:opacity-75"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-bold text-neutral-900 dark:text-neutral-100">
+              {profile.name}
+            </span>
+            <span className="block truncate text-xs text-neutral-500">
+              @{profile.username}
+            </span>
+          </span>
+        </button>
+      </div>
       <div className="overflow-hidden border border-black/10 bg-white/60 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="group relative h-36 overflow-hidden bg-indigo-500 sm:h-44">
           {profile.bgUrl && (
