@@ -35,7 +35,17 @@ No tests or coverage thresholds are defined. If adding tests, colocate them with
 
 ## Commit & Pull Request Guidelines
 
-Existing commits use short imperative-style prefixes such as `feat:`, `fix:`, and `add:` (for example, `feat: notifications`). Follow that concise convention and keep each commit focused.
+Use concise conventional commit prefixes and keep each commit focused:
+
+- `feat:` — new functionality
+- `fix:` — bug fixes
+- `perf:` — performance improvements
+- `refactor:` — code restructuring without behavior changes
+- `style:` — styling-only changes
+- `docs:` — documentation changes
+- `chore:` — maintenance or configuration work
+
+Older history also uses `add:`, but use `feat:` for new features going forward. For example: `feat: add repost notifications`.
 
 Pull requests should explain the user-facing change, identify important implementation areas, and include verification steps (`npm run lint` and `npm run build`). Include screenshots for visual changes and link a related issue when one exists.
 
