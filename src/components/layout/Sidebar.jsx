@@ -139,7 +139,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className="sticky top-0 z-20 hidden h-screen w-[76px] shrink-0 self-start select-none flex-col px-2 py-6 transition-all duration-300 md:flex lg:w-[220px] lg:px-4
+        className="sticky top-0 z-20 hidden h-screen w-[76px] shrink-0 self-start select-none flex-col px-2 py-6 transition-all duration-300 md:flex lg:w-[220px] lg:px-4 border-r border-black/10 dark:border-neutral-800
       /* Light Mode */
       bg-neutral-100 text-neutral-900
       /* Dark Mode */
@@ -180,19 +180,23 @@ export default function Sidebar() {
               }
             >
               {/* Group icon and text together */}
-              <div className="flex items-center gap-0 lg:gap-3">
-                {item.icon}
+              <div className="flex min-w-0 flex-1 items-center gap-0 lg:gap-3">
+                <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
+                  {item.icon}
+
+                  {item.label === "Notification" && unreadCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-center text-[9px] font-bold leading-none text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+
+                  {item.label === "Yap" && chatUnreadCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-center text-[9px] font-bold leading-none text-white">
+                      {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
+                    </span>
+                  )}
+                </span>
                 <span className="hidden lg:inline">{item.label}</span>
-                {item.label === "Notification" && unreadCount > 0 && (
-                  <span className="ml-auto hidden h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-center text-[10px] font-bold leading-none text-white lg:flex">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-                {item.label === "Yap" && chatUnreadCount > 0 && (
-                  <span className="ml-auto hidden h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1.5 text-center text-[10px] font-bold leading-none text-white lg:flex">
-                    {chatUnreadCount > 99 ? "99+" : chatUnreadCount}
-                  </span>
-                )}
               </div>
 
               {/* Active Indicator Dot */}

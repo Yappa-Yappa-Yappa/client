@@ -37,13 +37,13 @@ export default function MainLayout() {
           } md:pb-0 ${
             location.pathname === "/chat"
               ? "overflow-hidden"
-              : "lg:pr-[280px] xl:pr-[320px]"
+              : ""
           }`}
         >
           <div className="flex min-h-0 min-w-0 flex-1">
             {/* Page Content Rendered via Outlet */}
             <main
-              className={`relative min-w-0 flex-1 border-x border-black/10 dark:border-neutral-800 ${
+              className={`relative min-w-0 flex-1 ${
                 location.pathname === "/chat"
                   ? "h-full min-h-0 max-w-none overflow-hidden p-0"
                   : location.pathname === "/notification"
