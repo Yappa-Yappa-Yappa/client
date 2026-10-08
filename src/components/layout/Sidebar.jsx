@@ -30,8 +30,9 @@ export default function Sidebar() {
   const { user, accessToken } = useAuth();
   const { unreadCount } = useNotifications();
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [moreOpenPath, setMoreOpenPath] = useState(null);
   const moreRef = useRef(null);
+  const moreOpen = moreOpenPath === location.pathname;
   const isMobileChatRoom =
     location.pathname === "/chat" && location.state?.chatRoom === true;
   const moreRouteActive =
@@ -43,7 +44,7 @@ export default function Sidebar() {
 
     const handleOutsideTap = (event) => {
       if (!moreRef.current?.contains(event.target)) {
-        setMoreOpen(false);
+        setMoreOpenPath(null);
       }
     };
 
@@ -287,7 +288,9 @@ export default function Sidebar() {
             <div className="relative flex min-w-0 flex-col items-center justify-center">
               <button
                 type="button"
-                onClick={() => setMoreOpen((open) => !open)}
+                onClick={() =>
+                  setMoreOpenPath(moreOpen ? null : location.pathname)
+                }
                 className={`group flex w-full min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
                   moreOpen || moreRouteActive
                     ? "active text-indigo-600 dark:text-indigo-400"
@@ -329,7 +332,7 @@ export default function Sidebar() {
               <NavLink
                 key={label}
                 to={path}
-                onClick={() => setMoreOpen(false)}
+                onClick={() => setMoreOpenPath(null)}
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
               >
                 <Icon className="h-4 w-4" />

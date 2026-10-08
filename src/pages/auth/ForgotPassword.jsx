@@ -70,38 +70,38 @@ export default function ForgotPassword() {
 
   return (
     <AuthShell
-      title="Let’s get you back to your yaps"
-      description="A quick reset and you’ll be back to sharing your very important thoughts."
+      title="Let's get you back to your yaps"
+      description="A quick reset and you'll be back to sharing your very important thoughts."
     >
       <Link
         to="/login"
-        className="mb-7 flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-indigo-600"
+        className="mb-7 flex items-center gap-2 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--accent-primary)]"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to login
       </Link>
 
       <div className="mb-8">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-subtle)] text-[var(--accent-primary)]">
           <Mail className="h-6 w-6" />
         </div>
-        <h2 className="text-3xl font-bold tracking-tight text-[#11133b]">
+        <h2 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
           Forgot your password?
         </h2>
-        <p className="mt-2 text-sm leading-6 text-slate-500">
-          Enter your email and we’ll send you a secure link to create a new
+        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+          Enter your email and we'll send you a secure link to create a new
           password.
         </p>
       </div>
 
       {error && (
-        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+        <div className="mb-5 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300">
           {error}
         </div>
       )}
 
       {message ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-700">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm leading-6 text-emerald-700 dark:text-emerald-300">
           <div className="mb-2 flex items-center gap-2 font-bold">
             <Check className="h-4 w-4" />
             Check your inbox
@@ -111,7 +111,7 @@ export default function ForgotPassword() {
             type="button"
             onClick={handleResend}
             disabled={isResending || resendCountdown > 0}
-            className="mt-3 block font-bold text-emerald-800 underline underline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-3 block font-bold text-emerald-700 underline underline-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:text-emerald-300"
           >
             {isResending
               ? "Sending..."
@@ -123,11 +123,11 @@ export default function ForgotPassword() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
           <label className="block">
-            <span className="mb-2 block text-xs font-semibold text-slate-700">
+            <span className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">
               Email
             </span>
             <span className="relative block">
-              <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
               <input
                 type="email"
                 required
@@ -135,7 +135,7 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-slate-200 bg-white px-11 py-3.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                className="w-full rounded-xl border border-[var(--border-glass)] bg-[var(--bg-surface)] px-11 py-3.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-4 focus:ring-[var(--accent-primary)]/10"
               />
             </span>
           </label>
@@ -143,7 +143,7 @@ export default function ForgotPassword() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-[var(--accent-hover)] disabled:opacity-60"
           >
             {isSubmitting ? "Sending link..." : "Send reset link"}
             {!isSubmitting && <ArrowRight className="h-4 w-4" />}
@@ -151,11 +151,11 @@ export default function ForgotPassword() {
         </form>
       )}
 
-      <p className="mt-8 text-center text-sm text-slate-500">
+      <p className="mt-8 text-center text-sm text-[var(--text-secondary)]">
         Remembered your password?{" "}
         <Link
           to="/login"
-          className="font-bold text-indigo-600 hover:text-indigo-500"
+          className="font-bold text-[var(--accent-primary)] hover:text-[var(--accent-hover)]"
         >
           Sign in
         </Link>

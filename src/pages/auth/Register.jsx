@@ -32,6 +32,9 @@ export default function Register() {
   const [resendCountdown, setResendCountdown] = useState(0);
   const navigate = useNavigate();
   const { setSession } = useAuth();
+  const passwordMismatch =
+    formData.confirmPassword.length > 0 &&
+    formData.password !== formData.confirmPassword;
 
   useEffect(() => {
     if (resendCountdown === 0) return undefined;
@@ -188,7 +191,8 @@ export default function Register() {
               setShowPassword={setShowPassword}
               onChange={(value) => updateField("password", value)}
             />
-            <ul className="space-y-1 text-xs font-bold text-slate-500">
+            <PasswordRequirements password={formData.password} />
+            <ul className="hidden space-y-1 text-xs font-bold text-slate-500">
               <li
                 className={
                   formData.password.length >= 8 ? "text-emerald-600" : ""
@@ -227,6 +231,11 @@ export default function Register() {
               setShowPassword={setShowPassword}
               onChange={(value) => updateField("confirmPassword", value)}
             />
+            {passwordMismatch && (
+              <p className="-mt-2 text-xs font-medium text-red-500 dark:text-red-300">
+                Passwords do not match.
+              </p>
+            )}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -289,7 +298,7 @@ export default function Register() {
                   }
                   onKeyDown={(event) => handleOtpKeyDown(index, event)}
                   onPaste={(event) => handleOtpPaste(index, event)}
-                  className="h-14 w-full rounded-xl border border-slate-200 text-center text-xl font-bold text-[#11133b] outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                  className="h-14 w-full rounded-xl border border-[var(--border-glass)] bg-[var(--bg-surface)] text-center text-xl font-bold text-[var(--text-primary)] outline-none transition focus:border-[var(--accent-primary)] focus:ring-4 focus:ring-[var(--accent-primary)]/10"
                   aria-label={`OTP digit ${index + 1}`}
                 />
               ))}
@@ -321,6 +330,35 @@ export default function Register() {
         </>
       )}
     </AuthShell>
+  );
+}
+
+function PasswordRequirements({ password }) {
+  if (!password) return <div className="min-h-0" aria-hidden="true" />;
+
+  const requirements = [
+    [password.length >= 8, "8+ characters"],
+    [/[a-zA-Z]/.test(password), "One letter"],
+    [/[0-9]/.test(password), "One number"],
+    [/[^a-zA-Z0-9]/.test(password), "One symbol"],
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-xl border border-[var(--border-glass)] bg-[var(--bg-surface)]/50 px-3 py-2.5 text-xs">
+      {requirements.map(([valid, label]) => (
+        <span
+          key={label}
+          className={`flex items-center gap-1.5 ${valid ? "text-emerald-600 dark:text-emerald-400" : "text-[var(--text-muted)]"}`}
+        >
+          <span
+            className={`flex h-3.5 w-3.5 items-center justify-center rounded-full border ${valid ? "border-emerald-500 bg-emerald-500 text-white" : "border-[var(--text-muted)]"}`}
+          >
+            {valid && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+          </span>
+          {label}
+        </span>
+      ))}
+    </div>
   );
 }
 

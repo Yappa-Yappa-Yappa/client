@@ -17,6 +17,7 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [hasCredentialError, setHasCredentialError] = useState(false);
   const [canVerifyAccount, setCanVerifyAccount] = useState(false);
   const [isRequestingVerification, setIsRequestingVerification] =
     useState(false);
@@ -104,6 +105,7 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setHasCredentialError(false);
     setCanVerifyAccount(false);
     setIsSubmitting(true);
     try {
@@ -115,7 +117,9 @@ export default function Login() {
       setCanVerifyAccount(
         message.toLowerCase().includes("verify your account"),
       );
-      setError(message);
+      const isCredentialError = message.toLowerCase() === "invalid credentials";
+      setHasCredentialError(isCredentialError);
+      setError(isCredentialError ? "" : message);
     } finally {
       setIsSubmitting(false);
     }
@@ -127,23 +131,23 @@ export default function Login() {
       description="Your account is still here, waiting patiently like a tab you forgot to close."
     >
       <div className="mb-8">
-        <p className="mb-3 text-sm font-semibold text-indigo-600">
+        <p className="mb-3 text-sm font-semibold text-[var(--accent-primary)]">
           Good to see you
         </p>
-        <h2 className="text-3xl font-bold tracking-tight text-[#11133b]">
+        <h2 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
           Sign in to your account
         </h2>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">
           Join the conversation in a few seconds.
         </p>
       </div>
       {location.state?.message && (
-        <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+        <div className="mb-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-600 dark:text-emerald-300">
           {location.state.message}
         </div>
       )}
       {error && (
-        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+        <div className="mb-5 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300">
           {error}
           {canVerifyAccount && (
             <button
@@ -161,43 +165,46 @@ export default function Login() {
       )}
       <form onSubmit={handleSubmit} className="space-y-5">
         <label className="block">
-          <span className="mb-2 block text-xs font-semibold text-slate-700">
+          <span className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">
             Email
           </span>
           <span className="relative block">
-            <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type="email"
               required
               value={formData.email}
-              onChange={(event) =>
-                setFormData({ ...formData, email: event.target.value })
-              }
+              onChange={(event) => {
+                setHasCredentialError(false);
+                setFormData({ ...formData, email: event.target.value });
+              }}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-slate-200 bg-white px-11 py-3.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+              className="w-full rounded-xl border border-[var(--border-glass)] bg-[var(--bg-surface)] px-11 py-3.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-4 focus:ring-[var(--accent-primary)]/10"
             />
           </span>
         </label>
         <label className="block">
-          <span className="mb-2 block text-xs font-semibold text-slate-700">
+          <span className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">
             Password
           </span>
           <span className="relative block">
-            <LockKeyhole className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <LockKeyhole className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type={showPassword ? "text" : "password"}
               required
               value={formData.password}
-              onChange={(event) =>
-                setFormData({ ...formData, password: event.target.value })
-              }
+              onChange={(event) => {
+                setHasCredentialError(false);
+                setFormData({ ...formData, password: event.target.value });
+              }}
               placeholder="Enter your password"
-              className="w-full rounded-xl border border-slate-200 bg-white px-11 py-3.5 pr-12 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+              className={`w-full rounded-xl border bg-[var(--bg-surface)] px-11 py-3.5 pr-12 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:ring-4 focus:ring-[var(--accent-primary)]/10 ${hasCredentialError ? "border-red-500 focus:border-red-500" : "border-[var(--border-glass)] focus:border-[var(--accent-primary)]"}`}
+              aria-invalid={hasCredentialError}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               aria-label="Toggle password visibility"
             >
               {showPassword ? (
@@ -208,10 +215,27 @@ export default function Login() {
             </button>
           </span>
         </label>
+
+        <div className="flex items-center justify-between gap-3">
+          {hasCredentialError ? (
+            <span className="text-xs font-medium text-red-500 dark:text-red-300">
+              Invalid email or password.
+            </span>
+          ) : (
+            <span />
+          )}
+          <Link
+            to="/forgot-password"
+            className="text-center text-sm font-bold text-[var(--accent-primary)] hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-[var(--accent-hover)] disabled:opacity-60"
         >
           {isSubmitting ? "Signing in..." : "Sign In"}
           {!isSubmitting && <ArrowRight className="h-4 w-4" />}
@@ -219,15 +243,15 @@ export default function Login() {
       </form>
       {hasGoogleClientId && (
         <>
-          <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-            <span className="h-px flex-1 bg-slate-200" />
+          <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <span className="h-px flex-1 bg-[var(--border-glass)]" />
             <span>or continue with</span>
-            <span className="h-px flex-1 bg-slate-200" />
+            <span className="h-px flex-1 bg-[var(--border-glass)]" />
           </div>
           <div className="relative flex min-h-10 justify-center">
             <div ref={googleButtonRef} aria-label="Continue with Google" />
             {isGoogleSubmitting && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-white/80 text-sm font-semibold text-slate-600">
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-[var(--bg-surface)]/80 text-sm font-semibold text-[var(--text-secondary)]">
                 <LoaderCircle className="animate-spin" />
               </div>
             )}
@@ -235,20 +259,11 @@ export default function Login() {
         </>
       )}
 
-      <div className="flex justify-center items-center">
-        <Link
-          to="/forgot-password"
-          className="mt-6 mb-2 text-center text-sm text-indigo-600 hover:underline font-bold"
-        >
-          Forgot password?
-        </Link>
-      </div>
-
-      <p className="mt-8 text-center text-sm text-slate-500">
+      <p className="mt-8 text-center text-sm text-[var(--text-secondary)]">
         Don&apos;t have an account?{" "}
         <Link
           to="/register"
-          className="font-bold text-indigo-600 hover:text-indigo-500"
+          className="font-bold text-[var(--accent-primary)] hover:text-[var(--accent-hover)]"
         >
           Register
         </Link>
