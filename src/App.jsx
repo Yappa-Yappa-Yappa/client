@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthLayout from "./components/layout/AuthLayout";
@@ -31,6 +32,15 @@ import AccountInformation from "./pages/setting/AccountInformation";
 import SettingLayout from "./components/layout/SettingLayout";
 
 export default function App() {
+  return (
+    <>
+      <RouteTitle />
+      <AppRoutes />
+    </>
+  );
+}
+
+function AppRoutes() {
   return (
     <Routes>
       {/* Public / Guest Routes */}
@@ -92,4 +102,46 @@ export default function App() {
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
+}
+
+function RouteTitle() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = `${getRouteTitle(pathname)} | Yappa`;
+  }, [pathname]);
+
+  return null;
+}
+
+function getRouteTitle(pathname) {
+  const titles = {
+    "/": "Home",
+    "/login": "Login",
+    "/register": "Register",
+    "/forgot-password": "Forgot Password",
+    "/reset-password": "Reset Password",
+    "/home": "Home",
+    "/following": "Following",
+    "/search": "Search",
+    "/notification": "Notifications",
+    "/chat": "Chat",
+    "/history": "History",
+    "/trend": "Trending",
+    "/suggestions": "Suggestions",
+    "/favorite": "Favorites",
+    "/setting": "Settings",
+    "/setting/account-info": "Account Information",
+  };
+
+  if (titles[pathname]) return titles[pathname];
+  if (pathname.startsWith("/post/")) return "Post";
+  if (pathname.startsWith("/comment/")) return "Comments";
+  if (pathname.startsWith("/friend/")) return "Friends";
+  if (pathname.endsWith("/comments")) return "Replies";
+  if (pathname.endsWith("/reposts")) return "Reposts";
+  if (pathname.endsWith("/media")) return "Media";
+  if (pathname.startsWith("/profile/")) return "Profile";
+
+  return "Page Not Found";
 }
