@@ -27,6 +27,8 @@ import ProfilePosts from "./pages/profile/ProfilePosts";
 import ProfileReplies from "./pages/profile/ProfileReplies";
 import ProfileReposts from "./pages/profile/ProfileReposts";
 import ProfileMedia from "./pages/profile/ProfileMedia";
+import AccountInformation from "./pages/setting/AccountInformation";
+import SettingLayout from "./components/layout/SettingLayout";
 
 export default function App() {
   return (
@@ -70,7 +72,6 @@ export default function App() {
         <Route path="trend" element={<Trending />} />
         <Route path="suggestions" element={<Suggestions />} />
         <Route path="favorite" element={<Favorite />} />
-        <Route path="setting" element={<Setting />} />
 
         {/* Profile */}
         <Route path="profile/:username" element={<Profile />}>
@@ -78,6 +79,12 @@ export default function App() {
           <Route path="comments" element={<ProfileReplies />} />
           <Route path="reposts" element={<ProfileReposts />} />
           <Route path="media" element={<ProfileMedia />} />
+        </Route>
+
+        {/* Setting */}
+        <Route path="setting" element={<SettingLayout />}>
+          <Route index element={<Setting />} />
+          <Route path="account-info" element={<AccountInformation />} />
         </Route>
       </Route>
 

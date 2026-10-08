@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import ThemeToggle from "../components/ThemeToggle";
+import { NavLink, Outlet } from "react-router-dom";
 
 const settingSections = [
   {
@@ -16,24 +17,26 @@ const settingSections = [
         icon: UserRound,
         label: "Account information",
         description: "Manage your name, username, and profile details.",
+        path: "/setting/account-info",
       },
     ],
   },
   {
-      title: "Preferences",
-      items: [
-        {
-          icon: Palette,
-          label: "Appearance",
-          description: "Customize how Yappa looks on your devices.",
-          control: "theme",
-        },
+    title: "Preferences",
+    items: [
+      {
+        icon: Palette,
+        label: "Appearance",
+        description: "Customize how Yappa looks on your devices.",
+        control: "theme",
+      },
       {
         icon: Bell,
         label: "Notifications",
         description: "Choose what activity you want to be notified about.",
       },
     ],
+    path: "#",
   },
   {
     title: "Privacy and safety",
@@ -44,6 +47,7 @@ const settingSections = [
         description: "Control your visibility and interaction settings.",
       },
     ],
+    path: "#",
   },
 ];
 
@@ -76,54 +80,73 @@ export default function Setting() {
             {section.title}
           </h2>
           <div>
-            {section.items.map(
-              ({ icon: Icon, label, description, control }) =>
-                control === "theme" ? (
-                  <div
-                    key={label}
-                    className="flex w-full items-center gap-3 border-b border-black/10 px-4 py-4 dark:border-white/10 sm:px-6"
-                  >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center text-indigo-600 dark:text-indigo-400">
-                      <Icon className="h-5 w-5" />
+            {section.items.map(({ icon: Icon, label, description, control, path }) =>
+              control === "theme" ? (
+                <div
+                  key={label}
+                  className="flex w-full items-center gap-3 border-b border-black/10 px-4 py-4 dark:border-white/10 sm:px-6"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                      {label}
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                        {label}
-                      </span>
-                      <span className="mt-1 block text-xs text-neutral-500">
-                        {description}
-                      </span>
+                    <span className="mt-1 block text-xs text-neutral-500">
+                      {description}
                     </span>
-                    <ThemeToggle />
-                  </div>
-                ) : (
-                  <button
-                    key={label}
-                    type="button"
-                    className="flex w-full items-center gap-3 border-b border-black/10 px-4 py-4 text-left transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5 sm:px-6"
-                    aria-label={`${label}, coming soon`}
-                  >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center text-indigo-600 dark:text-indigo-400">
-                      <Icon className="h-5 w-5" />
+                  </span>
+                  <ThemeToggle />
+                </div>
+              ) : path ? (
+                <NavLink
+                  key={label}
+                  to={path}
+                  className="flex w-full items-center gap-3 border-b border-black/10 px-4 py-4 text-left transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5 sm:px-6"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                      {label}
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                        {label}
-                      </span>
-                      <span className="mt-1 block text-xs text-neutral-500">
-                        {description}
-                      </span>
+                    <span className="mt-1 block text-xs text-neutral-500">
+                      {description}
                     </span>
-                    <span className="flex shrink-0 items-center gap-2 text-xs text-neutral-400">
-                      <span className="hidden sm:inline">Coming soon</span>
-                      <ChevronRight className="h-4 w-4" />
+                  </span>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-neutral-400" />
+                </NavLink>
+              ) : (
+                <button
+                  key={label}
+                  type="button"
+                  className="flex w-full items-center gap-3 border-b border-black/10 px-4 py-4 text-left transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5 sm:px-6"
+                  aria-label={`${label}, coming soon`}
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                      {label}
                     </span>
-                  </button>
-                ),
+                    <span className="mt-1 block text-xs text-neutral-500">
+                      {description}
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2 text-xs text-neutral-400">
+                    <span className="hidden sm:inline">Coming soon</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </span>
+                </button>
+              ),
             )}
           </div>
         </section>
       ))}
+      <Outlet />
     </section>
   );
 }

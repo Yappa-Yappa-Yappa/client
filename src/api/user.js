@@ -15,6 +15,16 @@ export const changeUsername = async (data) => {
   return res.data;
 };
 
+export const changeEmail = async (data) => {
+  const res = await api.patch("/user/update-email", data);
+  return res.data;
+};
+
+export const changePassword = async (data) => {
+  const res = await api.patch("/user/update-password", data);
+  return res.data;
+};
+
 export const changeAvatar = async (file) => {
   const formData = new FormData();
   formData.append("imageUrl", file);
