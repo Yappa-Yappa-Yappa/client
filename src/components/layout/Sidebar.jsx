@@ -143,7 +143,7 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="relative z-10 flex flex-col gap-1.5 px-0 lg:px-1">
+        <nav className="relative z-10 flex flex-col justify-center items-center gap-1.5 px-0 lg:px-1">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
