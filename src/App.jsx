@@ -30,6 +30,12 @@ import ProfileReposts from "./pages/profile/ProfileReposts";
 import ProfileMedia from "./pages/profile/ProfileMedia";
 import AccountInformation from "./pages/setting/AccountInformation";
 import SettingLayout from "./components/layout/SettingLayout";
+import LegalLayout from "./components/layout/LegalLayout";
+import Terms from "./pages/legal/Terms";
+import Privacy from "./pages/legal/Privacy";
+import Cookies from "./pages/legal/Cookies";
+import Accessibility from "./pages/legal/Accessibility";
+import About from "./pages/legal/About";
 
 export default function App() {
   return (
@@ -98,6 +104,15 @@ function AppRoutes() {
         </Route>
       </Route>
 
+      {/* Legal */}
+      <Route path="en" element={<LegalLayout />}>
+        <Route path="terms" element={<Terms />} />
+        <Route path="privacy" element={<Privacy />} />
+        <Route path="cookies" element={<Cookies />} />
+        <Route path="accessibility" element={<Accessibility />} />
+        <Route path="about" element={<About />} />
+      </Route>
+
       {/* Fallback for unknown public and protected URLs */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -132,6 +147,11 @@ function getRouteTitle(pathname) {
     "/favorite": "Favorites",
     "/setting": "Settings",
     "/setting/account-info": "Account Information",
+    "/en/terms": "Terms of Service",
+    "/en/privacy": "Privacy Policy",
+    "/en/cookies": "Cookie Policy",
+    "/en/accessibility": "Accessibility",
+    "/en/about": "About",
   };
 
   if (titles[pathname]) return titles[pathname];

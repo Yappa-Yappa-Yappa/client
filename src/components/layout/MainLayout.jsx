@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import RightSidebar from "./RightSidebar";
+import FooterLinks from "./FooterLinks";
 
 export default function MainLayout() {
   const location = useLocation();
@@ -59,6 +60,11 @@ export default function MainLayout() {
               }`}
             >
               <Outlet />
+              {location.pathname !== "/chat" && (
+                <div className="mt-6 lg:hidden">
+                  <FooterLinks />
+                </div>
+              )}
               {location.pathname !== "/chat" && (
                 <div
                   className="h-[calc(7rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
