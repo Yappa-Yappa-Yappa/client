@@ -11,6 +11,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginWithGoogle, requestOtp } from "../../api/auth";
 import { useAuth } from "../../hooks/useAuth";
 import AuthShell from "../../components/auth/AuthShell";
+import SlowRequestNotice from "../../components/auth/SlowRequestNotice";
 
 export default function Login() {
   const hasGoogleClientId = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
@@ -240,6 +241,7 @@ export default function Login() {
           {isSubmitting ? "Signing in..." : "Sign In"}
           {!isSubmitting && <ArrowRight className="h-4 w-4" />}
         </button>
+        {isSubmitting && <SlowRequestNotice />}
       </form>
       {hasGoogleClientId && (
         <>

@@ -12,6 +12,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { register, requestOtp, verifyOtp } from "../../api/auth";
 import AuthShell from "../../components/auth/AuthShell";
+import SlowRequestNotice from "../../components/auth/SlowRequestNotice";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function Register() {
@@ -244,6 +245,7 @@ export default function Register() {
               {isSubmitting ? "Creating account..." : "Create Account"}
               {!isSubmitting && <ArrowRight className="h-4 w-4" />}
             </button>
+            {isSubmitting && <SlowRequestNotice />}
           </form>
           <p className="mt-7 text-center text-sm text-slate-500">
             Already have an account?{" "}

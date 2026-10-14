@@ -1,16 +1,11 @@
 import { useAuth } from "../hooks/useAuth";
 import { Navigate } from "react-router-dom";
+import BootScreen from "./BootScreen";
 
-export default function GuestRoute({ children }) {
+export default function ProtectedRoute({ children }) {
   const { accessToken, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-zinc-950">
-        <div className="w-6 h-6 border-2 border-zinc-700 border-t-zinc-300 rounded-full animate-spin" />
-      </div>
-    );
-  }
+  if (loading) return <BootScreen />;
 
   if (!accessToken) return <Navigate to={"/login"} />;
   return children;
