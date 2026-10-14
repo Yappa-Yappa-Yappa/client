@@ -542,7 +542,7 @@ export default function Feed({ feedType = "for-you" }) {
 
       {/* Mobile */}
       <div className="md:hidden sticky top-0 z-10 flex flex-col min-h-[100px] w-full items-stretch border-b border-black/10 bg-white/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-white/10 dark:bg-[#050508]/70">
-        <div className="flex h-[50px] w-full items-center justify-between px-3">
+        <div className="flex h-[50px] w-full items-center justify-between px-5 pt-4">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -559,7 +559,7 @@ export default function Feed({ feedType = "for-you" }) {
               (user?.name || user?.username || "Y")[0].toUpperCase()
             )}
           </button>
-          <img src={YapLogo} alt="Yappa" className="h-7 w-7 object-contain" />
+          <img src={YapLogo} alt="Yappa" className="h-9 w-9 object-contain" />
           <div className="w-[30px]" aria-hidden="true" />
         </div>
         <div className="flex h-[50px] w-full items-stretch">
