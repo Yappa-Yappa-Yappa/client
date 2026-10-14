@@ -143,7 +143,7 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="relative z-10 flex flex-col justify-center items-center gap-1.5 px-0 lg:px-1">
+        <nav className="relative z-10 flex flex-col gap-1.5 px-0 lg:px-1">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
@@ -161,7 +161,7 @@ export default function Sidebar() {
               }
             >
               {/* Group icon and text together */}
-              <div className="flex min-w-0 flex-1 items-center gap-0 lg:gap-3">
+              <div className="flex min-w-0 flex-1 items-center justify-center gap-0 lg:justify-start lg:gap-3">
                 <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
                   {item.icon}
 
