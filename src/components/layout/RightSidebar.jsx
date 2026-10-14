@@ -3,6 +3,15 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getTrendingPosts } from "../../api/post";
 import { followUser, getSuggested, unfollowUser } from "../../api/follow";
+import { Fragment } from "react";
+
+const links = [
+  { to: "/en/terms", label: "Terms" },
+  { to: "/en/privacy", label: "Privacy" },
+  { to: "/en/cookies", label: "Cookies" },
+  { to: "/en/accessibility", label: "Accessibility" },
+  { to: "/en/about", label: "About" },
+];
 
 export default function RightSidebar() {
   const navigate = useNavigate();
@@ -241,6 +250,19 @@ export default function RightSidebar() {
           </p>
         )}
       </section>
+
+      <div className="text-[10.2px] px-4 gap-x-3 gap-y-1 flex flex-wrap items-center dark:text-neutral-400">
+        {links.map((l, i) => (
+          <Fragment key={l.to}>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <Link to={l.to} className="hover:underline">
+              {l.label}
+            </Link>
+          </Fragment>
+        ))}
+        <span>·</span>
+        <span>© {new Date().getFullYear()} Yappa Yappa</span>
+      </div>
     </aside>
   );
 }

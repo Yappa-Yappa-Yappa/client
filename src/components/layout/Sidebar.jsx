@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useRef } from "react";
 import { io } from "socket.io-client";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { getUnreadConversationCount } from "../../api/conversation";
@@ -30,27 +29,8 @@ export default function Sidebar() {
   const { user, accessToken } = useAuth();
   const { unreadCount } = useNotifications();
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
-  const [moreOpenPath, setMoreOpenPath] = useState(null);
-  const moreRef = useRef(null);
-  const moreOpen = moreOpenPath === location.pathname;
   const isMobileChatRoom =
     location.pathname === "/chat" && location.state?.chatRoom === true;
-  const moreRouteActive =
-    location.pathname.startsWith("/friend/") ||
-    ["/favorite", "/history", "/trend"].includes(location.pathname);
-
-  useEffect(() => {
-    if (!moreOpen) return undefined;
-
-    const handleOutsideTap = (event) => {
-      if (!moreRef.current?.contains(event.target)) {
-        setMoreOpenPath(null);
-      }
-    };
-
-    document.addEventListener("pointerdown", handleOutsideTap);
-    return () => document.removeEventListener("pointerdown", handleOutsideTap);
-  }, [moreOpen]);
 
   useEffect(() => {
     if (!accessToken) return undefined;
@@ -181,7 +161,7 @@ export default function Sidebar() {
               }
             >
               {/* Group icon and text together */}
-              <div className="flex min-w-0 flex-1 items-center gap-0 lg:gap-3">
+              <div className="flex min-w-0 flex-1 items-center justify-center gap-0 lg:justify-start lg:gap-3">
                 <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
                   {item.icon}
 
@@ -237,12 +217,9 @@ export default function Sidebar() {
       </aside>
 
       {!isMobileChatRoom && (
-        <div
-          ref={moreRef}
-          className="pointer-events-none fixed inset-x-3 bottom-3 z-50 md:hidden"
-        >
+        <div className="pointer-events-none fixed inset-x-3 bottom-3 z-50 md:hidden">
           <nav
-            className={`relative pointer-events-auto grid min-h-16 grid-cols-6 overflow-visible rounded-full px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_10px_30px_rgba(0,0,0,0.14)] ${mobileGlassClass}`}
+            className={`relative pointer-events-auto grid min-h-16 grid-cols-5 overflow-visible rounded-full px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_10px_30px_rgba(0,0,0,0.14)] ${mobileGlassClass}`}
           >
             {[
               { icon: Home, label: "Home", path: "/home" },
@@ -284,62 +261,7 @@ export default function Sidebar() {
                 </span>
               </NavLink>
             ))}
-
-            <div className="relative flex min-w-0 flex-col items-center justify-center">
-              <button
-                type="button"
-                onClick={() =>
-                  setMoreOpenPath(moreOpen ? null : location.pathname)
-                }
-                className={`group flex w-full min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[10px] font-medium transition-colors ${
-                  moreOpen || moreRouteActive
-                    ? "active text-indigo-600 dark:text-indigo-400"
-                    : "text-neutral-500 dark:text-neutral-400"
-                }`}
-                aria-label="More navigation options"
-              >
-                <MoreHorizontal
-                  className={`h-5 w-5 transition-transform duration-200 ${
-                    moreOpen || moreRouteActive ? "scale-125" : ""
-                  }`}
-                />
-                <span className={moreOpen || moreRouteActive ? "" : "sr-only"}>
-                  More
-                </span>
-              </button>
-            </div>
           </nav>
-
-          <div
-            aria-hidden={!moreOpen}
-            className={`absolute bottom-[4.5rem] right-1 min-w-40 origin-bottom-right overflow-hidden rounded-2xl p-1 shadow-[0_10px_30px_rgba(0,0,0,0.14)] transition-[opacity,transform] duration-200 ease-out ${mobileGlassClass} ${
-              moreOpen
-                ? "pointer-events-auto scale-100 opacity-100"
-                : "pointer-events-none scale-95 opacity-0"
-            }`}
-          >
-            {[
-              {
-                icon: Users,
-                label: "Yappers",
-                path: `/friend/${user.username}/following`,
-              },
-              { icon: Star, label: "Favorite", path: "/favorite" },
-              { icon: History, label: "History", path: "/history" },
-              { icon: TrendingUp, label: "Trending", path: "/trend" },
-              { icon: Settings, label: "Settings", path: "/setting" },
-            ].map(({ icon: Icon, label, path }) => (
-              <NavLink
-                key={label}
-                to={path}
-                onClick={() => setMoreOpenPath(null)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
-              >
-                <Icon className="h-4 w-4" />
-                {label}
-              </NavLink>
-            ))}
-          </div>
         </div>
       )}
     </>

@@ -1,5 +1,6 @@
 import { ArrowUpRight, MessageCircle, Sparkles } from "lucide-react";
 import YapLogo from "../../assets/icons/YAP-nobg.png";
+import FooterLinks from "../layout/FooterLinks";
 
 export default function AuthShell({ children, title, description }) {
   return (
@@ -62,6 +63,9 @@ export default function AuthShell({ children, title, description }) {
               </span>
             </div>
             {children}
+            <div className="-mx-4 mt-8">
+              <FooterLinks />
+            </div>
           </div>
         </section>
       </div>

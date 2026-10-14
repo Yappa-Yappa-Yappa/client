@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthLayout from "./components/layout/AuthLayout";
@@ -29,8 +30,23 @@ import ProfileReposts from "./pages/profile/ProfileReposts";
 import ProfileMedia from "./pages/profile/ProfileMedia";
 import AccountInformation from "./pages/setting/AccountInformation";
 import SettingLayout from "./components/layout/SettingLayout";
+import LegalLayout from "./components/layout/LegalLayout";
+import Terms from "./pages/legal/Terms";
+import Privacy from "./pages/legal/Privacy";
+import Cookies from "./pages/legal/Cookies";
+import Accessibility from "./pages/legal/Accessibility";
+import About from "./pages/legal/About";
 
 export default function App() {
+  return (
+    <>
+      <RouteTitle />
+      <AppRoutes />
+    </>
+  );
+}
+
+function AppRoutes() {
   return (
     <Routes>
       {/* Public / Guest Routes */}
@@ -88,8 +104,64 @@ export default function App() {
         </Route>
       </Route>
 
+      {/* Legal */}
+      <Route path="en" element={<LegalLayout />}>
+        <Route path="terms" element={<Terms />} />
+        <Route path="privacy" element={<Privacy />} />
+        <Route path="cookies" element={<Cookies />} />
+        <Route path="accessibility" element={<Accessibility />} />
+        <Route path="about" element={<About />} />
+      </Route>
+
       {/* Fallback for unknown public and protected URLs */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
+}
+
+function RouteTitle() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = `${getRouteTitle(pathname)} | Yappa`;
+  }, [pathname]);
+
+  return null;
+}
+
+function getRouteTitle(pathname) {
+  const titles = {
+    "/": "Home",
+    "/login": "Login",
+    "/register": "Register",
+    "/forgot-password": "Forgot Password",
+    "/reset-password": "Reset Password",
+    "/home": "Home",
+    "/following": "Following",
+    "/search": "Search",
+    "/notification": "Notifications",
+    "/chat": "Chat",
+    "/history": "History",
+    "/trend": "Trending",
+    "/suggestions": "Suggestions",
+    "/favorite": "Favorites",
+    "/setting": "Settings",
+    "/setting/account-info": "Account Information",
+    "/en/terms": "Terms of Service",
+    "/en/privacy": "Privacy Policy",
+    "/en/cookies": "Cookie Policy",
+    "/en/accessibility": "Accessibility",
+    "/en/about": "About",
+  };
+
+  if (titles[pathname]) return titles[pathname];
+  if (pathname.startsWith("/post/")) return "Post";
+  if (pathname.startsWith("/comment/")) return "Comments";
+  if (pathname.startsWith("/friend/")) return "Friends";
+  if (pathname.endsWith("/comments")) return "Replies";
+  if (pathname.endsWith("/reposts")) return "Reposts";
+  if (pathname.endsWith("/media")) return "Media";
+  if (pathname.startsWith("/profile/")) return "Profile";
+
+  return "Page Not Found";
 }

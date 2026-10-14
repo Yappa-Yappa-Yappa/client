@@ -30,6 +30,8 @@ import LinkifiedText from "../components/LinkifiedText";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import ImageLightbox from "../components/ImageLightbox";
+import YapLogo from "../assets/icons/YAP-nobg.png";
+import MobileDrawer from "../components/layout/MobileDrawer";
 import {
   showErrorToast,
   showSuccessToast,
@@ -50,6 +52,32 @@ const formatRelativeTime = (dateValue) => {
   if (seconds < 31536000) return `${Math.floor(seconds / 2592000)}mo ago`;
   return `${Math.floor(seconds / 31536000)}y ago`;
 };
+
+const feedTabs = [
+  { to: "/home", label: "For you", type: "for-you" },
+  { to: "/following", label: "Following", type: "following" },
+];
+
+function FeedTab({ tab, active, onClick }) {
+  return (
+    <Link
+      to={tab.to}
+      onClick={(event) => onClick(event, tab.type)}
+      className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
+        active
+          ? "text-neutral-900 dark:text-neutral-100"
+          : "text-neutral-500 dark:text-neutral-400"
+      }`}
+    >
+      <span className="relative flex h-full items-center">
+        {tab.label}
+        {active && (
+          <span className="absolute inset-x-0 bottom-0 h-1 rounded-full bg-indigo-500" />
+        )}
+      </span>
+    </Link>
+  );
+}
 
 export default function Feed({ feedType = "for-you" }) {
   const navigate = useNavigate();
@@ -88,6 +116,8 @@ export default function Feed({ feedType = "for-you" }) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [shareStatus, setShareStatus] = useState("");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
   // Lightbox Modal State
   const [activeModal, setActiveModal] = useState({
@@ -498,36 +528,53 @@ export default function Feed({ feedType = "for-you" }) {
 
   return (
     <div className="w-full mx-auto space-y-0">
-      <div className="sticky top-0 z-10 flex h-[53px] w-full items-stretch border-b border-black/10 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-[#050508]/70">
-        <Link
-          to="/home"
-          onClick={(event) => handleFeedTabClick(event, "for-you")}
-          className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
-            feedType === "for-you"
-              ? "text-neutral-900 dark:text-neutral-100"
-              : "text-neutral-500 dark:text-neutral-400"
-          }`}
-        >
-          For you
-          {feedType === "for-you" && (
-            <span className="absolute inset-x-1/4 bottom-0 h-1 rounded-full bg-indigo-500" />
-          )}
-        </Link>
-        <Link
-          to="/following"
-          onClick={(event) => handleFeedTabClick(event, "following")}
-          className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
-            feedType === "following"
-              ? "text-neutral-900 dark:text-neutral-100"
-              : "text-neutral-500 dark:text-neutral-400"
-          }`}
-        >
-          Following
-          {feedType === "following" && (
-            <span className="absolute inset-x-1/4 bottom-0 h-1 rounded-full bg-indigo-500" />
-          )}
-        </Link>
+      {/* Laptop/iPad */}
+      <div className="sticky hidden top-0 z-10 md:flex h-[53px] w-full items-stretch border-b border-black/10 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-[#050508]/70">
+        {feedTabs.map((tab) => (
+          <FeedTab
+            key={tab.type}
+            tab={tab}
+            active={feedType === tab.type}
+            onClick={handleFeedTabClick}
+          />
+        ))}
       </div>
+
+      {/* Mobile */}
+      <div className="md:hidden sticky top-0 z-10 flex flex-col min-h-[100px] w-full items-stretch border-b border-black/10 bg-white/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-white/10 dark:bg-[#050508]/70">
+        <div className="flex h-[50px] w-full items-center justify-between px-5 pt-4">
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open account menu"
+            className="flex h-[30px] w-[30px] items-center justify-center overflow-hidden rounded-full bg-indigo-500 text-sm font-bold text-white"
+          >
+            {user?.imageUrl ? (
+              <img
+                src={user.imageUrl}
+                alt={user.name || "Profile"}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              (user?.name || user?.username || "Y")[0].toUpperCase()
+            )}
+          </button>
+          <img src={YapLogo} alt="Yappa" className="h-9 w-9 object-contain" />
+          <div className="w-[30px]" aria-hidden="true" />
+        </div>
+        <div className="flex h-[50px] w-full items-stretch">
+          {feedTabs.map((tab) => (
+            <FeedTab
+              key={tab.type}
+              tab={tab}
+              active={feedType === tab.type}
+              onClick={handleFeedTabClick}
+            />
+          ))}
+        </div>
+      </div>
+      <MobileDrawer open={drawerOpen} onClose={closeDrawer} />
+
       {/* Hidden File Input */}
       <input
         type="file"
