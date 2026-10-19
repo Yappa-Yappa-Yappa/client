@@ -1,5 +1,5 @@
 import { ArrowUpRight, MessageCircle, Sparkles } from "lucide-react";
-import YapLogo from "../../assets/icons/YAP-nobg.png";
+import YapLogo from "../../assets/icons/yappa-blob.png";
 import FooterLinks from "../layout/FooterLinks";
 
 export default function AuthShell({ children, title, description }) {

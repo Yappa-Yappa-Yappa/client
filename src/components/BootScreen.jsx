@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import YapLogo from "../assets/icons/YAP-nobg.png";
+import YapLogo from "../assets/icons/yappa-blob.png";
 
 const messages = [
   "Waking up the server... it's a heavy sleeper.",

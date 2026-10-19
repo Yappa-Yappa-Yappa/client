@@ -30,7 +30,7 @@ import LinkifiedText from "../components/LinkifiedText";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import ImageLightbox from "../components/ImageLightbox";
-import YapLogo from "../assets/icons/YAP-nobg.png";
+import YapLogo from "../assets/icons/yappa-blob.png";
 import MobileDrawer from "../components/layout/MobileDrawer";
 import {
   showErrorToast,

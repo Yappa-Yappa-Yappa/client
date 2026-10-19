@@ -1,5 +1,5 @@
 import { Link, Outlet } from "react-router-dom";
-import logo from "../../assets/icons/YAP-nobg.png";
+import logo from "../../assets/icons/yappa-blob.png";
 import FooterLinks from "./FooterLinks";
 
 export default function LegalLayout() {

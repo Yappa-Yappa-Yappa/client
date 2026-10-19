@@ -12,8 +12,8 @@ export default defineConfig({
         short_name: "Yappa",
         start_url: "/",
         display: "standalone",
-        theme_color: "#ffffff",
-        background_color: "#ffffff",
+        theme_color: "#DBDAF3",
+        background_color: "#DBDAF3",
         icons: [
           {
             src: "/icons/manifest-icon-192.maskable.png",
