@@ -30,6 +30,7 @@ import LinkifiedText from "../components/LinkifiedText";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import ImageLightbox from "../components/ImageLightbox";
+import ReportModal from "../components/ReportModal";
 import YapLogo from "../assets/icons/yappa-blob.png";
 import MobileDrawer from "../components/layout/MobileDrawer";
 import {
@@ -116,6 +117,7 @@ export default function Feed({ feedType = "for-you" }) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [shareStatus, setShareStatus] = useState("");
+  const [reportingPostId, setReportingPostId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
@@ -813,7 +815,13 @@ export default function Feed({ feedType = "for-you" }) {
                             )}
                             {!shareStatus && <span>Share post</span>}
                           </button>
-                          <button className="group relative flex min-h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 active:scale-[.98] dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenMenuPostId(null);
+                              setReportingPostId(postId);
+                            }}
+                            className="group relative flex min-h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 active:scale-[.98] dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400">
                             <Flag className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
                             <span>Report post</span>
                           </button>
@@ -995,6 +1003,16 @@ export default function Feed({ feedType = "for-you" }) {
         onPrevious={prevImage}
         onNext={nextImage}
       />
+
+      {reportingPostId && (
+        <ReportModal
+          postId={reportingPostId}
+          onClose={() => setReportingPostId(null)}
+          onSubmitted={() =>
+            showSuccessToast("Report submitted. Thanks for letting us know.")
+          }
+        />
+      )}
     </div>
   );
 }

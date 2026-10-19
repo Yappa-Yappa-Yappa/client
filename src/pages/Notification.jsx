@@ -1,6 +1,7 @@
 import {
   Bell,
   CheckCheck,
+  Flag,
   Heart,
   MessageCircle,
   Repeat2,
@@ -8,6 +9,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import YapLogo from "../assets/icons/yappa-blob.png";
 import NotificationSkeleton from "../components/NotificationSkeleton";
 import { useNotifications } from "../hooks/useNotifications";
 
@@ -39,6 +41,12 @@ const notificationMeta = {
     icon: Repeat2,
     verb: "reposted your yap",
     color: "text-sky-500",
+  },
+  REPORT: {
+    icon: Flag,
+    message:
+      "Thank you for your report, our team will surely (maybe) look into this.",
+    color: "text-amber-500",
   },
 };
 
@@ -131,6 +139,12 @@ export default function Notification() {
                           alt={actorName}
                           className="h-full w-full object-cover"
                         />
+                      ) : notification.type === "REPORT" ? (
+                        <img
+                          src={YapLogo}
+                          alt="Yappa"
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <span className="flex h-full items-center justify-center">
                           {actorName[0]?.toUpperCase()}
@@ -145,7 +159,13 @@ export default function Notification() {
                   </div>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm text-neutral-800 dark:text-neutral-200">
-                      <strong>{actorName}</strong> {meta.verb}
+                      {meta.message ? (
+                        meta.message
+                      ) : (
+                        <>
+                          <strong>{actorName}</strong> {meta.verb}
+                        </>
+                      )}
                     </span>
                     <span className="mt-1 block text-xs text-neutral-500">
                       {relativeTime(notification.createdAt)}
