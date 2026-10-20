@@ -16,6 +16,7 @@ import { getFeedById, incrementView } from "../api/post";
 import CommentSection from "../components/CommentSection";
 import LinkifiedText from "../components/LinkifiedText";
 import { useAuth } from "../hooks/useAuth";
+import { getRateLimitMessage } from "../utils/errors";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -49,13 +50,15 @@ export default function PostDetail() {
     try {
       if (isLiked) await unlikePost(post.id);
       else await likePost(post.id);
-    } catch {
+    } catch (requestError) {
       setPost((current) => ({
         ...current,
         isLiked,
         _count: { ...current._count, likes: currentCount },
       }));
-      setError("Could not update the post like.");
+      setError(
+        getRateLimitMessage(requestError, "Could not update the post like."),
+      );
     }
   };
 
@@ -67,9 +70,11 @@ export default function PostDetail() {
     try {
       if (isFavorited) await removeFavorite(post.id);
       else await addFavorite(post.id);
-    } catch {
+    } catch (requestError) {
       setPost((current) => ({ ...current, isFavorited }));
-      setError("Could not update the post bookmark.");
+      setError(
+        getRateLimitMessage(requestError, "Could not update the post bookmark."),
+      );
     }
   };
 
@@ -90,13 +95,15 @@ export default function PostDetail() {
     try {
       if (isReposted) await removeRepost(post.id);
       else await repostPost(post.id);
-    } catch {
+    } catch (requestError) {
       setPost((current) => ({
         ...current,
         isReposted,
         _count: { ...current._count, reposts: currentCount },
       }));
-      setError("Could not update the repost.");
+      setError(
+        getRateLimitMessage(requestError, "Could not update the repost."),
+      );
     }
   };
 

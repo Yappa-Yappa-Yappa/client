@@ -6,7 +6,8 @@ import ImageLightbox from "../components/ImageLightbox";
 import PostCard from "../components/PostCard";
 import UserPostSkeleton from "../components/UserPostSkeleton";
 import { useAuth } from "../hooks/useAuth";
-import { showSuccessToast } from "../utils/toast";
+import { getRateLimitMessage } from "../utils/errors";
+import { showErrorToast, showSuccessToast } from "../utils/toast";
 
 export default function UserPost({ userId, profileUsername }) {
   const { user: currentUser } = useAuth();
@@ -162,6 +163,7 @@ export default function UserPost({ userId, profileUsername }) {
     } catch (err) {
       console.error("Failed to update like state:", err);
       setPosts(previousPosts);
+      showErrorToast(getRateLimitMessage(err, "Could not update like."));
     } finally {
       setLikingPostIds((ids) => {
         const nextIds = new Set(ids);
@@ -193,6 +195,9 @@ export default function UserPost({ userId, profileUsername }) {
     } catch (err) {
       console.error("Failed to update post favorite:", err);
       setPosts(previousPosts);
+      showErrorToast(
+        getRateLimitMessage(err, "Failed to update the post favorite."),
+      );
     } finally {
       setFavoritingPostIds((ids) => {
         const nextIds = new Set(ids);

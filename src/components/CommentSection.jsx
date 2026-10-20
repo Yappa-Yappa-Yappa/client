@@ -19,6 +19,7 @@ import { favoriteComment, unfavoriteComment } from "../api/commentFavorite";
 import { deleteComment, updateComment } from "../api/commentActions";
 import { likeComment, unlikeComment } from "../api/commentLike";
 import { useAuth } from "../hooks/useAuth";
+import { getRateLimitMessage } from "../utils/errors";
 import ImageLightbox from "./ImageLightbox";
 
 const relativeTime = (value) => {
@@ -190,7 +191,7 @@ export default function CommentSection({ postId }) {
     try {
       if (isLiked) await unlikeComment(comment.id);
       else await likeComment(comment.id);
-    } catch {
+    } catch (requestError) {
       setComments((current) =>
         current.map((item) =>
           item.id === comment.id
@@ -208,7 +209,9 @@ export default function CommentSection({ postId }) {
             : item,
         ),
       );
-      setError("Could not update that comment like.");
+      setError(
+        getRateLimitMessage(requestError, "Could not update that comment like."),
+      );
     }
   };
 
@@ -223,13 +226,18 @@ export default function CommentSection({ postId }) {
     try {
       if (isFavorited) await unfavoriteComment(comment.id);
       else await favoriteComment(comment.id);
-    } catch {
+    } catch (requestError) {
       setComments((current) =>
         current.map((item) =>
           item.id === comment.id ? { ...item, isFavorited } : item,
         ),
       );
-      setError("Could not update that comment bookmark.");
+      setError(
+        getRateLimitMessage(
+          requestError,
+          "Could not update that comment bookmark.",
+        ),
+      );
     }
   };
 

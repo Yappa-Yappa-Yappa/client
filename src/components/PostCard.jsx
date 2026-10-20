@@ -15,6 +15,8 @@ import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { repostPost, removeRepost } from "../api/repost";
 import LinkifiedText from "./LinkifiedText";
+import { getRateLimitMessage } from "../utils/errors";
+import { showErrorToast } from "../utils/toast";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -121,6 +123,7 @@ export default function PostCard({
       setRepostCount((count) =>
         Math.max(0, count + (nextIsReposted ? -1 : 1)),
       );
+      showErrorToast(getRateLimitMessage(error, "Could not update repost."));
     } finally {
       setIsReposting(false);
     }

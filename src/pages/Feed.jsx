@@ -38,6 +38,7 @@ import {
   showSuccessToast,
   showWarningToast,
 } from "../utils/toast";
+import { getRateLimitMessage } from "../utils/errors";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -308,7 +309,7 @@ export default function Feed({ feedType = "for-you" }) {
       showSuccessToast("Your yap was published.");
     } catch (err) {
       console.error("Failed to create post:", err);
-      showErrorToast("Failed to publish your yap.");
+      showErrorToast(getRateLimitMessage(err, "Failed to publish your yap."));
     } finally {
       setIsSubmitting(false);
     }
@@ -336,7 +337,9 @@ export default function Feed({ feedType = "for-you" }) {
     } catch (err) {
       console.error("Failed to update post favorite", err);
       setPosts(previousPosts);
-      showErrorToast("Failed to update the post favorite.");
+      showErrorToast(
+        getRateLimitMessage(err, "Failed to update the post favorite."),
+      );
     } finally {
       setFavoritingPostIds((ids) => {
         const nextIds = new Set(ids);
@@ -373,7 +376,7 @@ export default function Feed({ feedType = "for-you" }) {
     } catch (err) {
       console.error("Failed to update repost state:", err);
       setPosts(previousPosts);
-      showErrorToast("Could not update repost.");
+      showErrorToast(getRateLimitMessage(err, "Could not update repost."));
     } finally {
       setRepostingPostIds((ids) => {
         const nextIds = new Set(ids);
@@ -428,7 +431,7 @@ export default function Feed({ feedType = "for-you" }) {
       showSuccessToast("Yap updated.");
     } catch (err) {
       console.error("Failed to edit post:", err);
-      showErrorToast("Could not edit Yap.");
+      showErrorToast(getRateLimitMessage(err, "Could not edit Yap."));
     }
   };
 
@@ -460,6 +463,7 @@ export default function Feed({ feedType = "for-you" }) {
     } catch (err) {
       console.error("Failed to update like state:", err);
       setPosts(previousPosts);
+      showErrorToast(getRateLimitMessage(err, "Could not update like."));
     } finally {
       setLikingPostIds((ids) => {
         const nextIds = new Set(ids);
