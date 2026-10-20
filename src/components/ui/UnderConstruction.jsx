@@ -31,8 +31,8 @@ export default function UnderConstruction() {
             Our tiny team is still negotiating with the last div. Check back
             soon before the CSS starts another meeting.
             <br />
-            I'm doing this alone and I'm not getting paid,{" "}
-            <span className="text-xs text-emerald-600">Fuck you</span>
+            I'm doing this alone and I'm not getting paid.{" "}
+            {/* <span className="text-xs text-emerald-600">Fuck you</span> */}
           </p>
         </div>
       </div>
