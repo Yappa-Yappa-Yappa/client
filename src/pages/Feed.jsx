@@ -1,3 +1,4 @@
+import ImageCarousel from "../components/ImageCarousel";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Image as ImageIcon,
@@ -508,7 +509,7 @@ export default function Feed({ feedType = "for-you" }) {
 
   const getGridClass = (count) => {
     if (count === 1) return "grid-cols-1";
-    if (count === 5) return "grid-cols-3";
+    if (count === 5) return "grid-cols-6";
     return "grid-cols-2";
   };
 
@@ -631,8 +632,8 @@ export default function Feed({ feedType = "for-you" }) {
                     imagePreviews.length === 1
                       ? ""
                       : imagePreviews.length === 5 && index < 2
-                        ? "h-40 col-span-1"
-                        : "h-36"
+                        ? "h-40 col-span-3"
+                        : imagePreviews.length === 5 ? "h-40 col-span-2" : "h-36"
                   }`}
                 >
                   <img
@@ -867,40 +868,13 @@ export default function Feed({ feedType = "for-you" }) {
                 </p>
               ) : null}
 
-              {/* Clickable Image Grid */}
+              {/* Image Carousel */}
               {postImages.length > 0 && (
-                <div
-                  className={`grid gap-1.5 mb-3 rounded-2xl overflow-hidden border border-black/10 dark:border-neutral-800 ${getGridClass(
-                    postImages.length,
-                  )}`}
-                >
-                  {postImages.map((src, idx) => (
-                    <div
-                      key={idx}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openModal(postImages, idx);
-                      }}
-                      className={`cursor-pointer overflow-hidden group bg-neutral-100 dark:bg-neutral-950 transition-colors ${
-                        postImages.length === 1
-                          ? ""
-                          : postImages.length === 5 && idx < 2
-                            ? "h-40 col-span-1"
-                            : "h-36"
-                      }`}
-                    >
-                      <img
-                        src={src}
-                        alt="Attachment"
-                        className={`block w-full transition-transform duration-300 group-hover:scale-105 ${
-                          postImages.length === 1
-                            ? "h-auto max-h-[70vh] object-contain"
-                            : "h-full object-cover"
-                        }`}
-                      />
-                    </div>
-                  ))}
-                </div>
+                <ImageCarousel
+                  images={postImages}
+                  onImageClick={(idx) => openModal(postImages, idx)}
+                  className="mb-3"
+                />
               )}
 
               <div className="flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400">

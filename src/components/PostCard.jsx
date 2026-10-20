@@ -1,3 +1,4 @@
+import ImageCarousel from "./ImageCarousel";
 import {
   Bookmark,
   ChartColumn,
@@ -31,12 +32,6 @@ const formatRelativeTime = (dateValue) => {
   if (seconds < 2592000) return `${Math.floor(seconds / 86400)}d ago`;
   if (seconds < 31536000) return `${Math.floor(seconds / 2592000)}mo ago`;
   return `${Math.floor(seconds / 31536000)}y ago`;
-};
-
-const getGridClass = (count) => {
-  if (count === 1) return "grid-cols-1";
-  if (count === 5) return "grid-cols-3";
-  return "grid-cols-2";
 };
 
 export default function PostCard({
@@ -300,34 +295,11 @@ export default function PostCard({
       ) : null}
 
       {postImages.length > 0 && (
-        <div
-          className={`grid gap-1.5 mb-3 overflow-hidden border border-black/10 dark:border-neutral-800 ${getGridClass(postImages.length)}`}
-        >
-          {postImages.map((src, index) => (
-            <button
-              type="button"
-              key={`${src}-${index}`}
-              onClick={() => openModal(postImages, index)}
-              className={`cursor-pointer overflow-hidden group bg-neutral-100 dark:bg-neutral-950 transition-colors text-left ${
-                postImages.length === 1
-                  ? ""
-                  : postImages.length === 5 && index < 2
-                    ? "h-40 col-span-1"
-                    : "h-36"
-              }`}
-            >
-              <img
-                src={src}
-                alt="Attachment"
-                className={`block w-full transition-transform duration-300 group-hover:scale-105 ${
-                  postImages.length === 1
-                    ? "h-auto max-h-[70vh] object-contain"
-                    : "h-full object-cover"
-                }`}
-              />
-            </button>
-          ))}
-        </div>
+        <ImageCarousel
+          images={postImages}
+          onImageClick={(index) => openModal(postImages, index)}
+          className="mb-3"
+        />
       )}
 
       <div className="flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400">

@@ -1,3 +1,4 @@
+import ImageCarousel from "../components/ImageCarousel";
 import {
   ArrowLeft,
   Bookmark,
@@ -8,6 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import ImageLightbox from "../components/ImageLightbox";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import { getLikesByPost, likePost, unlikePost } from "../api/like";
 import { repostPost, removeRepost, getRepostStatus } from "../api/repost";
@@ -21,6 +23,7 @@ import { getRateLimitMessage } from "../utils/errors";
 export default function PostDetail() {
   const { id } = useParams();
   const location = useLocation();
+  const [lightbox, setLightbox] = useState(null);
   const { user: currentUser } = useAuth();
   const backPath = location.state?.from || "/home";
   const backLabel =
@@ -197,6 +200,10 @@ export default function PostDetail() {
       </div>
     );
 
+  const imageUrls = post.images?.map((image) => image.url) ?? [];
+  const stepLightbox = (step) =>
+    setLightbox((prev) => (prev + step + imageUrls.length) % imageUrls.length);
+
   return (
     <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-3 sm:px-0 sm:py-0">
       <Link
@@ -240,16 +247,11 @@ export default function PostDetail() {
           </p>
         )}
         {post.images?.length > 0 && (
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {post.images.map((image) => (
-              <img
-                key={image.id || image.url}
-                src={image.url}
-                alt="Post attachment"
-                className="max-h-96 w-full object-cover"
-              />
-            ))}
-          </div>
+          <ImageCarousel
+            images={post.images.map((image) => image.url)}
+            onImageClick={(index) => setLightbox(index)}
+            className="mt-4"
+          />
         )}
         <div className="mt-4 flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
           <button
@@ -300,6 +302,15 @@ export default function PostDetail() {
         </div>
       </article>
       <CommentSection postId={post.id} />
+      {lightbox !== null && (
+        <ImageLightbox
+          images={imageUrls}
+          currentIndex={lightbox}
+          onClose={() => setLightbox(null)}
+          onPrevious={() => stepLightbox(-1)}
+          onNext={() => stepLightbox(1)}
+        />
+      )}
     </div>
   );
 }
