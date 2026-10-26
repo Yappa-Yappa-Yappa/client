@@ -6,8 +6,7 @@ import FooterLinks from "./FooterLinks";
 
 export default function MainLayout() {
   const location = useLocation();
-  const isProfilePage = location.pathname.startsWith("/profile/");
-  const isFriendPage = location.pathname.startsWith("/friend/");
+  const isChatPage = location.pathname === "/chat";
 
   useEffect(() => {
     const scrollContainer = document.getElementById("main-scroll-container");
@@ -17,55 +16,28 @@ export default function MainLayout() {
   return (
     <div
       id="main-scroll-container"
-      className={`${location.pathname === "/chat" ? "h-[100dvh]" : "h-screen"} w-screen overflow-x-hidden bg-neutral-100 text-neutral-900 transition-colors duration-300 dark:bg-[#050508] dark:text-neutral-100 ${
-        location.pathname === "/chat" ? "overflow-y-hidden" : "overflow-y-auto"
-      }`}
+      className={`${isChatPage ? "h-[100dvh]" : "h-screen"} w-screen overflow-x-hidden overflow-y-auto bg-neutral-100 text-neutral-900 transition-colors duration-300 [scrollbar-gutter:stable] dark:bg-[#050508] dark:text-neutral-100`}
     >
-      <div
-        className={`mx-auto flex w-full items-start ${
-          location.pathname === "/chat"
-            ? "max-w-none h-full min-h-0"
-            : "max-w-[1280px] min-h-screen"
-        }`}
-      >
+      <div className="mx-auto flex min-h-screen w-full max-w-[1280px] items-start">
         {/* Fixed Left Navigation */}
         <Sidebar />
 
         {/* Main Content Area with Contextual Sticky Header */}
         <div
           className={`flex min-h-0 min-w-0 flex-1 flex-col ${
-            location.pathname === "/chat" ? "pb-0" : "pb-16"
-          } md:pb-0 ${
-            location.pathname === "/chat"
-              ? "overflow-hidden"
-              : ""
-          }`}
+            isChatPage ? "pb-0" : "pb-16"
+          } md:pb-0`}
         >
           <div className="flex min-h-0 min-w-0 flex-1">
             {/* Page Content Rendered via Outlet */}
-            <main
-              className={`relative min-w-0 flex-1 ${
-                location.pathname === "/chat"
-                  ? "h-full min-h-0 max-w-none overflow-hidden p-0"
-                  : location.pathname === "/notification"
-                    ? "mx-auto min-h-screen w-full max-w-4xl p-0"
-                    : isProfilePage
-                      ? "mx-auto min-h-screen w-full max-w-4xl p-0"
-                      : ["/home", "/following", "/trend"].includes(location.pathname) ||
-                          isFriendPage
-                        ? "mx-auto min-h-screen w-full max-w-4xl p-0"
-                        : location.pathname === "/search"
-                          ? "mx-auto min-h-screen w-full max-w-none p-0"
-                          : "mx-auto min-h-screen w-full max-w-4xl p-0 sm:p-6 md:pb-6"
-              }`}
-            >
+            <main className="relative mx-auto min-h-screen w-full min-w-0 max-w-4xl flex-1 p-0">
               <Outlet />
-              {location.pathname !== "/chat" && (
+              {!isChatPage && (
                 <div className="mt-6 lg:hidden">
                   <FooterLinks />
                 </div>
               )}
-              {location.pathname !== "/chat" && (
+              {!isChatPage && (
                 <div
                   className="h-[calc(7rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
                   aria-hidden="true"
@@ -73,7 +45,7 @@ export default function MainLayout() {
               )}
             </main>
 
-            {location.pathname !== "/chat" && <RightSidebar />}
+            <RightSidebar />
           </div>
         </div>
       </div>

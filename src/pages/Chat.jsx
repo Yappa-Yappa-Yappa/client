@@ -1,5 +1,6 @@
 import {
   ArrowDown,
+  ArrowLeftToLine,
   Check,
   CheckCheck,
   LoaderCircle,
@@ -44,6 +45,7 @@ export default function Chat() {
   const [showConversationList, setShowConversationList] = useState(
     () => !location.state?.chatRoom,
   );
+  const [listCollapsed, setListCollapsed] = useState(false);
   const [error, setError] = useState("");
   const socketRef = useRef(null);
   const activeIdRef = useRef(null);
@@ -316,22 +318,31 @@ export default function Chat() {
   return (
     <div className="relative flex h-[100dvh] min-h-0 max-h-[100dvh] w-full overflow-hidden border-y border-black/10 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
       <aside
-        className={`${showConversationList ? "flex" : "hidden"} absolute inset-0 z-0 min-h-0 w-full shrink-0 flex-col overflow-hidden bg-white dark:bg-neutral-900 md:relative md:flex md:w-72 md:bg-transparent md:dark:bg-transparent border-r border-black/10 dark:border-neutral-800`}
+        className={`${showConversationList ? "flex" : "hidden"} absolute inset-0 z-0 min-h-0 w-full shrink-0 flex-col overflow-hidden bg-white dark:bg-neutral-900 md:relative ${listCollapsed ? "md:hidden" : "md:flex"} md:w-72 md:bg-transparent md:dark:bg-transparent border-r border-black/10 dark:border-neutral-800`}
       >
-        <div className="flex items-center justify-between border-b border-black/10 p-4 dark:border-neutral-800">
+        <div className="flex h-[72px] shrink-0 items-center justify-between border-b border-black/10 px-4 dark:border-neutral-800">
           <div>
             <h1 className="font-bold">Messages</h1>
             <p className="text-xs text-neutral-500">
               {connected ? "Live" : "Reconnecting…"}
             </p>
           </div>
-          <button
-            onClick={loadConversations}
-            className="rounded-lg p-2 text-neutral-400 hover:bg-black/5 dark:hover:bg-white/10"
-            aria-label="Refresh conversations"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </button>
+          <div className="flex items-center">
+            <button
+              onClick={loadConversations}
+              className="rounded-lg p-2 text-neutral-400 hover:bg-black/5 dark:hover:bg-white/10"
+              aria-label="Refresh conversations"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setListCollapsed(true)}
+              className="hidden rounded-lg p-2 text-neutral-400 hover:bg-black/5 dark:hover:bg-white/10 md:block"
+              aria-label="Collapse conversations"
+            >
+              <ArrowLeftToLine className="h-4 w-4" />
+            </button>
+          </div>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-2 pt-2 pb-20 md:p-2">
           {loading ? (
@@ -386,8 +397,17 @@ export default function Chat() {
         </div>
       </aside>
       <section
-        className={`${showConversationList ? "hidden md:flex" : "flex"} min-h-0 min-w-0 flex-1 flex-col overflow-hidden`}
+        className={`${showConversationList ? "hidden md:flex" : "flex"} relative min-h-0 min-w-0 flex-1 flex-col overflow-hidden`}
       >
+        {listCollapsed && !activeConversation && (
+          <button
+            onClick={() => setListCollapsed(false)}
+            className="absolute left-3 top-3 z-10 hidden rounded-lg p-2 text-neutral-400 hover:bg-black/5 dark:hover:bg-white/10 md:block"
+            aria-label="Expand conversations"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </button>
+        )}
         {!activeConversation ? (
           <div className="flex flex-1 flex-col items-center justify-center p-6 text-center">
             <MessageCircle className="h-10 w-10 text-indigo-500/60" />
@@ -398,7 +418,16 @@ export default function Chat() {
           </div>
         ) : (
           <>
-            <header className="flex items-center gap-3 border-b border-black/10 p-4 dark:border-neutral-800">
+            <header className="flex h-[72px] shrink-0 items-center gap-3 border-b border-black/10 px-4 dark:border-neutral-800">
+              {listCollapsed && (
+                <button
+                  onClick={() => setListCollapsed(false)}
+                  className="hidden rounded-lg p-2 text-neutral-400 hover:bg-black/5 dark:hover:bg-white/10 md:block"
+                  aria-label="Expand conversations"
+                >
+                  <PanelLeft className="h-4 w-4" />
+                </button>
+              )}
               <button
                 onClick={() => setShowConversationList(true)}
                 className="rounded-lg p-2 text-neutral-400 hover:bg-black/5 md:hidden"
