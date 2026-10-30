@@ -76,6 +76,8 @@ export default function Feed({ feedType = "for-you" }) {
   };
 
   const handlePostClick = (event, postId) => {
+    // Don't navigate while this post is being edited.
+    if (editingPostId === postId) return;
     // Leave buttons, links, inputs, and image interactions to their own handlers.
     if (event.target.closest("button, a, input, textarea, select")) return;
     openPost(postId);
@@ -810,12 +812,14 @@ export default function Feed({ feedType = "for-you" }) {
                   />
                   <div className="flex justify-end gap-2">
                     <button
+                      onMouseDown={(e) => e.preventDefault()}
                       onClick={cancelEditing}
                       className="rounded-lg px-3 py-1.5 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
                     >
                       Cancel
                     </button>
                     <button
+                      onMouseDown={(e) => e.preventDefault()}
                       onClick={() => handleEdit(postId)}
                       disabled={!editText.trim()}
                       className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
@@ -825,9 +829,10 @@ export default function Feed({ feedType = "for-you" }) {
                   </div>
                 </div>
               ) : post.content ? (
-                <p className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 mb-3 whitespace-pre-line">
-                  <ExpandableText text={post.content} />
-                </p>
+                <ExpandableText
+                  text={post.content}
+                  className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 whitespace-pre-line"
+                />
               ) : null}
 
               {/* Image Carousel */}

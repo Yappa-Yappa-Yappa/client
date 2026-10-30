@@ -1,21 +1,36 @@
 import ImageCarousel from "../components/ImageCarousel";
-import { ArrowLeft, Bookmark, ChartColumn, Heart, MessageCircle, Repeat2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Bookmark,
+  ChartColumn,
+  Flag,
+  Heart,
+  MessageCircle,
+  MoreVertical,
+  Pencil,
+  Repeat2,
+  Share2,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import ImageLightbox from "../components/ImageLightbox";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import { getLikesByPost, likePost, unlikePost } from "../api/like";
 import { repostPost, removeRepost, getRepostStatus } from "../api/repost";
 import { getFavorites } from "../api/favorite";
-import { getFeedById, incrementView } from "../api/post";
+import { deleteFeed, editFeed, getFeedById, incrementView } from "../api/post";
 import CommentSection from "../components/CommentSection";
 import LinkifiedText from "../components/LinkifiedText";
+import ReportModal from "../components/ReportModal";
 import { useAuth } from "../hooks/useAuth";
 import { getRateLimitMessage } from "../utils/errors";
+import { showErrorToast, showSuccessToast } from "../utils/toast";
 
 export default function PostDetail() {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const [lightbox, setLightbox] = useState(null);
   const { user: currentUser } = useAuth();
   const backPath = location.state?.from || "/home";
@@ -29,6 +44,77 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const countedViewFor = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [shareStatus, setShareStatus] = useState("");
+  const [reporting, setReporting] = useState(false);
+
+  const handleShare = async () => {
+    const shareData = {
+      title: `${post.user?.name || "Yapper"}'s yap on Yappa Yappa`,
+      text: post.content?.slice(0, 120) || "Check out this yap on Yappa Yappa.",
+      url: `${window.location.origin}/post/${post.id}`,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        setShareStatus("Shared");
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        setShareStatus("Link copied");
+      }
+    } catch (shareError) {
+      if (shareError?.name !== "AbortError") setShareStatus("Could not share");
+    }
+    window.setTimeout(() => setShareStatus(""), 2200);
+  };
+
+  const handleDelete = async () => {
+    setMenuOpen(false);
+    try {
+      await deleteFeed(post.id);
+      showSuccessToast("Post deleted.");
+      navigate(backPath, { replace: true });
+    } catch {
+      showErrorToast("Could not delete post.");
+    }
+  };
+
+  const startEditing = () => {
+    setEditText(post.content || "");
+    setIsEditing(true);
+    setMenuOpen(false);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    setEditText("");
+  };
+
+  const saveEdit = async () => {
+    const content = editText.trim();
+    if (!content || saving) return;
+
+    setSaving(true);
+    try {
+      const response = await editFeed(post.id, { content });
+      const updatedPost = response.data;
+      setPost((current) => ({
+        ...current,
+        ...updatedPost,
+        content: updatedPost?.content || content,
+      }));
+      cancelEditing();
+      showSuccessToast("Yap updated.");
+    } catch (requestError) {
+      showErrorToast(getRateLimitMessage(requestError, "Could not edit Yap."));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const toggleLike = async () => {
     if (!post) return;
@@ -136,6 +222,19 @@ export default function PostDetail() {
   }, [id, currentUser?.id]);
 
   useEffect(() => {
+    if (!menuOpen) return;
+
+    const handleOutsideMenuClick = (event) => {
+      if (!event.target.closest("[data-post-menu], [data-post-menu-trigger]")) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideMenuClick);
+    return () => document.removeEventListener("mousedown", handleOutsideMenuClick);
+  }, [menuOpen]);
+
+  useEffect(() => {
     // Stop if there is no post ID or this post was already counted.
     if (!id || countedViewFor.current === id) return;
 
@@ -180,6 +279,7 @@ export default function PostDetail() {
       </div>
     );
 
+  const isOwnPost = Boolean(currentUser?.id && (post.userId || post.user?.id) === currentUser.id);
   const imageUrls = post.images?.map((image) => image.url) ?? [];
   const stepLightbox = (step) =>
     setLightbox((prev) => (prev + step + imageUrls.length) % imageUrls.length);
@@ -193,7 +293,8 @@ export default function PostDetail() {
         <ArrowLeft className="h-4 w-4" /> {backLabel}
       </Link>
       <article className="border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
           <div className="h-10 w-10 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600">
             {post.user?.imageUrl ? (
               <img
@@ -216,11 +317,106 @@ export default function PostDetail() {
             </Link>
             <p className="text-xs text-neutral-500">{new Date(post.createdAt).toLocaleString()}</p>
           </div>
+          </div>
+          {currentUser && (
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                data-post-menu-trigger
+                onClick={() => setMenuOpen((open) => !open)}
+                className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-black/5 hover:text-neutral-700 dark:hover:bg-white/10 dark:hover:text-neutral-200"
+                title="Post options"
+                aria-label="Post options"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+              {menuOpen && (
+                <div
+                  data-post-menu
+                  className="absolute right-0 top-8 z-10 min-w-36 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900"
+                >
+                  {isOwnPost ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={startEditing}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDelete}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleShare}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-indigo-500/10 hover:text-indigo-600 dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                      >
+                        <Share2 className="h-3.5 w-3.5 shrink-0" />
+                        <span>{shareStatus || "Share post"}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setReporting(true);
+                        }}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-indigo-500/10 hover:text-indigo-600 dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                      >
+                        <Flag className="h-3.5 w-3.5 shrink-0" />
+                        <span>Report post</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-        {post.content && (
-          <p className="mt-4 whitespace-pre-line text-sm leading-relaxed">
-            <LinkifiedText text={post.content} />
-          </p>
+        {isEditing ? (
+          <div className="mt-4 space-y-2">
+            <textarea
+              value={editText}
+              onChange={(event) => setEditText(event.target.value)}
+              rows={4}
+              autoFocus
+              className="w-full resize-none rounded-xl border border-indigo-500/40 bg-transparent p-3 text-sm leading-relaxed text-neutral-800 outline-none dark:text-neutral-200"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={cancelEditing}
+                className="rounded-lg px-3 py-1.5 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={saveEdit}
+                disabled={!editText.trim() || saving}
+                className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+              >
+                {saving ? "Saving..." : "Save changes"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          post.content && (
+            <p className="mt-4 whitespace-pre-line text-sm leading-relaxed">
+              <LinkifiedText text={post.content} />
+            </p>
+          )
         )}
         {post.images?.length > 0 && (
           <ImageCarousel
@@ -276,6 +472,13 @@ export default function PostDetail() {
         </div>
       </article>
       <CommentSection postId={post.id} />
+      {reporting && (
+        <ReportModal
+          postId={post.id}
+          onClose={() => setReporting(false)}
+          onSubmitted={() => showSuccessToast("Report submitted. Thanks for letting us know.")}
+        />
+      )}
       {lightbox !== null && (
         <ImageLightbox
           images={imageUrls}
