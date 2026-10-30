@@ -1,12 +1,5 @@
 import ImageCarousel from "../components/ImageCarousel";
-import {
-  ArrowLeft,
-  Bookmark,
-  ChartColumn,
-  Heart,
-  MessageCircle,
-  Repeat2,
-} from "lucide-react";
+import { ArrowLeft, Bookmark, ChartColumn, Heart, MessageCircle, Repeat2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import ImageLightbox from "../components/ImageLightbox";
@@ -59,9 +52,7 @@ export default function PostDetail() {
         isLiked,
         _count: { ...current._count, likes: currentCount },
       }));
-      setError(
-        getRateLimitMessage(requestError, "Could not update the post like."),
-      );
+      setError(getRateLimitMessage(requestError, "Could not update the post like."));
     }
   };
 
@@ -75,9 +66,7 @@ export default function PostDetail() {
       else await addFavorite(post.id);
     } catch (requestError) {
       setPost((current) => ({ ...current, isFavorited }));
-      setError(
-        getRateLimitMessage(requestError, "Could not update the post bookmark."),
-      );
+      setError(getRateLimitMessage(requestError, "Could not update the post bookmark."));
     }
   };
 
@@ -104,9 +93,7 @@ export default function PostDetail() {
         isReposted,
         _count: { ...current._count, reposts: currentCount },
       }));
-      setError(
-        getRateLimitMessage(requestError, "Could not update the repost."),
-      );
+      setError(getRateLimitMessage(requestError, "Could not update the repost."));
     }
   };
 
@@ -119,13 +106,12 @@ export default function PostDetail() {
   useEffect(() => {
     const loadPost = async () => {
       try {
-        const [postResponse, likesResponse, favoritesResponse, repostResponse] =
-          await Promise.all([
-            getFeedById(id),
-            getLikesByPost(id),
-            getFavorites(),
-            getRepostStatus(id),
-          ]);
+        const [postResponse, likesResponse, favoritesResponse, repostResponse] = await Promise.all([
+          getFeedById(id),
+          getLikesByPost(id),
+          getFavorites(),
+          getRepostStatus(id),
+        ]);
 
         const likes = likesResponse.data?.likes || [];
         const favorites = favoritesResponse.data || [];
@@ -133,12 +119,9 @@ export default function PostDetail() {
 
         setPost({
           ...nextPost,
-          isLiked: likes.some(
-            (like) => like.user?.id === currentUser?.id,
-          ),
+          isLiked: likes.some((like) => like.user?.id === currentUser?.id),
           isFavorited: favorites.some(
-            (favorite) =>
-              favorite.postId === id || favorite.post?.id === id,
+            (favorite) => favorite.postId === id || favorite.post?.id === id,
           ),
           isReposted: Boolean(repostResponse.data),
         });
@@ -181,7 +164,7 @@ export default function PostDetail() {
     return (
       <div className="mx-auto max-w-2xl px-3 py-3 sm:px-0 sm:py-0">
         <div className="animate-pulse bg-neutral-200 p-8 dark:bg-neutral-900">
-        <div className="h-5 w-32 rounded bg-neutral-300 dark:bg-neutral-800" />
+          <div className="h-5 w-32 rounded bg-neutral-300 dark:bg-neutral-800" />
         </div>
       </div>
     );
@@ -189,13 +172,10 @@ export default function PostDetail() {
     return (
       <div className="mx-auto max-w-2xl px-3 py-3 sm:px-0 sm:py-0">
         <div className="border border-black/10 p-8 text-center dark:border-neutral-800">
-        <p className="text-sm text-neutral-500">{error || "Post not found."}</p>
-        <Link
-          to="/home"
-          className="mt-4 inline-block text-sm font-semibold text-indigo-500"
-        >
-          Back home
-        </Link>
+          <p className="text-sm text-neutral-500">{error || "Post not found."}</p>
+          <Link to="/home" className="mt-4 inline-block text-sm font-semibold text-indigo-500">
+            Back home
+          </Link>
         </div>
       </div>
     );
@@ -205,7 +185,7 @@ export default function PostDetail() {
     setLightbox((prev) => (prev + step + imageUrls.length) % imageUrls.length);
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-3 sm:px-0 sm:py-0">
+    <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-5 sm:px-0 sm:py-5">
       <Link
         to={backPath}
         className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-500"
@@ -229,16 +209,12 @@ export default function PostDetail() {
           </div>
           <div>
             <Link
-              to={
-                post.user?.username ? `/profile/${post.user.username}` : "/home"
-              }
+              to={post.user?.username ? `/profile/${post.user.username}` : "/home"}
               className="text-sm font-bold"
             >
               {post.user?.name || "Yapper"}
             </Link>
-            <p className="text-xs text-neutral-500">
-              {new Date(post.createdAt).toLocaleString()}
-            </p>
+            <p className="text-xs text-neutral-500">{new Date(post.createdAt).toLocaleString()}</p>
           </div>
         </div>
         {post.content && (
@@ -256,9 +232,7 @@ export default function PostDetail() {
         <div className="mt-4 flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
           <button
             type="button"
-            onClick={() =>
-              focusCommentInput()
-            }
+            onClick={() => focusCommentInput()}
             aria-label="View comments"
             className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
           >

@@ -15,9 +15,9 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { repostPost, removeRepost } from "../api/repost";
-import LinkifiedText from "./LinkifiedText";
 import { getRateLimitMessage } from "../utils/errors";
 import { showErrorToast } from "../utils/toast";
+import ExpandableText from "./ExpandableText";
 
 const formatRelativeTime = (dateValue) => {
   if (!dateValue) return "Recently";
@@ -63,17 +63,12 @@ export default function PostCard({
   const postId = post._id || post.id;
   const authorId = post.userId || post.user?.id || post.authorId;
   const isOwnPost = Boolean(currentUser?.id && authorId === currentUser.id);
-  const authorName =
-    post.user?.name || post.authorName || post.author || "Yapper";
+  const authorName = post.user?.name || post.authorName || post.author || "Yapper";
   const avatarUrl = post.user?.imageUrl;
   const username =
-    post.user?.username ||
-    post.username ||
-    authorName.toLowerCase().replace(/\s+/g, "");
+    post.user?.username || post.username || authorName.toLowerCase().replace(/\s+/g, "");
   const postImages = post.images?.length
-    ? post.images.map((img) =>
-        typeof img === "string" ? img : img.url || img.path,
-      )
+    ? post.images.map((img) => (typeof img === "string" ? img : img.url || img.path))
     : post.image || post.imageUrl
       ? [post.image || post.imageUrl]
       : [];
@@ -115,9 +110,7 @@ export default function PostCard({
     } catch (error) {
       console.error("Failed to update repost state:", error);
       setIsReposted(!nextIsReposted);
-      setRepostCount((count) =>
-        Math.max(0, count + (nextIsReposted ? -1 : 1)),
-      );
+      setRepostCount((count) => Math.max(0, count + (nextIsReposted ? -1 : 1)));
       showErrorToast(getRateLimitMessage(error, "Could not update repost."));
     } finally {
       setIsReposting(false);
@@ -154,8 +147,7 @@ export default function PostCard({
     };
 
     document.addEventListener("mousedown", handleOutsideMenuClick);
-    return () =>
-      document.removeEventListener("mousedown", handleOutsideMenuClick);
+    return () => document.removeEventListener("mousedown", handleOutsideMenuClick);
   }, [openMenuPostId, setOpenMenuPostId]);
 
   return (
@@ -174,11 +166,7 @@ export default function PostCard({
         >
           <div className="w-10 h-10 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
             {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={authorName}
-                className="h-full w-full object-cover"
-              />
+              <img src={avatarUrl} alt={authorName} className="h-full w-full object-cover" />
             ) : (
               authorName[0]?.toUpperCase()
             )}
@@ -187,9 +175,7 @@ export default function PostCard({
             <h4 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 leading-tight">
               {authorName}
             </h4>
-            <span className="text-xs text-neutral-500 dark:text-neutral-400">
-              @{username}
-            </span>
+            <span className="text-xs text-neutral-500 dark:text-neutral-400">@{username}</span>
           </div>
         </NavLink>
 
@@ -199,11 +185,7 @@ export default function PostCard({
           </span>
           <button
             data-post-menu-trigger
-            onClick={() =>
-              setOpenMenuPostId((currentId) =>
-                currentId === postId ? null : postId,
-              )
-            }
+            onClick={() => setOpenMenuPostId((currentId) => (currentId === postId ? null : postId))}
             className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
             title="Post options"
             aria-label="Post options"
@@ -289,9 +271,10 @@ export default function PostCard({
           </div>
         </div>
       ) : post.content ? (
-        <p className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 mb-3 whitespace-pre-line">
-          <LinkifiedText text={post.content} />
-        </p>
+        <ExpandableText
+          text={post.content}
+          className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 whitespace-pre-line"
+        />
       ) : null}
 
       {postImages.length > 0 && (
@@ -303,7 +286,7 @@ export default function PostCard({
       )}
 
       <div className="flex items-center justify-between gap-1.5 border-t border-black/5 pt-3 text-xs font-semibold text-neutral-500 dark:border-neutral-800/60 dark:text-neutral-400">
-          <button
+        <button
           onClick={openPostDetail}
           aria-label="View comments"
           className="flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
@@ -322,9 +305,7 @@ export default function PostCard({
               : "hover:bg-rose-500/10 hover:text-rose-500 dark:hover:bg-rose-400/10 dark:hover:text-rose-400"
           } disabled:opacity-50`}
         >
-          <Heart
-            className={`w-4 h-4 ${post.isLiked ? "fill-current text-rose-500" : ""}`}
-          />
+          <Heart className={`w-4 h-4 ${post.isLiked ? "fill-current text-rose-500" : ""}`} />
           <span>{post._count?.likes ?? post.likes ?? 0}</span>
         </button>
 
@@ -352,13 +333,9 @@ export default function PostCard({
         </button>
 
         <button
-          onClick={() =>
-            handleFavoriteToggle(postId, Boolean(post.isFavorited))
-          }
+          onClick={() => handleFavoriteToggle(postId, Boolean(post.isFavorited))}
           disabled={favoritingPostIds?.has(postId)}
-          aria-label={
-            post.isFavorited ? "Remove post from favorites" : "Save post"
-          }
+          aria-label={post.isFavorited ? "Remove post from favorites" : "Save post"}
           title={post.isFavorited ? "Remove from favorites" : "Save post"}
           className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
             post.isFavorited
@@ -366,9 +343,7 @@ export default function PostCard({
               : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
           }`}
         >
-          <Bookmark
-            className={`w-4 h-4 ${post.isFavorited ? "fill-current" : ""}`}
-          />
+          <Bookmark className={`w-4 h-4 ${post.isFavorited ? "fill-current" : ""}`} />
         </button>
       </div>
     </article>

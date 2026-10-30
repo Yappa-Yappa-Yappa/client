@@ -16,29 +16,19 @@ import {
   Share2,
   Flag,
 } from "lucide-react";
-import {
-  deleteFeed,
-  editFeed,
-  getFeeds,
-  getFollowingPosts,
-  postFeed,
-} from "../api/post";
+import { deleteFeed, editFeed, getFeeds, getFollowingPosts, postFeed } from "../api/post";
 import { likePost, unlikePost } from "../api/like";
 import { repostPost, removeRepost } from "../api/repost";
 import { useAuth } from "../hooks/useAuth";
 import FeedSkeleton from "../components/FeedSkeleton";
-import LinkifiedText from "../components/LinkifiedText";
+import ExpandableText from "../components/ExpandableText";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import ImageLightbox from "../components/ImageLightbox";
 import ReportModal from "../components/ReportModal";
 import YapLogo from "../assets/icons/yappa-blob.png";
 import MobileDrawer from "../components/layout/MobileDrawer";
-import {
-  showErrorToast,
-  showSuccessToast,
-  showWarningToast,
-} from "../utils/toast";
+import { showErrorToast, showSuccessToast, showWarningToast } from "../utils/toast";
 import { getRateLimitMessage } from "../utils/errors";
 
 const formatRelativeTime = (dateValue) => {
@@ -67,16 +57,12 @@ function FeedTab({ tab, active, onClick }) {
       to={tab.to}
       onClick={(event) => onClick(event, tab.type)}
       className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
-        active
-          ? "text-neutral-900 dark:text-neutral-100"
-          : "text-neutral-500 dark:text-neutral-400"
+        active ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 dark:text-neutral-400"
       }`}
     >
       <span className="relative flex h-full items-center">
         {tab.label}
-        {active && (
-          <span className="absolute inset-x-0 bottom-0 h-1 rounded-full bg-indigo-500" />
-        )}
+        {active && <span className="absolute inset-x-0 bottom-0 h-1 rounded-full bg-indigo-500" />}
       </span>
     </Link>
   );
@@ -146,8 +132,7 @@ export default function Feed({ feedType = "for-you" }) {
     };
 
     document.addEventListener("mousedown", handleOutsideMenuClick);
-    return () =>
-      document.removeEventListener("mousedown", handleOutsideMenuClick);
+    return () => document.removeEventListener("mousedown", handleOutsideMenuClick);
   }, [openMenuPostId]);
 
   const fetchPosts = useCallback(
@@ -224,17 +209,12 @@ export default function Feed({ feedType = "for-you" }) {
   const handleShare = async (sharedPost) => {
     const sharedPostId = sharedPost._id || sharedPost.id;
     const sharedAuthorName =
-      sharedPost.user?.name ||
-      sharedPost.authorName ||
-      sharedPost.author ||
-      "Yapper";
+      sharedPost.user?.name || sharedPost.authorName || sharedPost.author || "Yapper";
 
     const shareUrl = `${window.location.origin}/post/${sharedPostId}`;
     const shareData = {
       title: `${sharedAuthorName}'s yap on Yappa Yappa`,
-      text:
-        sharedPost.content?.slice(0, 120) ||
-        "Check out this yap on Yappa Yappa.",
+      text: sharedPost.content?.slice(0, 120) || "Check out this yap on Yappa Yappa.",
       url: shareUrl,
     };
 
@@ -323,24 +303,18 @@ export default function Feed({ feedType = "for-you" }) {
     setFavoritingPostIds((ids) => new Set(ids).add(postId));
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
-        (post._id || post.id) === postId
-          ? { ...post, isFavorited: !isFavorited }
-          : post,
+        (post._id || post.id) === postId ? { ...post, isFavorited: !isFavorited } : post,
       ),
     );
 
     try {
       if (isFavorited) await removeFavorite(postId);
       else await addFavorite(postId);
-      showSuccessToast(
-        isFavorited ? "Removed from favorites." : "Saved to favorites.",
-      );
+      showSuccessToast(isFavorited ? "Removed from favorites." : "Saved to favorites.");
     } catch (err) {
       console.error("Failed to update post favorite", err);
       setPosts(previousPosts);
-      showErrorToast(
-        getRateLimitMessage(err, "Failed to update the post favorite."),
-      );
+      showErrorToast(getRateLimitMessage(err, "Failed to update the post favorite."));
     } finally {
       setFavoritingPostIds((ids) => {
         const nextIds = new Set(ids);
@@ -390,9 +364,7 @@ export default function Feed({ feedType = "for-you" }) {
   const handleDelete = async (id) => {
     try {
       await deleteFeed(id);
-      setPosts((prevPosts) =>
-        prevPosts.filter((post) => (post._id || post.id) !== id),
-      );
+      setPosts((prevPosts) => prevPosts.filter((post) => (post._id || post.id) !== id));
       showSuccessToast("Post deleted.");
     } catch (err) {
       console.error("Failed to delete post:", err);
@@ -490,20 +462,14 @@ export default function Feed({ feedType = "for-you" }) {
   function prevImage() {
     setActiveModal((prev) => ({
       ...prev,
-      currentIndex:
-        prev.currentIndex === 0
-          ? prev.images.length - 1
-          : prev.currentIndex - 1,
+      currentIndex: prev.currentIndex === 0 ? prev.images.length - 1 : prev.currentIndex - 1,
     }));
   }
 
   function nextImage() {
     setActiveModal((prev) => ({
       ...prev,
-      currentIndex:
-        prev.currentIndex === prev.images.length - 1
-          ? 0
-          : prev.currentIndex + 1,
+      currentIndex: prev.currentIndex === prev.images.length - 1 ? 0 : prev.currentIndex + 1,
     }));
   }
 
@@ -633,7 +599,9 @@ export default function Feed({ feedType = "for-you" }) {
                       ? ""
                       : imagePreviews.length === 5 && index < 2
                         ? "h-40 col-span-3"
-                        : imagePreviews.length === 5 ? "h-40 col-span-2" : "h-36"
+                        : imagePreviews.length === 5
+                          ? "h-40 col-span-2"
+                          : "h-36"
                   }`}
                 >
                   <img
@@ -672,9 +640,7 @@ export default function Feed({ feedType = "for-you" }) {
 
             <button
               type="submit"
-              disabled={
-                (!postText.trim() && imageFiles.length === 0) || isSubmitting
-              }
+              disabled={(!postText.trim() && imageFiles.length === 0) || isSubmitting}
               className="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 transition-all active:scale-95 shadow-lg shadow-indigo-600/30"
             >
               {isSubmitting ? (
@@ -708,8 +674,7 @@ export default function Feed({ feedType = "for-you" }) {
           const postId = post._id || post.id;
           const authorId = post.userId || post.user?.id || post.authorId;
           const isOwnPost = Boolean(user?.id && authorId === user.id);
-          const authorName =
-            post.user?.name || post.authorName || post.author || "Yapper";
+          const authorName = post.user?.name || post.authorName || post.author || "Yapper";
           const avatarUrl = post.user?.imageUrl;
           const username =
             post.user?.username ||
@@ -717,9 +682,7 @@ export default function Feed({ feedType = "for-you" }) {
             `@${authorName.toLowerCase().replace(/\s+/g, "")}`;
 
           const postImages = post.images?.length
-            ? post.images.map((img) =>
-                typeof img === "string" ? img : img.url || img.path,
-              )
+            ? post.images.map((img) => (typeof img === "string" ? img : img.url || img.path))
             : post.image || post.imageUrl
               ? [post.image || post.imageUrl]
               : [];
@@ -768,9 +731,7 @@ export default function Feed({ feedType = "for-you" }) {
                   <button
                     data-post-menu-trigger
                     onClick={() =>
-                      setOpenMenuPostId((currentId) =>
-                        currentId === postId ? null : postId,
-                      )
+                      setOpenMenuPostId((currentId) => (currentId === postId ? null : postId))
                     }
                     className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                     title="Post options"
@@ -826,7 +787,8 @@ export default function Feed({ feedType = "for-you" }) {
                               setOpenMenuPostId(null);
                               setReportingPostId(postId);
                             }}
-                            className="group relative flex min-h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 active:scale-[.98] dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400">
+                            className="group relative flex min-h-9 w-full items-center gap-2 rounded-lg px-3 text-left text-xs font-medium text-neutral-700 transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 active:scale-[.98] dark:text-neutral-200 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                          >
                             <Flag className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:scale-110" />
                             <span>Report post</span>
                           </button>
@@ -864,7 +826,7 @@ export default function Feed({ feedType = "for-you" }) {
                 </div>
               ) : post.content ? (
                 <p className="text-sm leading-relaxed text-neutral-800 dark:text-neutral-200 mb-3 whitespace-pre-line">
-                  <LinkifiedText text={post.content} />
+                  <ExpandableText text={post.content} />
                 </p>
               ) : null}
 
@@ -889,9 +851,7 @@ export default function Feed({ feedType = "for-you" }) {
 
                 {/* Heart Button */}
                 <button
-                  onClick={() =>
-                    handleLikeToggle(postId, Boolean(post.isLiked))
-                  }
+                  onClick={() => handleLikeToggle(postId, Boolean(post.isLiked))}
                   disabled={likingPostIds.has(postId)}
                   aria-label={post.isLiked ? "Unlike post" : "Like post"}
                   className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/60 ${
@@ -930,12 +890,7 @@ export default function Feed({ feedType = "for-you" }) {
                   }`}
                 >
                   <Repeat2 className="w-4 h-4" />
-                  <span>
-                    {post.repostCount ??
-                      post.reposts ??
-                      post._count?.reposts ??
-                      0}
-                  </span>
+                  <span>{post.repostCount ?? post.reposts ?? post._count?.reposts ?? 0}</span>
                 </button>
 
                 <button
@@ -944,23 +899,15 @@ export default function Feed({ feedType = "for-you" }) {
                     handleFavorite(postId, Boolean(post.isFavorited));
                   }}
                   disabled={favoritingPostIds.has(postId)}
-                  aria-label={
-                    post.isFavorited
-                      ? "Remove post from favorites"
-                      : "Save post"
-                  }
-                  title={
-                    post.isFavorited ? "Remove from favorites" : "Save post"
-                  }
+                  aria-label={post.isFavorited ? "Remove post from favorites" : "Save post"}
+                  title={post.isFavorited ? "Remove from favorites" : "Save post"}
                   className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
                     post.isFavorited
                       ? "text-indigo-600 dark:text-indigo-400"
                       : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
                   }`}
                 >
-                  <Bookmark
-                    className={`w-4 h-4 ${post.isFavorited ? "fill-current" : ""}`}
-                  />
+                  <Bookmark className={`w-4 h-4 ${post.isFavorited ? "fill-current" : ""}`} />
                 </button>
               </div>
             </article>
@@ -986,9 +933,7 @@ export default function Feed({ feedType = "for-you" }) {
         <ReportModal
           postId={reportingPostId}
           onClose={() => setReportingPostId(null)}
-          onSubmitted={() =>
-            showSuccessToast("Report submitted. Thanks for letting us know.")
-          }
+          onSubmitted={() => showSuccessToast("Report submitted. Thanks for letting us know.")}
         />
       )}
     </div>

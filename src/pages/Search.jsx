@@ -1,34 +1,30 @@
-import {
-  FileText,
-  LoaderCircle,
-  Search as SearchIcon,
-  UserRound,
-  X,
-} from "lucide-react";
+import { FileText, LoaderCircle, Search as SearchIcon, UserRound, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { searchUserOrPost } from "../api/search";
+import LinkifiedText from "../components/LinkifiedText";
+import HighlightedText from "../components/HighlightedText";
 
-const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+// const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
 
-const renderLinkifiedText = (text) =>
-  text.split(urlPattern).map((part, index) => {
-    if (!/^(https?:\/\/|www\.)/.test(part)) return part;
+// const renderLinkifiedText = (text) =>
+//   text.split(urlPattern).map((part, index) => {
+//     if (!/^(https?:\/\/|www\.)/.test(part)) return part;
 
-    const href = part.startsWith("www.") ? `https://${part}` : part;
-    return (
-      <a
-        key={`${part}-${index}`}
-        href={href}
-        target="_blank"
-        rel="noreferrer"
-        className="break-all text-indigo-600 underline decoration-indigo-300 underline-offset-2 hover:text-indigo-500 dark:text-indigo-400"
-        onClick={(event) => event.stopPropagation()}
-      >
-        {part}
-      </a>
-    );
-  });
+//     const href = part.startsWith("www.") ? `https://${part}` : part;
+//     return (
+//       <a
+//         key={`${part}-${index}`}
+//         href={href}
+//         target="_blank"
+//         rel="noreferrer"
+//         className="break-all text-indigo-600 underline decoration-indigo-300 underline-offset-2 hover:text-indigo-500 dark:text-indigo-400"
+//         onClick={(event) => event.stopPropagation()}
+//       >
+//         {part}
+//       </a>
+//     );
+//   });
 
 export default function Search() {
   const [searchParams] = useSearchParams();
@@ -39,6 +35,7 @@ export default function Search() {
   const [results, setResults] = useState({ users: [], posts: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loadingMore, setLoadingMore] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,10 +63,7 @@ export default function Search() {
       setSearchedQuery(trimmedQuery);
     } catch (requestError) {
       setResults({ users: [], posts: [] });
-      setError(
-        requestError.response?.data?.message ||
-          "Could not complete your search.",
-      );
+      setError(requestError.response?.data?.message || "Could not complete your search.");
     } finally {
       setLoading(false);
     }
@@ -85,6 +79,30 @@ export default function Search() {
     setSearchedQuery("");
     setResults({ users: [], posts: [] });
     setError("");
+  };
+
+  const loadMore = async (type) => {
+    setLoadingMore(type);
+    try {
+      const response = await searchUserOrPost(searchedQuery, {
+        type,
+        skip: results[type].length,
+      });
+      const data = response.data;
+      setResults((prev) => ({
+        ...prev,
+        [type]: [
+          ...prev[type],
+          ...data[type].filter((item) => !prev[type].some((old) => old.id === item.id)),
+        ],
+        hasMoreUsers: type === "users" ? data.hasMoreUsers : prev.hasMoreUsers,
+        hasMorePosts: type === "posts" ? data.hasMorePosts : prev.hasMorePosts,
+      }));
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || "Could not load more results.");
+    } finally {
+      setLoadingMore(null);
+    }
   };
 
   const tabs = [
@@ -103,9 +121,7 @@ export default function Search() {
           <h1 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
             Explore & Search
           </h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Find people and posts across Yappa.
-          </p>
+          <p className="mt-1 text-sm text-neutral-500">Find people and posts across Yappa.</p>
 
           <div className="mt-4 flex min-w-0 items-center gap-2 rounded-xl border border-black/10 bg-transparent px-3 dark:border-neutral-700">
             <SearchIcon className="h-4 w-4 shrink-0 text-neutral-400" />
@@ -192,23 +208,35 @@ export default function Search() {
                             />
                           ) : (
                             <span className="flex h-full items-center justify-center">
-                              {(user.name ||
-                                user.username ||
-                                "Y")[0].toUpperCase()}
+                              {(user.name || user.username || "Y")[0].toUpperCase()}
                             </span>
                           )}
                         </div>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                            {user.name || "Yapper"}
+                            <HighlightedText text={user.name || "Yapper"} query={searchedQuery} />
                           </p>
                           <p className="truncate text-xs text-neutral-500">
-                            @{user.username || "yapper"}
+                            @
+                            <HighlightedText
+                              text={user.username || "yapper"}
+                              query={searchedQuery}
+                            />
                           </p>
                         </div>
                       </Link>
                     ))}
                   </div>
+                  {results.hasMoreUsers && (
+                    <button
+                      type="button"
+                      onClick={() => loadMore("users")}
+                      disabled={loadingMore === "users"}
+                      className="mt-2 w-full rounded-xl py-2 text-sm font-semibold text-indigo-600 hover:bg-black/5 disabled:opacity-60 dark:text-indigo-400 dark:hover:bg-white/5"
+                    >
+                      {loadingMore === "users" ? "Loading..." : "See more"}
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -233,7 +261,7 @@ export default function Search() {
                               navigate(`/post/${post.id}`);
                             }
                           }}
-                          className="flex gap-3 rounded-xl border border-black/5 p-3 transition-colors hover:bg-black/5 dark:border-neutral-800 dark:hover:bg-white/5"
+                          className="flex gap-3 rounded-xl border border-black/5 p-3 transition-colors hover:bg-black/5 dark:border-neutral-800 dark:hover:bg-white/5 hover:cursor-pointer"
                         >
                           {image ? (
                             <img
@@ -246,15 +274,48 @@ export default function Search() {
                               <FileText className="h-5 w-5" />
                             </div>
                           )}
-                          <p className="min-w-0 self-center whitespace-pre-wrap break-words text-sm text-neutral-700 dark:text-neutral-300">
-                            {post.content
-                              ? renderLinkifiedText(post.content)
-                              : "Post with image"}
-                          </p>
+                          <div className="min-w-0 self-center">
+                            <div className="mb-1 flex items-center gap-2">
+                              <div className="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center text-[10px] font-bold leading-5 text-indigo-600 dark:text-indigo-300">
+                                {post.user?.imageUrl ? (
+                                  <img
+                                    src={post.user.imageUrl}
+                                    alt={post.user.name || "Yapper"}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  (post.user?.name || post.user?.username || "Y")[0].toUpperCase()
+                                )}
+                              </div>
+                              <span className="truncate text-xs font-semibold text-neutral-900 dark:text-neutral-100">
+                                {post.user?.name || "Yapper"}
+                              </span>
+                              <span className="truncate text-xs text-neutral-500">
+                                @{post.user?.username || "yapper"}
+                              </span>
+                            </div>
+                            <p className="line-clamp-3 whitespace-pre-wrap break-words text-sm text-neutral-700 dark:text-neutral-300">
+                              {post.content ? (
+                                <LinkifiedText text={post.content} highlight={searchedQuery} />
+                              ) : (
+                                "Post with image"
+                              )}
+                            </p>
+                          </div>
                         </div>
                       );
                     })}
                   </div>
+                  {results.hasMorePosts && (
+                    <button
+                      type="button"
+                      onClick={() => loadMore("posts")}
+                      disabled={loadingMore === "posts"}
+                      className="mt-2 w-full rounded-xl py-2 text-sm font-semibold text-indigo-600 hover:bg-black/5 disabled:opacity-60 dark:text-indigo-400 dark:hover:bg-white/5"
+                    >
+                      {loadingMore === "posts" ? "Loading..." : "See more"}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
