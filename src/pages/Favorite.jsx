@@ -67,16 +67,16 @@ export default function Favorite() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-4 px-4 sm:px-0">
-        <div className="h-8 w-48 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
-        <div className="h-36 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
-        <div className="h-36 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
+      <div className="mx-auto max-w-2xl px-4 py-5 sm:px-0 sm:py-5">
+        <div className="h-8 my-5 w-48 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
+        <div className="h-36 my-5 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
+        <div className="h-36 my-5 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 sm:px-0">
+    <div className="mx-auto max-w-2xl px-4 py-5 sm:px-0 sm:py-5">
       <div className="mb-5 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
           <Bookmark className="h-5 w-5 fill-current" />
@@ -100,9 +100,7 @@ export default function Favorite() {
       {favorites.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-black/10 bg-white/60 px-6 py-12 text-center shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
           <Bookmark className="mx-auto mb-3 h-8 w-8 text-neutral-400" />
-          <h2 className="font-semibold text-neutral-800 dark:text-neutral-200">
-            No favorites yet
-          </h2>
+          <h2 className="font-semibold text-neutral-800 dark:text-neutral-200">No favorites yet</h2>
           <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             Save yaps you want to find again later.
           </p>
