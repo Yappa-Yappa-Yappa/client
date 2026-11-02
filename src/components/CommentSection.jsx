@@ -23,10 +23,7 @@ import { getRateLimitMessage } from "../utils/errors";
 import ImageLightbox from "./ImageLightbox";
 
 const relativeTime = (value) => {
-  const seconds = Math.max(
-    0,
-    Math.floor((Date.now() - new Date(value).getTime()) / 1000),
-  );
+  const seconds = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 1000));
   if (seconds < 60) return "just now";
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -66,9 +63,7 @@ export default function CommentSection({ postId }) {
 
   const removeCommentImage = (preview) => {
     URL.revokeObjectURL(preview);
-    setCommentImages((current) =>
-      current.filter((image) => image.preview !== preview),
-    );
+    setCommentImages((current) => current.filter((image) => image.preview !== preview));
   };
 
   const loadComments = useCallback(async () => {
@@ -105,12 +100,9 @@ export default function CommentSection({ postId }) {
       setContent("");
       commentImages.forEach((image) => URL.revokeObjectURL(image.preview));
       setCommentImages([]);
-      if (commentInputRef.current)
-        commentInputRef.current.style.height = "auto";
+      if (commentInputRef.current) commentInputRef.current.style.height = "auto";
     } catch (requestError) {
-      setError(
-        requestError.response?.data?.message || "Could not post your comment.",
-      );
+      setError(requestError.response?.data?.message || "Could not post your comment.");
     } finally {
       setSubmitting(false);
     }
@@ -126,9 +118,7 @@ export default function CommentSection({ postId }) {
   const handleDelete = async (commentId) => {
     try {
       await deleteComment(commentId);
-      setComments((current) =>
-        current.filter((comment) => comment.id !== commentId),
-      );
+      setComments((current) => current.filter((comment) => comment.id !== commentId));
     } catch {
       setError("Could not delete that comment.");
     }
@@ -162,9 +152,7 @@ export default function CommentSection({ postId }) {
       );
       cancelEditing();
     } catch (requestError) {
-      setError(
-        requestError.response?.data?.message || "Could not edit that comment.",
-      );
+      setError(requestError.response?.data?.message || "Could not edit that comment.");
     }
   };
 
@@ -178,10 +166,7 @@ export default function CommentSection({ postId }) {
               isLiked: !isLiked,
               _count: {
                 ...item._count,
-                likes: Math.max(
-                  0,
-                  (item._count?.likes || 0) + (isLiked ? -1 : 1),
-                ),
+                likes: Math.max(0, (item._count?.likes || 0) + (isLiked ? -1 : 1)),
               },
             }
           : item,
@@ -200,18 +185,13 @@ export default function CommentSection({ postId }) {
                 isLiked,
                 _count: {
                   ...item._count,
-                  likes: Math.max(
-                    0,
-                    (item._count?.likes || 0) + (isLiked ? 1 : -1),
-                  ),
+                  likes: Math.max(0, (item._count?.likes || 0) + (isLiked ? 1 : -1)),
                 },
               }
             : item,
         ),
       );
-      setError(
-        getRateLimitMessage(requestError, "Could not update that comment like."),
-      );
+      setError(getRateLimitMessage(requestError, "Could not update that comment like."));
     }
   };
 
@@ -228,340 +208,312 @@ export default function CommentSection({ postId }) {
       else await favoriteComment(comment.id);
     } catch (requestError) {
       setComments((current) =>
-        current.map((item) =>
-          item.id === comment.id ? { ...item, isFavorited } : item,
-        ),
+        current.map((item) => (item.id === comment.id ? { ...item, isFavorited } : item)),
       );
-      setError(
-        getRateLimitMessage(
-          requestError,
-          "Could not update that comment bookmark.",
-        ),
-      );
+      setError(getRateLimitMessage(requestError, "Could not update that comment bookmark."));
     }
   };
 
   return (
     <>
       <section
-      id="comments"
-      className="mt-4 border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60"
-    >
-      <h2 className="text-sm font-bold">
-        Comments{" "}
-        <span className="font-normal text-neutral-500">
-          ({comments.length})
-        </span>
-      </h2>
-      <form
-        onSubmit={handleSubmit}
-        className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end"
+        id="comments"
+        className="mt-4 border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60"
       >
-        <div className="min-w-0 flex-1">
-          <textarea
-            id="comment-input"
-            ref={commentInputRef}
-          value={content}
-          onChange={handleContentChange}
-          maxLength={500}
-          rows={2}
-          placeholder="Add a comment…"
-            className="w-full resize-none overflow-hidden rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700"
-          />
-          {commentImages.length > 0 && (
-            <div className="mt-2 flex gap-2">
-              {commentImages.map((image) => (
-                <div key={image.preview} className="relative h-16 w-16">
-                  <img
-                    src={image.preview}
-                    alt="Comment preview"
-                    className="h-full w-full rounded-lg object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeCommentImage(image.preview)}
-                    className="absolute -right-1.5 -top-1.5 rounded-full bg-neutral-900 p-0.5 text-white"
-                    aria-label="Remove image"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          {commentImages.length < 3 && (
-            <label className="mt-2 inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-neutral-500 hover:bg-indigo-500/10 hover:text-indigo-600">
-              <ImageIcon className="h-4 w-4" />
-              Add image/GIF
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={addCommentImages}
-                className="sr-only"
-              />
-            </label>
-          )}
-        </div>
-        <button
-          type="submit"
-          disabled={(!content.trim() && commentImages.length === 0) || submitting}
-          aria-label="Post comment"
-          className="self-end rounded-xl bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-500 disabled:opacity-50 sm:self-auto"
-        >
-          <Send className="h-4 w-4" />
-        </button>
-      </form>
-      {error && <p className="mt-2 text-xs text-rose-500">{error}</p>}
-      <div className="mt-5 space-y-4">
-        {loading ? (
-          <p className="text-sm text-neutral-500">Loading comments…</p>
-        ) : comments.length === 0 ? (
-          <p className="text-sm text-neutral-500">
-            No comments yet. Start the conversation.
-          </p>
-        ) : (
-          comments.map((comment) => {
-            const author = comment.user || {};
-            const isOwnComment =
-              author.id === user?.id || comment.userId === user?.id;
-            return (
-              <div
-                key={comment.id}
-                className="cursor-pointer rounded-xl bg-neutral-100 p-3 dark:bg-neutral-800"
-                onClick={() =>
-                  navigate(`/comment/${comment.id}`, {
-                    state: { from: `/post/${postId}` },
-                  })
-                }
-              >
-                <div className="flex gap-3">
-                  <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center text-xs font-bold text-indigo-600 dark:text-indigo-300">
-                    {author.imageUrl ? (
-                      <img
-                        src={author.imageUrl}
-                        alt={author.name || "Yapper"}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex h-full items-center justify-center">
-                        {(author.name || "Y")[0].toUpperCase()}
-                      </span>
-                    )}
+        <h2 className="text-sm font-bold">
+          Comments <span className="font-normal text-neutral-500">({comments.length})</span>
+        </h2>
+        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end">
+          <div className="min-w-0 flex-1">
+            <textarea
+              id="comment-input"
+              ref={commentInputRef}
+              value={content}
+              onChange={handleContentChange}
+              maxLength={500}
+              rows={2}
+              placeholder="Add a comment…"
+              className="w-full resize-none overflow-hidden rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-indigo-500 dark:border-neutral-700"
+            />
+            {commentImages.length > 0 && (
+              <div className="mt-2 flex gap-2">
+                {commentImages.map((image) => (
+                  <div key={image.preview} className="relative h-16 w-16">
+                    <img
+                      src={image.preview}
+                      alt="Comment preview"
+                      className="h-full w-full rounded-lg object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeCommentImage(image.preview)}
+                      className="absolute -right-1.5 -top-1.5 rounded-full bg-neutral-900 p-0.5 text-white"
+                      aria-label="Remove image"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </div>
-                  <div className="relative min-w-0 flex-1 px-0 py-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-bold">
-                        {author.name || "Yapper"}
-                      </span>
-                      <span className="text-[11px] text-neutral-500">
-                        {relativeTime(comment.createdAt)}
-                      </span>
-                    </div>
-                    {comment.parent?.user?.username && (
-                      <p className="mt-1 text-[11px] text-indigo-500">
-                        Replying to @{comment.parent.user.username}
-                      </p>
-                    )}
-                    <div className="flex w-full items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                      {editingCommentId === comment.id ? (
-                        <div className="flex min-w-0 flex-1 flex-col gap-2">
-                          <textarea
-                            onClick={(event) => event.stopPropagation()}
-                            value={editContent}
-                            onChange={(event) =>
-                              setEditContent(event.target.value)
-                            }
-                            maxLength={500}
-                            rows={2}
-                            autoFocus
-                            className="w-full resize-none overflow-hidden break-words rounded-lg border border-indigo-500/40 bg-transparent px-2 py-1.5 text-sm outline-none"
-                          />
-                          <div className="flex justify-end gap-2">
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                cancelEditing();
-                              }}
-                              className="rounded-lg px-2 py-1 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                handleEdit(comment.id);
-                              }}
-                              disabled={!editContent.trim()}
-                              className="rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white disabled:opacity-50"
-                            >
-                              Save
-                            </button>
-                          </div>
-                        </div>
+                ))}
+              </div>
+            )}
+            {commentImages.length < 3 && (
+              <div className="flex justify-between">
+                <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-xs font-semibold text-neutral-500 hover:bg-indigo-500/10 hover:text-indigo-600">
+                  <ImageIcon className="h-4 w-4" />
+                  Add image/GIF
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={addCommentImages}
+                    className="sr-only"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={(!content.trim() && commentImages.length === 0) || submitting}
+                  aria-label="Post comment"
+                  className="self-end rounded-xl bg-indigo-600 p-2.5 text-white transition hover:bg-indigo-500 disabled:opacity-50 sm:self-auto"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        </form>
+        {error && <p className="mt-2 text-xs text-rose-500">{error}</p>}
+        <div className="mt-5 space-y-4">
+          {loading ? (
+            <p className="text-sm text-neutral-500">Loading comments…</p>
+          ) : comments.length === 0 ? (
+            <p className="text-sm text-neutral-500">No comments yet. Start the conversation.</p>
+          ) : (
+            comments.map((comment) => {
+              const author = comment.user || {};
+              const isOwnComment = author.id === user?.id || comment.userId === user?.id;
+              return (
+                <div
+                  key={comment.id}
+                  className="cursor-pointer rounded-xl bg-neutral-100 p-3 dark:bg-neutral-800"
+                  onClick={() =>
+                    navigate(`/comment/${comment.id}`, {
+                      state: { from: `/post/${postId}` },
+                    })
+                  }
+                >
+                  <div className="flex gap-3">
+                    <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-indigo-500/20 text-center text-xs font-bold text-indigo-600 dark:text-indigo-300">
+                      {author.imageUrl ? (
+                        <img
+                          src={author.imageUrl}
+                          alt={author.name || "Yapper"}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
-                        <p className="mt-1 min-w-0 whitespace-pre-wrap break-words text-sm text-neutral-700 dark:text-neutral-300">
-                          {comment.content}
+                        <span className="flex h-full items-center justify-center">
+                          {(author.name || "Y")[0].toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative min-w-0 flex-1 px-0 py-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold">{author.name || "Yapper"}</span>
+                        <span className="text-[11px] text-neutral-500">
+                          {relativeTime(comment.createdAt)}
+                        </span>
+                      </div>
+                      {comment.parent?.user?.username && (
+                        <p className="mt-1 text-[11px] text-indigo-500">
+                          Replying to @{comment.parent.user.username}
                         </p>
                       )}
-                      {comment.images?.length > 0 && (
-                        <div className="mt-2 grid max-w-sm grid-cols-3 gap-2">
-                          {comment.images.map((image, index) => (
-                            <button
-                              type="button"
-                              key={image.id || image.url}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                openImages(comment.images, index);
-                              }}
-                              className="overflow-hidden rounded-lg"
-                              aria-label="Open comment image"
-                            >
-                              <img
-                                src={image.url}
-                                alt="Comment attachment"
-                                className="h-20 w-full object-cover transition hover:scale-105"
+                      <div className="flex w-full items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          {editingCommentId === comment.id ? (
+                            <div className="flex min-w-0 flex-1 flex-col gap-2">
+                              <textarea
+                                onClick={(event) => event.stopPropagation()}
+                                value={editContent}
+                                onChange={(event) => setEditContent(event.target.value)}
+                                maxLength={500}
+                                rows={2}
+                                autoFocus
+                                className="w-full resize-none overflow-hidden break-words rounded-lg border border-indigo-500/40 bg-transparent px-2 py-1.5 text-sm outline-none"
                               />
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      </div>
-                      {isOwnComment && editingCommentId !== comment.id && (
-                        <div className="relative shrink-0">
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              setOpenCommentMenuId((currentId) =>
-                                currentId === comment.id ? null : comment.id,
-                              );
-                            }}
-                            aria-label="Comment options"
-                            className="rounded-lg p-1.5 text-neutral-400 hover:bg-black/5 hover:text-neutral-700 dark:hover:bg-white/10 dark:hover:text-neutral-200"
-                          >
-                            <Ellipsis className="h-4 w-4" />
-                          </button>
-                          {openCommentMenuId === comment.id && (
-                            <div className="absolute right-0 top-8 z-10 min-w-28 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
-                              <button
-                                type="button"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  startEditing(comment);
-                                }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
-                              >
-                                <Pencil className="h-3.5 w-3.5" />
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setOpenCommentMenuId(null);
-                                  handleDelete(comment.id);
-                                }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                                Delete
-                              </button>
+                              <div className="flex justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    cancelEditing();
+                                  }}
+                                  className="rounded-lg px-2 py-1 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleEdit(comment.id);
+                                  }}
+                                  disabled={!editContent.trim()}
+                                  className="rounded-lg bg-indigo-600 px-2 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="mt-1 min-w-0 whitespace-pre-wrap break-words text-sm text-neutral-700 dark:text-neutral-300">
+                              {comment.content}
+                            </p>
+                          )}
+                          {comment.images?.length > 0 && (
+                            <div className="mt-2 grid max-w-sm grid-cols-3 gap-2">
+                              {comment.images.map((image, index) => (
+                                <button
+                                  type="button"
+                                  key={image.id || image.url}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    openImages(comment.images, index);
+                                  }}
+                                  className="overflow-hidden rounded-lg"
+                                  aria-label="Open comment image"
+                                >
+                                  <img
+                                    src={image.url}
+                                    alt="Comment attachment"
+                                    className="h-20 w-full object-cover transition hover:scale-105"
+                                  />
+                                </button>
+                              ))}
                             </div>
                           )}
                         </div>
-                      )}
+                        {isOwnComment && editingCommentId !== comment.id && (
+                          <div className="relative shrink-0">
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                setOpenCommentMenuId((currentId) =>
+                                  currentId === comment.id ? null : comment.id,
+                                );
+                              }}
+                              aria-label="Comment options"
+                              className="rounded-lg p-1.5 text-neutral-400 hover:bg-black/5 hover:text-neutral-700 dark:hover:bg-white/10 dark:hover:text-neutral-200"
+                            >
+                              <Ellipsis className="h-4 w-4" />
+                            </button>
+                            {openCommentMenuId === comment.id && (
+                              <div className="absolute right-0 top-8 z-10 min-w-28 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    startEditing(comment);
+                                  }}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-neutral-700 hover:bg-black/5 dark:text-neutral-200 dark:hover:bg-white/10"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    setOpenCommentMenuId(null);
+                                    handleDelete(comment.id);
+                                  }}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
+                  <div
+                    className="mt-3 flex items-center justify-between gap-1 border-t border-black/5 pt-2 text-xs font-semibold text-neutral-500 dark:border-neutral-700/60 dark:text-neutral-400"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate(`/comment/${comment.id}`, {
+                          state: { from: `/post/${postId}` },
+                        })
+                      }
+                      aria-label="Reply to comment"
+                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                    >
+                      <CornerUpLeft className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigate(`/comment/${comment.id}`, {
+                          state: { from: `/post/${postId}` },
+                        })
+                      }
+                      aria-label="View comment thread"
+                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      <span>{comment._count?.replies || 0}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleCommentLike(comment)}
+                      aria-label={comment.isLiked ? "Unlike comment" : "Like comment"}
+                      className={`flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${comment.isLiked ? "text-rose-500" : ""}`}
+                    >
+                      <Heart className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`} />
+                      <span>{comment._count?.likes || 0}</span>
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="View comment activity"
+                      title="Comment activity coming soon"
+                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                    >
+                      <ChartColumn className="h-4 w-4" />
+                      <span>{comment.viewCount || 0}</span>
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Repost comment"
+                      title="Comment reposts coming soon"
+                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                    >
+                      <Repeat2 className="h-4 w-4" />
+                      <span>{comment.repostCount || 0}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleCommentFavorite(comment)}
+                      aria-label={
+                        comment.isFavorited ? "Remove comment bookmark" : "Bookmark comment"
+                      }
+                      title={comment.isFavorited ? "Remove bookmark" : "Bookmark comment"}
+                      className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${comment.isFavorited ? "text-indigo-600 dark:text-indigo-400" : ""}`}
+                    >
+                      <Bookmark
+                        className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`}
+                      />
+                    </button>
+                  </div>
                 </div>
-                <div
-                  className="mt-3 flex items-center justify-between gap-1 border-t border-black/5 pt-2 text-xs font-semibold text-neutral-500 dark:border-neutral-700/60 dark:text-neutral-400"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    onClick={() =>
-                      navigate(`/comment/${comment.id}`, {
-                        state: { from: `/post/${postId}` },
-                      })
-                    }
-                    aria-label="Reply to comment"
-                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                  >
-                    <CornerUpLeft className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      navigate(`/comment/${comment.id}`, {
-                        state: { from: `/post/${postId}` },
-                      })
-                    }
-                    aria-label="View comment thread"
-                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                    <span>{comment._count?.replies || 0}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toggleCommentLike(comment)}
-                    aria-label={
-                      comment.isLiked ? "Unlike comment" : "Like comment"
-                    }
-                    className={`flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${comment.isLiked ? "text-rose-500" : ""}`}
-                  >
-                    <Heart
-                      className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`}
-                    />
-                    <span>{comment._count?.likes || 0}</span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="View comment activity"
-                    title="Comment activity coming soon"
-                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                  >
-                    <ChartColumn className="h-4 w-4" />
-                    <span>{comment.viewCount || 0}</span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Repost comment"
-                    title="Comment reposts coming soon"
-                    className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                  >
-                    <Repeat2 className="h-4 w-4" />
-                    <span>{comment.repostCount || 0}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toggleCommentFavorite(comment)}
-                    aria-label={
-                      comment.isFavorited
-                        ? "Remove comment bookmark"
-                        : "Bookmark comment"
-                    }
-                    title={
-                      comment.isFavorited
-                        ? "Remove bookmark"
-                        : "Bookmark comment"
-                    }
-                    className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${comment.isFavorited ? "text-indigo-600 dark:text-indigo-400" : ""}`}
-                  >
-                    <Bookmark
-                      className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`}
-                    />
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
       </section>
       {activeImages && (
         <ImageLightbox
@@ -572,15 +524,13 @@ export default function CommentSection({ postId }) {
             setActiveImages((current) => ({
               ...current,
               currentIndex:
-                (current.currentIndex - 1 + current.images.length) %
-                current.images.length,
+                (current.currentIndex - 1 + current.images.length) % current.images.length,
             }))
           }
           onNext={() =>
             setActiveImages((current) => ({
               ...current,
-              currentIndex:
-                (current.currentIndex + 1) % current.images.length,
+              currentIndex: (current.currentIndex + 1) % current.images.length,
             }))
           }
         />

@@ -23,10 +23,7 @@ import { useAuth } from "../hooks/useAuth";
 import ImageLightbox from "../components/ImageLightbox";
 
 const relativeTime = (value) => {
-  const seconds = Math.max(
-    0,
-    Math.floor((Date.now() - new Date(value).getTime()) / 1000),
-  );
+  const seconds = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 1000));
   if (seconds < 60) return "just now";
   if (seconds < 3600) return Math.floor(seconds / 60) + "m ago";
   if (seconds < 86400) return Math.floor(seconds / 3600) + "h ago";
@@ -35,11 +32,8 @@ const relativeTime = (value) => {
 
 const replaceComment = (thread, commentId, updater) => ({
   ...thread,
-  comment:
-    thread.comment.id === commentId ? updater(thread.comment) : thread.comment,
-  replies: thread.replies.map((reply) =>
-    reply.id === commentId ? updater(reply) : reply,
-  ),
+  comment: thread.comment.id === commentId ? updater(thread.comment) : thread.comment,
+  replies: thread.replies.map((reply) => (reply.id === commentId ? updater(reply) : reply)),
 });
 
 export default function CommentThread() {
@@ -78,9 +72,7 @@ export default function CommentThread() {
 
   const removeReplyImage = (preview) => {
     URL.revokeObjectURL(preview);
-    setReplyImages((current) =>
-      current.filter((image) => image.preview !== preview),
-    );
+    setReplyImages((current) => current.filter((image) => image.preview !== preview));
   };
 
   useEffect(() => {
@@ -106,8 +98,7 @@ export default function CommentThread() {
       setError("");
     } catch (requestError) {
       setError(
-        requestError.response?.data?.message ||
-          "This comment thread is no longer available.",
+        requestError.response?.data?.message || "This comment thread is no longer available.",
       );
     } finally {
       setLoading(false);
@@ -136,12 +127,7 @@ export default function CommentThread() {
   const handleReply = async (event) => {
     event.preventDefault();
     const trimmedContent = replyContent.trim();
-    if (
-      (!trimmedContent && replyImages.length === 0) ||
-      !replyingTo ||
-      submitting ||
-      !thread
-    )
+    if ((!trimmedContent && replyImages.length === 0) || !replyingTo || submitting || !thread)
       return;
 
     setSubmitting(true);
@@ -167,9 +153,7 @@ export default function CommentThread() {
       }));
       cancelReply();
     } catch (requestError) {
-      setError(
-        requestError.response?.data?.message || "Could not post your reply.",
-      );
+      setError(requestError.response?.data?.message || "Could not post your reply.");
     } finally {
       setSubmitting(false);
     }
@@ -203,9 +187,7 @@ export default function CommentThread() {
       );
       cancelEditing();
     } catch (requestError) {
-      setError(
-        requestError.response?.data?.message || "Could not edit that comment.",
-      );
+      setError(requestError.response?.data?.message || "Could not edit that comment.");
     }
   };
 
@@ -280,7 +262,7 @@ export default function CommentThread() {
     return (
       <div className="mx-auto max-w-2xl px-3 py-3 sm:px-0 sm:py-0">
         <div className="animate-pulse rounded-2xl bg-neutral-200 p-8 dark:bg-neutral-900">
-        <div className="h-5 w-40 rounded bg-neutral-300 dark:bg-neutral-800" />
+          <div className="h-5 w-40 rounded bg-neutral-300 dark:bg-neutral-800" />
         </div>
       </div>
     );
@@ -290,15 +272,13 @@ export default function CommentThread() {
     return (
       <div className="mx-auto max-w-2xl px-3 py-3 sm:px-0 sm:py-0">
         <div className="rounded-2xl border border-black/10 p-8 text-center dark:border-neutral-800">
-        <p className="text-sm text-neutral-500">
-          {error || "Comment not found."}
-        </p>
-        <Link
-          to={location.state?.from || "/home"}
-          className="mt-4 inline-block text-sm font-semibold text-indigo-500"
-        >
-          Go back
-        </Link>
+          <p className="text-sm text-neutral-500">{error || "Comment not found."}</p>
+          <Link
+            to={location.state?.from || "/home"}
+            className="mt-4 inline-block text-sm font-semibold text-indigo-500"
+          >
+            Go back
+          </Link>
         </div>
       </div>
     );
@@ -316,7 +296,7 @@ export default function CommentThread() {
           "rounded-2xl border border-black/10 bg-white/60 p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60 " +
           (!isThreadRoot ? "cursor-pointer" : "")
         }
-            onClick={() => {
+        onClick={() => {
           if (!isThreadRoot) {
             navigate("/comment/" + comment.id, {
               state: { from: "/comment/" + id },
@@ -340,12 +320,8 @@ export default function CommentThread() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-bold">
-                {author.name || "Yapper"}
-              </span>
-              <span className="text-xs text-neutral-500">
-                {relativeTime(comment.createdAt)}
-              </span>
+              <span className="text-sm font-bold">{author.name || "Yapper"}</span>
+              <span className="text-xs text-neutral-500">{relativeTime(comment.createdAt)}</span>
             </div>
             {comment.parent?.user?.username && (
               <p className="mt-1 text-xs text-indigo-500">
@@ -353,10 +329,7 @@ export default function CommentThread() {
               </p>
             )}
             {isEditing ? (
-              <div
-                className="mt-3 space-y-2"
-                onClick={(event) => event.stopPropagation()}
-              >
+              <div className="mt-3 space-y-2" onClick={(event) => event.stopPropagation()}>
                 <textarea
                   value={editContent}
                   onChange={(event) => setEditContent(event.target.value)}
@@ -444,9 +417,7 @@ export default function CommentThread() {
                 aria-label={comment.isLiked ? "Unlike comment" : "Like comment"}
                 className={`flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${comment.isLiked ? "text-rose-500" : ""}`}
               >
-                <Heart
-                  className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`}
-                />
+                <Heart className={`h-4 w-4 ${comment.isLiked ? "fill-current" : ""}`} />
                 <span>{comment._count?.likes || 0}</span>
               </button>
               <button
@@ -470,31 +441,18 @@ export default function CommentThread() {
               <button
                 type="button"
                 onClick={() => toggleCommentFavorite(comment)}
-                aria-label={
-                  comment.isFavorited
-                    ? "Remove comment bookmark"
-                    : "Bookmark comment"
-                }
-                title={
-                  comment.isFavorited ? "Remove bookmark" : "Bookmark comment"
-                }
+                aria-label={comment.isFavorited ? "Remove comment bookmark" : "Bookmark comment"}
+                title={comment.isFavorited ? "Remove bookmark" : "Bookmark comment"}
                 className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${comment.isFavorited ? "text-indigo-600 dark:text-indigo-400" : ""}`}
               >
-                <Bookmark
-                  className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`}
-                />
+                <Bookmark className={`h-4 w-4 ${comment.isFavorited ? "fill-current" : ""}`} />
               </button>
               {isOwnComment && !isEditing && (
-                <div
-                  className="relative"
-                  onClick={(event) => event.stopPropagation()}
-                >
+                <div className="relative" onClick={(event) => event.stopPropagation()}>
                   <button
                     type="button"
                     onClick={() =>
-                      setOpenMenuId((current) =>
-                        current === comment.id ? null : comment.id,
-                      )
+                      setOpenMenuId((current) => (current === comment.id ? null : comment.id))
                     }
                     aria-label="Comment options"
                     className="rounded-lg p-1.5 text-neutral-400 hover:bg-black/5 hover:text-neutral-700 dark:hover:bg-white/10 dark:hover:text-neutral-200"
@@ -539,8 +497,7 @@ export default function CommentThread() {
                     rows={2}
                     autoFocus
                     placeholder={
-                      "Reply to " +
-                      (author.username ? "@" + author.username : "this comment")
+                      "Reply to " + (author.username ? "@" + author.username : "this comment")
                     }
                     className="w-full resize-none rounded-xl border border-indigo-500/40 bg-transparent px-3 py-2 text-sm outline-none"
                   />
@@ -565,39 +522,38 @@ export default function CommentThread() {
                       ))}
                     </div>
                   )}
-                  {replyImages.length < 3 && (
-                    <label className="mt-2 inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-neutral-500 hover:bg-indigo-500/10 hover:text-indigo-600">
-                      <ImageIcon className="h-4 w-4" />
-                      Add image/GIF
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={addReplyImages}
-                        className="sr-only"
-                      />
-                    </label>
-                  )}
-                </div>
-                <div className="flex items-center justify-end gap-2 sm:shrink-0">
-                  <button
-                    type="submit"
-                    disabled={
-                      (!replyContent.trim() && replyImages.length === 0) ||
-                      submitting
-                    }
-                    aria-label="Post reply"
-                    className="rounded-xl bg-indigo-600 p-2.5 text-white disabled:opacity-50"
-                  >
-                    <Send className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={cancelReply}
-                    className="rounded-lg px-2 py-2 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
-                  >
-                    Cancel
-                  </button>
+                  <div className="flex justify-between items-center">
+                    {replyImages.length < 3 && (
+                      <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-xs font-semibold text-neutral-500 hover:bg-indigo-500/10 hover:text-indigo-600">
+                        <ImageIcon className="h-4 w-4" />
+                        Add image/GIF
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={addReplyImages}
+                          className="sr-only"
+                        />
+                      </label>
+                    )}
+                    <div className="flex items-center justify-end gap-2 sm:shrink-0">
+                      <button
+                        type="submit"
+                        disabled={(!replyContent.trim() && replyImages.length === 0) || submitting}
+                        aria-label="Post reply"
+                        className="rounded-xl bg-indigo-600 p-2.5 text-white disabled:opacity-50"
+                      >
+                        <Send className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelReply}
+                        className="rounded-lg px-2 py-2 text-xs text-neutral-500 hover:bg-black/5 dark:hover:bg-white/10"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </form>
             )}
@@ -609,34 +565,29 @@ export default function CommentThread() {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-3 sm:px-0 sm:py-0">
-      <button
-        type="button"
-        onClick={() =>
-          navigate(location.state?.from || "/post/" + thread.comment.postId)
-        }
-        className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-500"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back
-      </button>
-      <div>
-        <h1 className="text-lg font-bold">Comment</h1>
-        <p className="text-xs text-neutral-500">
-          {thread.replies.length}{" "}
-          {thread.replies.length === 1 ? "reply" : "replies"}
-        </p>
-      </div>
-      {error && <p className="text-sm text-rose-500">{error}</p>}
-      {renderComment(thread.comment, true)}
-      <div className="space-y-3 border-l-2 border-indigo-500/20 pl-4">
-        {thread.replies.length === 0 ? (
-          <p className="py-4 text-sm text-neutral-500">
-            No replies yet. Start the conversation.
+      <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-5 sm:px-0 sm:py-5">
+        <button
+          type="button"
+          onClick={() => navigate(location.state?.from || "/post/" + thread.comment.postId)}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-500"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back
+        </button>
+        <div>
+          <h1 className="text-lg font-bold">Comment</h1>
+          <p className="text-xs text-neutral-500">
+            {thread.replies.length} {thread.replies.length === 1 ? "reply" : "replies"}
           </p>
-        ) : (
-          thread.replies.map((reply) => renderComment(reply))
-        )}
-      </div>
+        </div>
+        {error && <p className="text-sm text-rose-500">{error}</p>}
+        {renderComment(thread.comment, true)}
+        <div className="space-y-3 border-l-2 border-indigo-500/20 pl-4">
+          {thread.replies.length === 0 ? (
+            <p className="py-4 text-sm text-neutral-500">No replies yet. Start the conversation.</p>
+          ) : (
+            thread.replies.map((reply) => renderComment(reply))
+          )}
+        </div>
       </div>
       {activeImages && (
         <ImageLightbox
@@ -647,15 +598,13 @@ export default function CommentThread() {
             setActiveImages((current) => ({
               ...current,
               currentIndex:
-                (current.currentIndex - 1 + current.images.length) %
-                current.images.length,
+                (current.currentIndex - 1 + current.images.length) % current.images.length,
             }))
           }
           onNext={() =>
             setActiveImages((current) => ({
               ...current,
-              currentIndex:
-                (current.currentIndex + 1) % current.images.length,
+              currentIndex: (current.currentIndex + 1) % current.images.length,
             }))
           }
         />
