@@ -17,6 +17,31 @@ html, body, #root {
   }
 }
 
+/* Toasts: black/white like the feed, with a neon indigo border */
+.app-toast {
+  background: #ffffff !important;
+  color: #0a0a0a !important;
+  border: 1.5px solid #6366f1;
+  border-radius: 9999px !important;
+  padding: 12px 18px !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.15),
+    0 0 14px rgba(99, 102, 241, 0.45),
+    0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.dark .app-toast {
+  background: #0a0a0a !important;
+  color: #fafafa !important;
+  border-color: #818cf8;
+  box-shadow:
+    0 0 0 1px rgba(129, 140, 248, 0.25),
+    0 0 18px rgba(129, 140, 248, 0.55),
+    0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
 :root {
   /* LIGHT MODE - Soft Lilac & Rose Glass */
   --bg-main: #FAF8FC;          /* Warm Creamy Lavender Tint */

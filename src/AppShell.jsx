@@ -12,13 +12,12 @@ export default function AppShell() {
         containerClassName="app-toaster"
         toastOptions={{
           duration: 3500,
-          style: {
-            background: "var(--accent-primary)",
-            color: "#ffffff",
-            border: "1px solid var(--accent-hover)",
-            borderRadius: "9999px",
-            padding: "12px 18px",
-            boxShadow: "0 8px 24px var(--accent-glow)",
+          className: "app-toast",
+          success: {
+            iconTheme: { primary: "#6366f1", secondary: "#ffffff" },
+          },
+          error: {
+            iconTheme: { primary: "#f43f5e", secondary: "#ffffff" },
           },
         }}
       />
