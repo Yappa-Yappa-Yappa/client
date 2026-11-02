@@ -173,7 +173,7 @@ export default function EditProfileModal({
             </div>
           </div>
 
-          <div className="space-y-4 px-5 pb-5">
+          <div className="space-y-4 px-5 pb-16">
             <label className="relative block">
               <input
                 name="name"
