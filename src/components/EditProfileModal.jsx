@@ -112,18 +112,10 @@ export default function EditProfileModal({
           </button>
         </header>
 
-        <form
-          id="edit-profile-form"
-          onSubmit={save}
-          className="overflow-y-auto"
-        >
+        <form id="edit-profile-form" onSubmit={save} className="overflow-y-auto">
           <div className="relative h-36 bg-indigo-500 sm:h-44 border-[0.5px] border-black">
             {profile.bgUrl && (
-              <img
-                src={profile.bgUrl}
-                alt=""
-                className="h-full w-full object-cover"
-              />
+              <img src={profile.bgUrl} alt="" className="h-full w-full object-cover" />
             )}
             <div className="absolute inset-0 flex items-center justify-center bg-black/20">
               <label
@@ -157,9 +149,7 @@ export default function EditProfileModal({
                   />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center text-3xl font-bold text-indigo-600 dark:text-indigo-300">
-                    {(profile.name || profile.username || "P")
-                      .charAt(0)
-                      .toUpperCase()}
+                    {(profile.name || profile.username || "P").charAt(0).toUpperCase()}
                   </span>
                 )}
                 <label
@@ -206,6 +196,7 @@ export default function EditProfileModal({
                 maxLength={54}
                 placeholder=" "
                 className={fieldClass}
+                disabled
               />
               <span className="pointer-events-none absolute left-3 top-2 text-xs text-neutral-500 transition peer-placeholder-shown:top-4 peer-placeholder-shown:text-[15px] peer-focus:top-2 peer-focus:text-xs peer-focus:text-indigo-500">
                 Username
@@ -220,12 +211,14 @@ export default function EditProfileModal({
                 maxLength={350}
                 rows={4}
                 placeholder=" "
-                className={`${fieldClass} resize-none`}
+                className={`${fieldClass} resize-none pb-7`}
               />
+              <div className="pointer-events-none absolute left-px right-3 top-px h-6 rounded-t-md bg-white dark:bg-neutral-950" />
+
               <span className="pointer-events-none absolute left-3 top-2 text-xs text-neutral-500 transition peer-placeholder-shown:top-4 peer-placeholder-shown:text-[15px] peer-focus:top-2 peer-focus:text-xs peer-focus:text-indigo-500">
                 Bio
               </span>
-              <span className="absolute bottom-2 right-3 text-xs text-neutral-400">
+              <span className="pointer-events-none absolute bottom-2 right-5 text-xs text-neutral-400">
                 {form.bio.length}/350
               </span>
             </label>
