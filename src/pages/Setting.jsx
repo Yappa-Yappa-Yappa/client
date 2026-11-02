@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import ThemeToggle from "../components/ThemeToggle";
+import FaceIdSetting from "../components/FaceIdSetting";
 import { NavLink, Outlet } from "react-router-dom";
 
 const settingSections = [
@@ -143,6 +144,7 @@ export default function Setting() {
                 </button>
               ),
             )}
+            {section.title === "Account" && <FaceIdSetting />}
           </div>
         </section>
       ))}

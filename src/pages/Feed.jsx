@@ -28,6 +28,7 @@ import ImageLightbox from "../components/ImageLightbox";
 import ReportModal from "../components/ReportModal";
 import YapLogo from "../assets/icons/yappa-blob.png";
 import MobileDrawer from "../components/layout/MobileDrawer";
+import FaceIdBanner from "../components/FaceIdBanner";
 import { showErrorToast, showSuccessToast, showWarningToast } from "../utils/toast";
 import { getRateLimitMessage } from "../utils/errors";
 
@@ -549,6 +550,8 @@ export default function Feed({ feedType = "for-you" }) {
         </div>
       </div>
       <MobileDrawer open={drawerOpen} onClose={closeDrawer} />
+
+      <FaceIdBanner />
 
       {/* Hidden File Input */}
       <input

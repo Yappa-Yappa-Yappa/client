@@ -12,6 +12,10 @@ export const loginWithGoogle = async (credential) => {
   const res = await api.post("/auth/google", { credential });
   return res.data;
 };
+export const loginWithFace = async (code) => {
+  const res = await api.post("/auth/face", { code });
+  return res.data;
+};
 export const register = async (data) => {
   const res = await api.post("/auth/register", data);
   return res.data;

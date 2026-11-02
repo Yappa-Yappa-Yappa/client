@@ -6,12 +6,17 @@ import {
   LoaderCircle,
   LockKeyhole,
   Mail,
+  ScanFace,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { loginWithGoogle, requestOtp } from "../../api/auth";
+import { loginWithFace, loginWithGoogle, requestOtp } from "../../api/auth";
 import { useAuth } from "../../hooks/useAuth";
 import AuthShell from "../../components/auth/AuthShell";
 import SlowRequestNotice from "../../components/auth/SlowRequestNotice";
+import FaceFrameModal from "../../components/FaceFrameModal";
+import { useTheme } from "../../contexts/ThemeContext";
+import { faceClientUrl } from "../../utils/face";
+import { showSuccessToast } from "../../utils/toast";
 
 export default function Login() {
   const hasGoogleClientId = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
@@ -24,10 +29,13 @@ export default function Login() {
     useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const [isFaceSubmitting, setIsFaceSubmitting] = useState(false);
+  const [faceSrc, setFaceSrc] = useState("");
   const googleButtonRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { login, setSession } = useAuth();
+  const { theme } = useTheme();
 
   const handleGoogleCredential = useCallback(
     async (response) => {
@@ -46,6 +54,36 @@ export default function Login() {
         );
       } finally {
         setIsGoogleSubmitting(false);
+      }
+    },
+    [navigate, setSession],
+  );
+
+  const openFaceLogin = () => {
+    setError("");
+    const url = new URL("/face-login", faceClientUrl);
+    url.searchParams.set("redirect", `${window.location.origin}/login`);
+    url.searchParams.set("embed", "1");
+    url.searchParams.set("theme", theme);
+    setFaceSrc(url.toString());
+  };
+
+  const handleFaceMessage = useCallback(
+    async (data) => {
+      if (data?.type !== "face-login" || !data.code) return;
+      setFaceSrc("");
+      setIsFaceSubmitting(true);
+      try {
+        const result = await loginWithFace(data.code);
+        setSession(result.data);
+        showSuccessToast("Signed in with Face ID");
+        navigate("/", { replace: true });
+      } catch (err) {
+        setError(
+          err.response?.data?.message ||
+            "Face login failed. Please try again.",
+        );
+        setIsFaceSubmitting(false);
       }
     },
     [navigate, setSession],
@@ -243,6 +281,28 @@ export default function Login() {
         </button>
         {isSubmitting && <SlowRequestNotice />}
       </form>
+      {faceClientUrl && (
+        <>
+          <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <span className="h-px flex-1 bg-[var(--border-glass)]" />
+            <span>or</span>
+            <span className="h-px flex-1 bg-[var(--border-glass)]" />
+          </div>
+          <button
+            type="button"
+            onClick={openFaceLogin}
+            disabled={isFaceSubmitting}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border-glass)] bg-[var(--bg-surface)] py-3.5 text-sm font-bold text-[var(--text-primary)] transition hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] disabled:opacity-60"
+          >
+            {isFaceSubmitting ? (
+              <LoaderCircle className="h-4 w-4 animate-spin" />
+            ) : (
+              <ScanFace className="h-4 w-4" />
+            )}
+            Log in with Face ID
+          </button>
+        </>
+      )}
       {hasGoogleClientId && (
         <>
           <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
@@ -270,6 +330,14 @@ export default function Login() {
           Register
         </Link>
       </p>
+      {faceSrc && (
+        <FaceFrameModal
+          title="Log in with Face ID"
+          src={faceSrc}
+          onMessage={handleFaceMessage}
+          onClose={() => setFaceSrc("")}
+        />
+      )}
     </AuthShell>
   );
 }
