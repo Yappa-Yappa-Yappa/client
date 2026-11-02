@@ -56,7 +56,7 @@ function FeedTab({ tab, active, onClick }) {
     <Link
       to={tab.to}
       onClick={(event) => onClick(event, tab.type)}
-      className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
+      className={`relative flex flex-1 items-center justify-center text-sm font-semibold transition-colors  ${
         active ? "text-neutral-900 dark:text-neutral-100" : "text-neutral-500 dark:text-neutral-400"
       }`}
     >
