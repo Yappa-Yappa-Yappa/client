@@ -30,7 +30,7 @@ export default function MainLayout() {
         >
           <div className="flex min-h-0 min-w-0 flex-1">
             {/* Page Content Rendered via Outlet */}
-            <main className="relative mx-auto min-h-screen w-full min-w-0 max-w-4xl flex-1 p-0">
+            <main className="relative mx-auto w-full min-w-0 max-w-4xl flex-1 p-0">
               <Outlet />
               {!isChatPage && (
                 <div className="mt-6 lg:hidden">
@@ -39,7 +39,7 @@ export default function MainLayout() {
               )}
               {!isChatPage && (
                 <div
-                  className="h-[calc(7rem+env(safe-area-inset-bottom))] shrink-0 md:h-6"
+                  className="h-[calc(5.5rem+env(safe-area-inset-bottom))] shrink-0 md:h-0"
                   aria-hidden="true"
                 />
               )}

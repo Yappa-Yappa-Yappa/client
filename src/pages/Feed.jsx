@@ -659,7 +659,7 @@ export default function Feed({ feedType = "for-you" }) {
       </div>
 
       {loading && posts.length === 0 && (
-        <div className="flex justify-center py-10">
+        <div className="flex justify-center">
           <FeedSkeleton />
         </div>
       )}
