@@ -36,6 +36,7 @@ import Privacy from "./pages/legal/Privacy";
 import Cookies from "./pages/legal/Cookies";
 import Accessibility from "./pages/legal/Accessibility";
 import About from "./pages/legal/About";
+import Quiz from "./pages/Quiz";
 
 export default function App() {
   return (
@@ -88,6 +89,7 @@ function AppRoutes() {
         <Route path="trend" element={<Trending />} />
         <Route path="suggestions" element={<Suggestions />} />
         <Route path="favorite" element={<Favorite />} />
+        <Route path="quiz" element={<Quiz />} />
 
         {/* Profile */}
         <Route path="profile/:username" element={<Profile />}>
@@ -123,7 +125,7 @@ function RouteTitle() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    document.title = `${getRouteTitle(pathname)} | Yappa`;
+    document.title = `${getRouteTitle(pathname)} · Yappa`;
   }, [pathname]);
 
   return null;
@@ -143,6 +145,7 @@ function getRouteTitle(pathname) {
     "/chat": "Chat",
     "/history": "History",
     "/trend": "Trending",
+    "/quiz": "Quizzy",
     "/suggestions": "Suggestions",
     "/favorite": "Favorites",
     "/setting": "Settings",

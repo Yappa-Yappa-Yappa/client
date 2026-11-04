@@ -1,5 +1,6 @@
 import {
   Bell,
+  Brain,
   History,
   Home,
   MessageCircle,
@@ -29,8 +30,7 @@ export default function Sidebar() {
   const { user, accessToken } = useAuth();
   const { unreadCount } = useNotifications();
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
-  const isMobileChatRoom =
-    location.pathname === "/chat" && location.state?.chatRoom === true;
+  const isMobileChatRoom = location.pathname === "/chat" && location.state?.chatRoom === true;
 
   useEffect(() => {
     if (!accessToken) return undefined;
@@ -45,9 +45,7 @@ export default function Sidebar() {
     };
 
     refreshChatUnreadCount();
-    const socket = socketUrl
-      ? io(socketUrl, { auth: { token: accessToken } })
-      : null;
+    const socket = socketUrl ? io(socketUrl, { auth: { token: accessToken } }) : null;
 
     socket?.on("message:new", (message) => {
       if (message.senderId !== user?.id) {
@@ -104,6 +102,11 @@ export default function Sidebar() {
       icon: <TrendingUp className="w-6 h-6 shrink-0" />,
       label: "Trending",
       path: "/trend",
+    },
+    {
+      icon: <Brain className="w-6 h-6 shrink-0" />,
+      label: "Quizzy",
+      path: "/quiz",
     },
     {
       icon: <User className="w-6 h-6 shrink-0" />,
@@ -256,9 +259,7 @@ export default function Sidebar() {
                     </span>
                   )}
                 </span>
-                <span className="hidden duration-200 truncate group-[.active]:block">
-                  {label}
-                </span>
+                <span className="hidden duration-200 truncate group-[.active]:block">{label}</span>
               </NavLink>
             ))}
           </nav>
