@@ -93,11 +93,11 @@ export default function Sidebar() {
       label: "Favorite",
       path: "/favorite",
     },
-    {
-      icon: <History className="w-6 h-6 shrink-0" />,
-      label: "History",
-      path: "/history",
-    },
+    // {
+    //   icon: <History className="w-6 h-6 shrink-0" />,
+    //   label: "History",
+    //   path: "/history",
+    // },
     {
       icon: <TrendingUp className="w-6 h-6 shrink-0" />,
       label: "Trending",
