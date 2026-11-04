@@ -123,7 +123,7 @@ function RouteTitle() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    document.title = `${getRouteTitle(pathname)} | Yappa`;
+    document.title = `Yappa • ${getRouteTitle(pathname)}`;
   }, [pathname]);
 
   return null;
