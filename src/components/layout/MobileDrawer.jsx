@@ -1,15 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import {
-  History,
-  Settings,
-  Star,
-  TrendingUp,
-  User,
-  Users,
-  X,
-} from "lucide-react";
+import { History, Settings, Star, TrendingUp, User, Users, X } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import Logout from "../../pages/auth/Logout";
 import FooterLinks from "./FooterLinks";
@@ -38,7 +30,7 @@ export default function MobileDrawer({ open, onClose }) {
       path: `/friend/${user.username}/following`,
     },
     { icon: Star, label: "Favorite", path: "/favorite" },
-    { icon: History, label: "History", path: "/history" },
+    // { icon: History, label: "History", path: "/history" },
     { icon: TrendingUp, label: "Trending", path: "/trend" },
     { icon: Settings, label: "Settings", path: "/setting" },
   ];
@@ -85,9 +77,7 @@ export default function MobileDrawer({ open, onClose }) {
           )}
         </span>
         <span className="min-w-0">
-          <strong className="block truncate text-lg font-bold">
-            {user.name || "Yapper"}
-          </strong>
+          <strong className="block truncate text-lg font-bold">{user.name || "Yapper"}</strong>
           <span className="block truncate text-sm text-neutral-500 dark:text-neutral-400">
             @{user.username}
           </span>
