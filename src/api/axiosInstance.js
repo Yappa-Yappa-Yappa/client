@@ -38,6 +38,8 @@ api.interceptors.response.use(
     const isRefreshRequest = originalRequest?.url?.includes("/auth/refresh");
     const isPublicAuthRequest =
       originalRequest?.url?.includes("/auth/login") ||
+      originalRequest?.url?.includes("/auth/face") ||
+      originalRequest?.url?.includes("/auth/google") ||
       originalRequest?.url?.includes("/auth/register") ||
       originalRequest?.url?.includes("/otps/");
 
