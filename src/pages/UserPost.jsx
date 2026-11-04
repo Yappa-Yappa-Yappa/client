@@ -41,9 +41,7 @@ export default function UserPost({ userId, profileUsername }) {
               const { count, likes } = likesResponse?.data || {};
               return {
                 ...post,
-                isLiked: (likes || []).some(
-                  (like) => like.user?.id === currentUser?.id,
-                ),
+                isLiked: (likes || []).some((like) => like.user?.id === currentUser?.id),
                 _count: {
                   ...post._count,
                   likes: count ?? post._count?.likes ?? 0,
@@ -55,15 +53,11 @@ export default function UserPost({ userId, profileUsername }) {
           }),
         );
         setPosts((previousPosts) =>
-          append
-            ? [...previousPosts, ...postsWithLikeState]
-            : postsWithLikeState,
+          append ? [...previousPosts, ...postsWithLikeState] : postsWithLikeState,
         );
         const pagination = res.data?.pagination;
         setPage(pagination?.page || pageToLoad);
-        setHasMore(
-          Boolean(pagination && pagination.page < pagination.totalPages),
-        );
+        setHasMore(Boolean(pagination && pagination.page < pagination.totalPages));
       } catch (err) {
         console.error("Failed to load user posts:", err);
       } finally {
@@ -130,9 +124,7 @@ export default function UserPost({ userId, profileUsername }) {
   const handleDelete = async (postId) => {
     try {
       await deleteFeed(postId);
-      setPosts((previousPosts) =>
-        previousPosts.filter((post) => (post._id || post.id) !== postId),
-      );
+      setPosts((previousPosts) => previousPosts.filter((post) => (post._id || post.id) !== postId));
     } catch (err) {
       console.error("Failed to delete post:", err);
     }
@@ -180,24 +172,18 @@ export default function UserPost({ userId, profileUsername }) {
     setFavoritingPostIds((ids) => new Set(ids).add(postId));
     setPosts((currentPosts) =>
       currentPosts.map((post) =>
-        (post._id || post.id) === postId
-          ? { ...post, isFavorited: !isFavorited }
-          : post,
+        (post._id || post.id) === postId ? { ...post, isFavorited: !isFavorited } : post,
       ),
     );
 
     try {
       if (isFavorited) await removeFavorite(postId);
       else await addFavorite(postId);
-      showSuccessToast(
-        isFavorited ? "Removed from favorites." : "Saved to favorites.",
-      );
+      showSuccessToast(isFavorited ? "Removed from favorites." : "Saved to favorites.");
     } catch (err) {
       console.error("Failed to update post favorite:", err);
       setPosts(previousPosts);
-      showErrorToast(
-        getRateLimitMessage(err, "Failed to update the post favorite."),
-      );
+      showErrorToast(getRateLimitMessage(err, "Failed to update the post favorite."));
     } finally {
       setFavoritingPostIds((ids) => {
         const nextIds = new Set(ids);
@@ -207,15 +193,12 @@ export default function UserPost({ userId, profileUsername }) {
     }
   };
 
-  const openModal = (images, currentIndex) =>
-    setActiveModal({ images, currentIndex });
+  const openModal = (images, currentIndex) => setActiveModal({ images, currentIndex });
   const closeModal = () => setActiveModal(null);
   const moveModal = (direction) => {
     setActiveModal((modal) => ({
       ...modal,
-      currentIndex:
-        (modal.currentIndex + direction + modal.images.length) %
-        modal.images.length,
+      currentIndex: (modal.currentIndex + direction + modal.images.length) % modal.images.length,
     }));
   };
 
@@ -234,9 +217,7 @@ export default function UserPost({ userId, profileUsername }) {
       <div className="space-y-px">
         {posts.length === 0 ? (
           <div className="flex min-h-36 items-center justify-center border-x border-b border-black/10 bg-white/60 px-6 py-8 text-center dark:border-neutral-800 dark:bg-neutral-900/60">
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              No posts yet.
-            </p>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">No posts yet.</p>
           </div>
         ) : (
           posts.map((post) => (
@@ -258,16 +239,14 @@ export default function UserPost({ userId, profileUsername }) {
               handleFavoriteToggle={handleFavoriteToggle}
               favoritingPostIds={favoritingPostIds}
               openModal={openModal}
-              postDetailFrom={
-                profileUsername ? `/profile/${profileUsername}` : "/home"
-              }
+              postDetailFrom={profileUsername ? `/profile/${profileUsername}` : "/home"}
             />
           ))
         )}
         {hasMore && (
-          <div ref={loadMoreRef} className="w-full py-4">
+          <div ref={loadMoreRef} className="w-full">
             {loadingMore && (
-              <div className="mt-5 space-y-0">
+              <div className="space-y-0">
                 <UserPostSkeleton />
                 <UserPostSkeleton />
                 <UserPostSkeleton />
