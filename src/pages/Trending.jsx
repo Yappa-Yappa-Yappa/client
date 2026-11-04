@@ -1,10 +1,4 @@
-import {
-  ArrowUpRight,
-  ChartColumn,
-  Flame,
-  Heart,
-  MessageCircle,
-} from "lucide-react";
+import { ArrowUpRight, ChartColumn, Flame, Heart, MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getTrendingPosts } from "../api/post";
@@ -61,7 +55,7 @@ export default function Trending() {
   }, []);
 
   return (
-    <section className="w-full space-y-6">
+    <section className="w-full">
       <div className="relative overflow-hidden border border-indigo-500/15 bg-gradient-to-br from-indigo-500/10 via-white/70 to-fuchsia-500/10 p-6 shadow-sm dark:border-indigo-400/15 dark:from-indigo-500/15 dark:via-white/[0.04] dark:to-fuchsia-500/10 sm:p-8">
         <div className="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-indigo-400/20 blur-3xl" />
         <div className="relative flex items-start gap-4">
@@ -101,7 +95,7 @@ export default function Trending() {
           {trending.map((post, index) => (
             <article
               key={post.id}
-              className="group border border-black/10 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-indigo-400/30"
+              className="group border border-black/10 bg-white/70 p-4 transition-colors hover:bg-indigo-500/5 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-indigo-400/5"
             >
               <div className="flex items-start gap-3">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-sm font-bold text-indigo-600 dark:bg-indigo-400/10 dark:text-indigo-300">
@@ -125,9 +119,7 @@ export default function Trending() {
                       {post.user?.name || "Yapper"}
                     </span>
                     <span>·</span>
-                    <span className="shrink-0">
-                      {formatDate(post.createdAt)}
-                    </span>
+                    <span className="shrink-0">{formatDate(post.createdAt)}</span>
                   </div>
 
                   <Link
