@@ -22,7 +22,13 @@ import { repostPost, removeRepost } from "../api/repost";
 import { useAuth } from "../hooks/useAuth";
 import FeedSkeleton from "../components/FeedSkeleton";
 import ExpandableText from "../components/ExpandableText";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+  useNavigationType,
+} from "react-router-dom";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import ImageLightbox from "../components/ImageLightbox";
 import ReportModal from "../components/ReportModal";
@@ -69,6 +75,10 @@ function FeedTab({ tab, active, onClick }) {
   );
 }
 
+// Loaded posts per user and feed tab, so coming back from a post keeps the
+// list (and the scroll position restored by MainLayout) instead of refetching.
+const feedCache = new Map();
+
 export default function Feed({ feedType = "for-you" }) {
   const navigate = useNavigate();
 
@@ -94,19 +104,32 @@ export default function Feed({ feedType = "for-you" }) {
   const [postText, setPostText] = useState("");
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const cacheKey = `${user?.id}:${feedType}`;
+  // Only reuse cached posts when coming back (browser back or a back link);
+  // opening Home fresh should still load the latest feed.
+  const cached =
+    navigationType === "POP" || location.state?.restoreScroll
+      ? feedCache.get(cacheKey)
+      : undefined;
+  const restoredKeyRef = useRef(cached ? cacheKey : null);
+  // Cache key the posts in state belong to (so a tab switch can't save the
+  // previous tab's posts under the new key).
+  const loadedKeyRef = useRef(cached ? cacheKey : null);
+  const [posts, setPosts] = useState(() => cached?.posts ?? []);
+  const [loading, setLoading] = useState(!cached);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likingPostIds, setLikingPostIds] = useState(new Set());
   const [favoritingPostIds, setFavoritingPostIds] = useState(new Set());
   const [repostingPostIds, setRepostingPostIds] = useState(new Set());
   const [error, setError] = useState(null);
-  const { user } = useAuth();
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
   const [editingPostId, setEditingPostId] = useState(null);
   const [editText, setEditText] = useState("");
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(() => cached?.page ?? 1);
+  const [hasMore, setHasMore] = useState(() => cached?.hasMore ?? true);
   const [shareStatus, setShareStatus] = useState("");
   const [reportingPostId, setReportingPostId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -171,10 +194,20 @@ export default function Feed({ feedType = "for-you" }) {
   );
 
   useEffect(() => {
+    // Keep the cached copy in sync so it can be restored after leaving the page.
+    if (!loading && loadedKeyRef.current === cacheKey) {
+      feedCache.set(cacheKey, { posts, page, hasMore });
+    }
+  }, [cacheKey, loading, posts, page, hasMore]);
+
+  useEffect(() => {
+    // Restored from cache on mount: don't replace it with a fresh first page.
+    if (restoredKeyRef.current === cacheKey) return;
+    restoredKeyRef.current = null;
+    loadedKeyRef.current = cacheKey;
     // Initial feed loading is intentionally triggered when the signed-in user changes.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPosts();
-  }, [fetchPosts]);
+  }, [fetchPosts, cacheKey]);
 
   const handleImageFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);

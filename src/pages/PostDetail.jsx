@@ -288,6 +288,7 @@ export default function PostDetail() {
     <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-5 sm:px-0 sm:py-5">
       <Link
         to={backPath}
+        state={{ restoreScroll: true }}
         className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-500"
       >
         <ArrowLeft className="h-4 w-4" /> {backLabel}
