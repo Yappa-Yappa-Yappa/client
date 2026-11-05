@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigationType } from "react-router-dom";
 import { getLikesByPost, likePost, unlikePost } from "../api/like";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import { deleteFeed, editFeed, getPostsByUser } from "../api/post";
@@ -9,18 +10,33 @@ import { useAuth } from "../hooks/useAuth";
 import { getRateLimitMessage } from "../utils/errors";
 import { showErrorToast, showSuccessToast } from "../utils/toast";
 
+// Loaded posts per profile and viewer, so coming back from a post keeps the
+// list (and the scroll position restored by MainLayout) instead of refetching.
+const userPostsCache = new Map();
+
 export default function UserPost({ userId, profileUsername }) {
   const { user: currentUser } = useAuth();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const cacheKey = `${userId}:${currentUser?.id}`;
+  // Only reuse cached posts when coming back (browser back or a back link).
+  const cached =
+    navigationType === "POP" || location.state?.restoreScroll
+      ? userPostsCache.get(cacheKey)
+      : undefined;
+  const restoredKeyRef = useRef(cached ? cacheKey : null);
+  // Cache key the posts in state belong to.
+  const loadedKeyRef = useRef(cached ? cacheKey : null);
+  const [posts, setPosts] = useState(() => cached?.posts ?? []);
+  const [loading, setLoading] = useState(!cached);
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
   const [editingPostId, setEditingPostId] = useState(null);
   const [editText, setEditText] = useState("");
   const [likingPostIds, setLikingPostIds] = useState(new Set());
   const [favoritingPostIds, setFavoritingPostIds] = useState(new Set());
   const [activeModal, setActiveModal] = useState(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(() => cached?.page ?? 1);
+  const [hasMore, setHasMore] = useState(() => cached?.hasMore ?? false);
   const [loadingMore, setLoadingMore] = useState(false);
   const loadMoreRef = useRef(null);
 
@@ -69,8 +85,19 @@ export default function UserPost({ userId, profileUsername }) {
   );
 
   useEffect(() => {
+    // Keep the cached copy in sync so it can be restored after leaving the page.
+    if (!loading && !loadingMore && loadedKeyRef.current === cacheKey) {
+      userPostsCache.set(cacheKey, { posts, page, hasMore });
+    }
+  }, [cacheKey, loading, loadingMore, posts, page, hasMore]);
+
+  useEffect(() => {
+    // Restored from cache on mount: don't replace it with a fresh first page.
+    if (restoredKeyRef.current === cacheKey) return;
+    restoredKeyRef.current = null;
+    loadedKeyRef.current = cacheKey;
     fetchUserPosts();
-  }, [fetchUserPosts]);
+  }, [fetchUserPosts, cacheKey]);
 
   useEffect(() => {
     const loadMoreElement = loadMoreRef.current;
