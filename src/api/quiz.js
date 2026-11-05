@@ -13,3 +13,13 @@ export const getTopicById = async (id) => {
   const res = await quizzy.get(`/topics/${id}`);
   return res.data;
 };
+
+export const getPlayQuestions = async (topicId) => {
+  const res = await quizzy.get(`/questions/t/${topicId}/play`);
+  return res.data;
+};
+
+export const submitAnswer = async (questionId, answer) => {
+  const res = await quizzy.post(`/questions/${questionId}/answer`, { answer });
+  return res.data;
+};
