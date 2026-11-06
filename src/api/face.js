@@ -6,7 +6,8 @@ export const getFaceStatus = async () => {
 };
 
 // Returns { data: { url } }: the Face ID scan page for this user.
-export const getFaceSetupLink = async () => {
-  const res = await api.post("/face/setup");
+// Setting up or replacing a face needs the account password.
+export const getFaceSetupLink = async (password) => {
+  const res = await api.post("/face/setup", { password });
   return res.data;
 };
