@@ -8,6 +8,7 @@ import {
   ArrowLeft as PanelLeft,
   RefreshCw,
   Send,
+  Image,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -42,9 +43,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [connected, setConnected] = useState(false);
-  const [showConversationList, setShowConversationList] = useState(
-    () => !location.state?.chatRoom,
-  );
+  const [showConversationList, setShowConversationList] = useState(() => !location.state?.chatRoom);
   const [listCollapsed, setListCollapsed] = useState(false);
   const [error, setError] = useState("");
   const socketRef = useRef(null);
@@ -56,12 +55,8 @@ export default function Chat() {
     try {
       const response = await getConversations();
       const nextConversations = [...(response.data || [])].sort((a, b) => {
-        const aTime = new Date(
-          a.lastMessage?.createdAt || a.createdAt,
-        ).getTime();
-        const bTime = new Date(
-          b.lastMessage?.createdAt || b.createdAt,
-        ).getTime();
+        const aTime = new Date(a.lastMessage?.createdAt || a.createdAt).getTime();
+        const bTime = new Date(b.lastMessage?.createdAt || b.createdAt).getTime();
         return bTime - aTime;
       });
       setConversations(nextConversations);
@@ -108,9 +103,7 @@ export default function Chat() {
             setMessages(response.data?.messages || []);
             setConversations((current) =>
               current.map((conversation) =>
-                conversation.id === activeId
-                  ? { ...conversation, unreadCount: 0 }
-                  : conversation,
+                conversation.id === activeId ? { ...conversation, unreadCount: 0 } : conversation,
               ),
             );
             socketRef.current?.emit("conversation:read", {
@@ -153,36 +146,30 @@ export default function Chat() {
         });
     });
     socket.on("disconnect", () => setConnected(false));
-    socket.on(
-      "message:status",
-      ({ messageId, status, deliveredAt, seenAt }) => {
-        setMessages((current) =>
-          current.map((message) =>
-            message.id === messageId
-              ? { ...message, status, deliveredAt, seenAt }
-              : message,
-          ),
-        );
-        setConversations((current) =>
-          current.map((conversation) =>
-            conversation.lastMessage?.id === messageId
-              ? {
-                  ...conversation,
-                  lastMessage: {
-                    ...conversation.lastMessage,
-                    status,
-                    deliveredAt,
-                    seenAt,
-                  },
-                }
-              : conversation,
-          ),
-        );
-      },
-    );
+    socket.on("message:status", ({ messageId, status, deliveredAt, seenAt }) => {
+      setMessages((current) =>
+        current.map((message) =>
+          message.id === messageId ? { ...message, status, deliveredAt, seenAt } : message,
+        ),
+      );
+      setConversations((current) =>
+        current.map((conversation) =>
+          conversation.lastMessage?.id === messageId
+            ? {
+                ...conversation,
+                lastMessage: {
+                  ...conversation.lastMessage,
+                  status,
+                  deliveredAt,
+                  seenAt,
+                },
+              }
+            : conversation,
+        ),
+      );
+    });
     socket.on("message:new", (message) => {
-      const isActiveConversation =
-        message.conversationId === activeIdRef.current;
+      const isActiveConversation = message.conversationId === activeIdRef.current;
       const isOwnMessage = message.senderId === currentUser?.id;
       if (!isOwnMessage) {
         socket.emit("message:delivered", { messageId: message.id });
@@ -195,9 +182,7 @@ export default function Chat() {
                   ...conversation,
                   lastMessage: message,
                   unreadCount:
-                    isOwnMessage || isActiveConversation
-                      ? 0
-                      : (conversation.unreadCount || 0) + 1,
+                    isOwnMessage || isActiveConversation ? 0 : (conversation.unreadCount || 0) + 1,
                 }
               : conversation,
           ),
@@ -215,18 +200,14 @@ export default function Chat() {
         }
         setMessages((current) => {
           const pendingIndex = message.clientMessageId
-            ? current.findIndex(
-                (item) => item.clientMessageId === message.clientMessageId,
-              )
+            ? current.findIndex((item) => item.clientMessageId === message.clientMessageId)
             : -1;
           if (pendingIndex >= 0) {
             const next = [...current];
             next[pendingIndex] = message;
             return next;
           }
-          return current.some((item) => item.id === message.id)
-            ? current
-            : [...current, message];
+          return current.some((item) => item.id === message.id) ? current : [...current, message];
         });
       }
     });
@@ -240,9 +221,7 @@ export default function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const activeConversation = conversations.find(
-    (conversation) => conversation.id === activeId,
-  );
+  const activeConversation = conversations.find((conversation) => conversation.id === activeId);
 
   const selectConversation = (conversationId) => {
     setActiveId(conversationId);
@@ -257,8 +236,7 @@ export default function Chat() {
     const content = input.trim();
     if (!content || !activeId || !socketRef.current?.connected) return;
     const clientMessageId =
-      globalThis.crypto?.randomUUID?.() ||
-      `local-${Date.now()}-${Math.random()}`;
+      globalThis.crypto?.randomUUID?.() || `local-${Date.now()}-${Math.random()}`;
     const optimisticMessage = {
       id: clientMessageId,
       clientMessageId,
@@ -292,9 +270,7 @@ export default function Chat() {
       (response) => {
         if (!response?.ok) {
           setMessages((current) =>
-            current.filter(
-              (message) => message.clientMessageId !== clientMessageId,
-            ),
+            current.filter((message) => message.clientMessageId !== clientMessageId),
           );
           loadConversations();
           setError(response?.error || "Could not send message.");
@@ -323,9 +299,7 @@ export default function Chat() {
         <div className="flex h-[72px] shrink-0 items-center justify-between border-b border-black/10 px-4 dark:border-neutral-800">
           <div>
             <h1 className="font-bold">Messages</h1>
-            <p className="text-xs text-neutral-500">
-              {connected ? "Live" : "Reconnecting…"}
-            </p>
+            <p className="text-xs text-neutral-500">{connected ? "Live" : "Reconnecting…"}</p>
           </div>
           <div className="flex items-center">
             <button
@@ -348,9 +322,7 @@ export default function Chat() {
           {loading ? (
             <ChatSkeleton variant="conversations" />
           ) : conversations.length === 0 ? (
-            <p className="p-3 text-sm text-neutral-500">
-              Open someone’s profile to start a chat.
-            </p>
+            <p className="p-3 text-sm text-neutral-500">Open someone’s profile to start a chat.</p>
           ) : (
             conversations.map((conversation) => (
               <div
@@ -439,9 +411,7 @@ export default function Chat() {
                 type="button"
                 onClick={() => {
                   if (activeConversation.participant?.username) {
-                    navigate(
-                      `/profile/${activeConversation.participant.username}`,
-                    );
+                    navigate(`/profile/${activeConversation.participant.username}`);
                   }
                 }}
                 className="min-w-0 text-left transition-opacity hover:opacity-75"
@@ -462,9 +432,7 @@ export default function Chat() {
                     )}
                   </div>
                   <div className="flex flex-col">
-                    <p className="font-bold">
-                      {activeConversation.participant?.name || "Yapper"}
-                    </p>
+                    <p className="font-bold">{activeConversation.participant?.name || "Yapper"}</p>
                     <p className="text-xs text-neutral-500">
                       @{activeConversation.participant?.username || "yapper"}
                     </p>
@@ -492,9 +460,7 @@ export default function Chat() {
                         <div
                           className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${isOwnMessage ? "bg-indigo-600 text-white" : "bg-neutral-100 dark:bg-neutral-800"}`}
                         >
-                          <p className="whitespace-pre-wrap">
-                            {message.content}
-                          </p>
+                          <p className="whitespace-pre-wrap">{message.content}</p>
                           <span className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-60">
                             <span>{formatTime(message.createdAt)}</span>
                             {isOwnMessage &&
@@ -504,15 +470,9 @@ export default function Chat() {
                                   aria-label="Sending"
                                 />
                               ) : status === "seen" ? (
-                                <CheckCheck
-                                  className="h-3 w-3 text-indigo-200"
-                                  aria-label="Seen"
-                                />
+                                <CheckCheck className="h-3 w-3 text-indigo-200" aria-label="Seen" />
                               ) : status === "delivered" ? (
-                                <CheckCheck
-                                  className="h-3 w-3"
-                                  aria-label="Delivered"
-                                />
+                                <CheckCheck className="h-3 w-3" aria-label="Delivered" />
                               ) : (
                                 <Check className="h-3 w-3" aria-label="Sent" />
                               ))}
@@ -532,6 +492,9 @@ export default function Chat() {
               }}
               className="flex gap-2 border-t border-black/10 p-3 dark:border-neutral-800"
             >
+              <div className="flex justify-center items-center rounded-xl p-2.5 text-indigo-600 dark:text-indigo-400 hover:cursor-pointer">
+                <Image className="w-4 h-4" />
+              </div>
               <input
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
