@@ -472,6 +472,15 @@ export default function CommentSection({ postId }) {
                     </button>
                     <button
                       type="button"
+                      aria-label="Repost comment"
+                      title="Comment reposts coming soon"
+                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
+                    >
+                      <Repeat2 className="h-4 w-4" />
+                      <span>{comment.repostCount || 0}</span>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => toggleCommentLike(comment)}
                       aria-label={comment.isLiked ? "Unlike comment" : "Like comment"}
                       className={`flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${comment.isLiked ? "text-rose-500" : ""}`}
@@ -487,15 +496,6 @@ export default function CommentSection({ postId }) {
                     >
                       <ChartColumn className="h-4 w-4" />
                       <span>{comment.viewCount || 0}</span>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Repost comment"
-                      title="Comment reposts coming soon"
-                      className="flex min-h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600"
-                    >
-                      <Repeat2 className="h-4 w-4" />
-                      <span>{comment.repostCount || 0}</span>
                     </button>
                     <button
                       type="button"

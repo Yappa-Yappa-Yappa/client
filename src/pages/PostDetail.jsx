@@ -298,28 +298,30 @@ export default function PostDetail() {
       <article className="border border-black/10 bg-white/60 p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-          <div className="h-10 w-10 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600">
-            {post.user?.imageUrl ? (
-              <img
-                src={post.user.imageUrl}
-                alt={post.user.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="flex h-full items-center justify-center">
-                {(post.user?.name || "Y")[0]}
-              </span>
-            )}
-          </div>
-          <div>
-            <Link
-              to={post.user?.username ? `/profile/${post.user.username}` : "/home"}
-              className="text-sm font-bold"
-            >
-              {post.user?.name || "Yapper"}
-            </Link>
-            <p className="text-xs text-neutral-500">{new Date(post.createdAt).toLocaleString()}</p>
-          </div>
+            <div className="h-10 w-10 overflow-hidden rounded-full bg-indigo-500/20 text-center font-bold text-indigo-600">
+              {post.user?.imageUrl ? (
+                <img
+                  src={post.user.imageUrl}
+                  alt={post.user.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="flex h-full items-center justify-center">
+                  {(post.user?.name || "Y")[0]}
+                </span>
+              )}
+            </div>
+            <div>
+              <Link
+                to={post.user?.username ? `/profile/${post.user.username}` : "/home"}
+                className="text-sm font-bold"
+              >
+                {post.user?.name || "Yapper"}
+              </Link>
+              <p className="text-xs text-neutral-500">
+                {new Date(post.createdAt).toLocaleString()}
+              </p>
+            </div>
           </div>
           {currentUser && (
             <div className="relative shrink-0">
@@ -443,6 +445,15 @@ export default function PostDetail() {
           </button>
           <button
             type="button"
+            onClick={toggleRepost}
+            aria-label={post.isReposted ? "Remove repost" : "Repost post"}
+            className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${post.isReposted ? "text-emerald-600 dark:text-emerald-400" : ""}`}
+          >
+            <Repeat2 className="h-4 w-4" />
+            <span>{post._count?.reposts || 0}</span>
+          </button>
+          <button
+            type="button"
             onClick={toggleLike}
             aria-label={post.isLiked ? "Unlike post" : "Like post"}
             className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-rose-500/10 hover:text-rose-500 ${post.isLiked ? "text-rose-500" : ""}`}
@@ -458,15 +469,7 @@ export default function PostDetail() {
             <ChartColumn className="h-4 w-4" />
             <span>{post.viewCount || 0}</span>
           </button>
-          <button
-            type="button"
-            onClick={toggleRepost}
-            aria-label={post.isReposted ? "Remove repost" : "Repost post"}
-            className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 hover:bg-indigo-500/10 hover:text-indigo-600 ${post.isReposted ? "text-emerald-600 dark:text-emerald-400" : ""}`}
-          >
-            <Repeat2 className="h-4 w-4" />
-            <span>{post._count?.reposts || 0}</span>
-          </button>
+
           <button
             type="button"
             onClick={toggleFavorite}
@@ -486,10 +489,7 @@ export default function PostDetail() {
         />
       )}
       {confirmingDelete && (
-        <ConfirmDeleteModal
-          onConfirm={handleDelete}
-          onClose={() => setConfirmingDelete(false)}
-        />
+        <ConfirmDeleteModal onConfirm={handleDelete} onClose={() => setConfirmingDelete(false)} />
       )}
       {lightbox !== null && (
         <ImageLightbox

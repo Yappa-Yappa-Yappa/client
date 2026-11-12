@@ -22,13 +22,7 @@ import { repostPost, removeRepost } from "../api/repost";
 import { useAuth } from "../hooks/useAuth";
 import FeedSkeleton from "../components/FeedSkeleton";
 import ExpandableText from "../components/ExpandableText";
-import {
-  Link,
-  NavLink,
-  useLocation,
-  useNavigate,
-  useNavigationType,
-} from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate, useNavigationType } from "react-router-dom";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import ImageLightbox from "../components/ImageLightbox";
 import ReportModal from "../components/ReportModal";
@@ -112,9 +106,7 @@ export default function Feed({ feedType = "for-you" }) {
   // Only reuse cached posts when coming back (browser back or a back link);
   // opening Home fresh should still load the latest feed.
   const cached =
-    navigationType === "POP" || location.state?.restoreScroll
-      ? feedCache.get(cacheKey)
-      : undefined;
+    navigationType === "POP" || location.state?.restoreScroll ? feedCache.get(cacheKey) : undefined;
   const restoredKeyRef = useRef(cached ? cacheKey : null);
   // Cache key the posts in state belong to (so a tab switch can't save the
   // previous tab's posts under the new key).
@@ -892,6 +884,23 @@ export default function Feed({ feedType = "for-you" }) {
                   <span>{post._count?.comments || post.comments || 0}</span>
                 </button>
 
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleRepost(postId, Boolean(post.isReposted));
+                  }}
+                  disabled={repostingPostIds.has(postId)}
+                  aria-label="Repost"
+                  className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
+                    post.isReposted
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+                  }`}
+                >
+                  <Repeat2 className="w-4 h-4" />
+                  <span>{post.repostCount ?? post.reposts ?? post._count?.reposts ?? 0}</span>
+                </button>
+
                 {/* Heart Button */}
                 <button
                   onClick={() => handleLikeToggle(postId, Boolean(post.isLiked))}
@@ -917,23 +926,6 @@ export default function Feed({ feedType = "for-you" }) {
                 >
                   <ChartColumn className="w-4 h-4" />
                   <span>{post.viewCount ?? post._count?.viewCount ?? 0}</span>
-                </button>
-
-                <button
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleRepost(postId, Boolean(post.isReposted));
-                  }}
-                  disabled={repostingPostIds.has(postId)}
-                  aria-label="Repost"
-                  className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
-                    post.isReposted
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
-                  }`}
-                >
-                  <Repeat2 className="w-4 h-4" />
-                  <span>{post.repostCount ?? post.reposts ?? post._count?.reposts ?? 0}</span>
                 </button>
 
                 <button
