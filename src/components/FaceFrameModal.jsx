@@ -1,10 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 
 // Shows a Face ID page in a popup on top of Yappa, so the address bar never leaves Yappa.
 // The page reports back with window.postMessage; only messages from that page's own origin are passed on.
+// It also reports its content height ({ type: "face-resize", height }) so the frame fits it with no empty space.
+const DEFAULT_HEIGHT = 480;
+
 export default function FaceFrameModal({ src, title, onMessage, onClose }) {
   const frameRef = useRef(null);
+  const [frameHeight, setFrameHeight] = useState(DEFAULT_HEIGHT);
 
   useEffect(() => {
     const faceOrigin = new URL(src).origin;
@@ -12,6 +16,13 @@ export default function FaceFrameModal({ src, title, onMessage, onClose }) {
     const handleMessage = (event) => {
       if (event.origin !== faceOrigin) return;
       if (event.source !== frameRef.current?.contentWindow) return;
+      if (event.data?.type === "face-resize") {
+        const height = Number(event.data.height);
+        if (Number.isFinite(height)) {
+          setFrameHeight(Math.min(Math.max(Math.round(height), 280), 900));
+        }
+        return;
+      }
       onMessage(event.data);
     };
     const handleKeyDown = (event) => {
@@ -52,7 +63,8 @@ export default function FaceFrameModal({ src, title, onMessage, onClose }) {
           src={src}
           title={title}
           allow="camera"
-          className="h-[600px] max-h-[75vh] w-full rounded-xl border-0"
+          style={{ height: frameHeight }}
+          className="max-h-[75vh] w-full rounded-xl border-0 transition-[height] duration-200"
         />
       </div>
     </div>
