@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { repostPost, removeRepost } from "../api/repost";
 import { getRateLimitMessage } from "../utils/errors";
 import { showErrorToast } from "../utils/toast";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ExpandableText from "./ExpandableText";
 
 const formatRelativeTime = (dateValue) => {
@@ -55,6 +56,7 @@ export default function PostCard({
 }) {
   const navigate = useNavigate();
   const [shareStatus, setShareStatus] = useState("");
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [isReposted, setIsReposted] = useState(Boolean(post.isReposted));
   const [repostCount, setRepostCount] = useState(
     post._count?.reposts ?? post.repostCount ?? post.reposts ?? 0,
@@ -210,7 +212,7 @@ export default function PostCard({
                   <button
                     onClick={() => {
                       setOpenMenuPostId(null);
-                      handleDelete(postId);
+                      setConfirmingDelete(true);
                     }}
                     className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
                   >
@@ -349,6 +351,13 @@ export default function PostCard({
           <Bookmark className={`w-4 h-4 ${post.isFavorited ? "fill-current" : ""}`} />
         </button>
       </div>
+
+      {confirmingDelete && (
+        <ConfirmDeleteModal
+          onConfirm={() => handleDelete(postId)}
+          onClose={() => setConfirmingDelete(false)}
+        />
+      )}
     </article>
   );
 }
