@@ -5,7 +5,7 @@
 This repository is a React 19 single-page client built with Vite and Tailwind CSS.
 
 - `src/main.jsx` bootstraps the application; `src/App.jsx` defines routing.
-- `src/pages/` contains route-level screens, with authentication pages under `auth/`, the feed under `feed/`, and other screens at the pages root.
+- `src/pages/` contains route-level screens, with authentication pages under `auth/`, profile tabs under `profile/`, settings screens under `setting/`, legal pages under `legal/`, and other screens (including the feed, `Feed.jsx`) at the pages root.
 - `src/components/` contains reusable UI and layout components, including route guards in the root.
 - `src/errors/` contains fallback and error views used by the router.
 - `src/api/` contains Axios configuration and endpoint modules; `src/contexts/` and `src/hooks/` contain shared auth state and hooks.
@@ -27,7 +27,7 @@ There is no automated test script or test framework configured. Run lint and a p
 
 ## Coding Style & Naming Conventions
 
-Use modern ES modules and JSX with two-space indentation, semicolon-free formatting, and single quotes, matching the existing files. Name React components and component files in PascalCase (`ProtectedRoute.jsx`), hooks with the `use` prefix (`useAuth.js`), and API modules by domain (`auth.js`). Prefer functional components, React hooks, and Tailwind utility classes. Keep JSX readable and avoid disabling ESLint rules without a specific reason.
+Use modern ES modules and JSX with two-space indentation. Newer files are semicolon-free with single quotes, but many older files use double quotes and semicolons, so match the file you edit. Name React components and component files in PascalCase (`ProtectedRoute.jsx`), hooks with the `use` prefix (`useAuth.js`), and API modules by domain (`auth.js`). Prefer functional components, React hooks, and Tailwind utility classes. Keep JSX readable and avoid disabling ESLint rules without a specific reason.
 
 ## Testing Guidelines
 

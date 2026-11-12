@@ -70,7 +70,7 @@ The build output is generated in `dist/`.
 src/
 ├── api/         # HTTP API helpers
 ├── assets/      # Fonts, icons, and static images
-├── components/  # Reusable UI and layout components
+├── components/  # Reusable UI and layout components (post card, image carousel, modals)
 ├── contexts/    # Shared application state and theme
 ├── errors/      # Error and fallback views
 ├── hooks/       # Reusable React hooks
@@ -79,6 +79,12 @@ src/
 ├── App.jsx      # Application routes
 └── main.jsx     # React entry point
 ```
+
+## Features worth knowing
+
+- Posts with several images show them in a swipeable carousel (`ImageCarousel`); a single image shows at full size, and clicking any image opens the full-size viewer (`ImageLightbox`).
+- Deleting a post or comment asks for confirmation first (`ConfirmDeleteModal`).
+- Posts and comments can be reported (`ReportModal`).
 
 ## Backend connection
 
