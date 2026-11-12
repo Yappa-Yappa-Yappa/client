@@ -20,6 +20,7 @@ import { favoriteComment, unfavoriteComment } from "../api/commentFavorite";
 import { deleteComment, updateComment } from "../api/commentActions";
 import { likeComment, unlikeComment } from "../api/commentLike";
 import { useAuth } from "../hooks/useAuth";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import ImageLightbox from "../components/ImageLightbox";
 
 const relativeTime = (value) => {
@@ -53,6 +54,7 @@ export default function CommentThread() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const replyInputRef = useRef(null);
   const [activeImages, setActiveImages] = useState(null);
+  const [deletingComment, setDeletingComment] = useState(null);
 
   const openImages = (images, currentIndex) =>
     setActiveImages({
@@ -471,7 +473,10 @@ export default function CommentThread() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDelete(comment)}
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          setDeletingComment(comment);
+                        }}
                         className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -607,6 +612,15 @@ export default function CommentThread() {
               currentIndex: (current.currentIndex + 1) % current.images.length,
             }))
           }
+        />
+      )}
+
+      {deletingComment && (
+        <ConfirmDeleteModal
+          title="Delete comment?"
+          message="This can't be undone."
+          onConfirm={() => handleDelete(deletingComment)}
+          onClose={() => setDeletingComment(null)}
         />
       )}
     </>
