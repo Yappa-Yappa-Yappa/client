@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import ImageLightbox from "../components/ImageLightbox";
 import { addFavorite, removeFavorite } from "../api/favorite";
 import { getLikesByPost, likePost, unlikePost } from "../api/like";
@@ -32,6 +33,7 @@ export default function PostDetail() {
   const location = useLocation();
   const navigate = useNavigate();
   const [lightbox, setLightbox] = useState(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const { user: currentUser } = useAuth();
   const backPath = location.state?.from || "/home";
   const backLabel =
@@ -348,7 +350,10 @@ export default function PostDetail() {
                       </button>
                       <button
                         type="button"
-                        onClick={handleDelete}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setConfirmingDelete(true);
+                        }}
                         className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -478,6 +483,12 @@ export default function PostDetail() {
           postId={post.id}
           onClose={() => setReporting(false)}
           onSubmitted={() => showSuccessToast("Report submitted. Thanks for letting us know.")}
+        />
+      )}
+      {confirmingDelete && (
+        <ConfirmDeleteModal
+          onConfirm={handleDelete}
+          onClose={() => setConfirmingDelete(false)}
         />
       )}
       {lightbox !== null && (

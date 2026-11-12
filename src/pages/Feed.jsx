@@ -32,6 +32,7 @@ import {
 import { addFavorite, removeFavorite } from "../api/favorite";
 import ImageLightbox from "../components/ImageLightbox";
 import ReportModal from "../components/ReportModal";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import YapLogo from "../assets/icons/yappa-blob.png";
 import MobileDrawer from "../components/layout/MobileDrawer";
 import { showErrorToast, showSuccessToast, showWarningToast } from "../utils/toast";
@@ -131,6 +132,7 @@ export default function Feed({ feedType = "for-you" }) {
   const [hasMore, setHasMore] = useState(() => cached?.hasMore ?? true);
   const [shareStatus, setShareStatus] = useState("");
   const [reportingPostId, setReportingPostId] = useState(null);
+  const [deletingPostId, setDeletingPostId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
@@ -791,7 +793,7 @@ export default function Feed({ feedType = "for-you" }) {
                           <button
                             onClick={() => {
                               setOpenMenuPostId(null);
-                              handleDelete(postId);
+                              setDeletingPostId(postId);
                             }}
                             className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
                           >
@@ -966,6 +968,13 @@ export default function Feed({ feedType = "for-you" }) {
         onPrevious={prevImage}
         onNext={nextImage}
       />
+
+      {deletingPostId && (
+        <ConfirmDeleteModal
+          onConfirm={() => handleDelete(deletingPostId)}
+          onClose={() => setDeletingPostId(null)}
+        />
+      )}
 
       {reportingPostId && (
         <ReportModal

@@ -20,6 +20,7 @@ import { deleteComment, updateComment } from "../api/commentActions";
 import { likeComment, unlikeComment } from "../api/commentLike";
 import { useAuth } from "../hooks/useAuth";
 import { getRateLimitMessage } from "../utils/errors";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import ImageLightbox from "./ImageLightbox";
 
 const relativeTime = (value) => {
@@ -44,6 +45,7 @@ export default function CommentSection({ postId }) {
   const commentInputRef = useRef(null);
   const [openCommentMenuId, setOpenCommentMenuId] = useState(null);
   const [activeImages, setActiveImages] = useState(null);
+  const [deletingComment, setDeletingComment] = useState(null);
 
   const openImages = (images, currentIndex) =>
     setActiveImages({
@@ -425,7 +427,7 @@ export default function CommentSection({ postId }) {
                                   onClick={(event) => {
                                     event.stopPropagation();
                                     setOpenCommentMenuId(null);
-                                    handleDelete(comment.id);
+                                    setDeletingComment(comment.id);
                                   }}
                                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-red-500 hover:bg-red-500/10"
                                 >
@@ -533,6 +535,15 @@ export default function CommentSection({ postId }) {
               currentIndex: (current.currentIndex + 1) % current.images.length,
             }))
           }
+        />
+      )}
+
+      {deletingComment && (
+        <ConfirmDeleteModal
+          title="Delete comment?"
+          message="This can't be undone."
+          onConfirm={() => handleDelete(deletingComment)}
+          onClose={() => setDeletingComment(null)}
         />
       )}
     </>
