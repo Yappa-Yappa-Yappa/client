@@ -301,6 +301,21 @@ export default function PostCard({
         </button>
 
         <button
+          onClick={handleRepost}
+          disabled={isReposting}
+          aria-label={isReposted ? "Remove repost" : "Repost"}
+          title={isReposted ? "Remove repost" : "Repost"}
+          className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
+            isReposted
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
+          }`}
+        >
+          <Repeat2 className="w-4 h-4" />
+          <span>{repostCount}</span>
+        </button>
+
+        <button
           onClick={() => handleLikeToggle(postId, Boolean(post.isLiked))}
           disabled={likingPostIds.has(postId)}
           aria-label={post.isLiked ? "Unlike post" : "Like post"}
@@ -320,21 +335,6 @@ export default function PostCard({
         >
           <ChartColumn className="w-4 h-4" />
           <span>{post.viewCount ?? post._count?.viewCount ?? 0}</span>
-        </button>
-
-        <button
-          onClick={handleRepost}
-          disabled={isReposting}
-          aria-label={isReposted ? "Remove repost" : "Repost"}
-          title={isReposted ? "Remove repost" : "Repost"}
-          className={`flex min-h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/60 disabled:opacity-50 ${
-            isReposted
-              ? "text-emerald-600 dark:text-emerald-400"
-              : "hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:bg-indigo-400/10 dark:hover:text-indigo-400"
-          }`}
-        >
-          <Repeat2 className="w-4 h-4" />
-          <span>{repostCount}</span>
         </button>
 
         <button
