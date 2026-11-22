@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { resetPassword } from "../../api/auth";
 import AuthShell from "../../components/auth/AuthShell";
@@ -22,8 +16,7 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const updateField = (field, value) =>
-    setFormData((current) => ({ ...current, [field]: value }));
+  const updateField = (field, value) => setFormData((current) => ({ ...current, [field]: value }));
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -48,10 +41,7 @@ export default function ResetPassword() {
         state: { message: "Your password has been reset. You can now sign in." },
       });
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "We could not reset your password. The link may have expired.",
-      );
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,9 +64,7 @@ export default function ResetPassword() {
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
           <LockKeyhole className="h-6 w-6" />
         </div>
-        <h2 className="text-3xl font-bold tracking-tight text-[#11133b]">
-          Reset your password
-        </h2>
+        <h2 className="text-3xl font-bold tracking-tight text-[#11133b]">Reset your password</h2>
         <p className="mt-2 text-sm leading-6 text-slate-500">
           Create a new password to get back into your Yappa account.
         </p>
@@ -115,18 +103,12 @@ export default function ResetPassword() {
           />
 
           <ul className="space-y-1 text-xs font-bold text-slate-500">
-            <PasswordRule
-              valid={formData.newPassword.length >= 8}
-              text="At least 8 characters"
-            />
+            <PasswordRule valid={formData.newPassword.length >= 8} text="At least 8 characters" />
             <PasswordRule
               valid={/[a-zA-Z]/.test(formData.newPassword)}
               text="At least one letter"
             />
-            <PasswordRule
-              valid={/[0-9]/.test(formData.newPassword)}
-              text="At least one number"
-            />
+            <PasswordRule valid={/[0-9]/.test(formData.newPassword)} text="At least one number" />
             <PasswordRule
               valid={/[^a-zA-Z0-9]/.test(formData.newPassword)}
               text="At least one special character"
@@ -146,10 +128,7 @@ export default function ResetPassword() {
 
       <p className="mt-8 text-center text-sm text-slate-500">
         Need a new reset link?{" "}
-        <Link
-          to="/forgot-password"
-          className="font-bold text-indigo-600 hover:text-indigo-500"
-        >
+        <Link to="/forgot-password" className="font-bold text-indigo-600 hover:text-indigo-500">
           Request one
         </Link>
       </p>
@@ -157,18 +136,10 @@ export default function ResetPassword() {
   );
 }
 
-function PasswordInput({
-  label,
-  value,
-  showPassword,
-  setShowPassword,
-  onChange,
-}) {
+function PasswordInput({ label, value, showPassword, setShowPassword, onChange }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-semibold text-slate-700">
-        {label}
-      </span>
+      <span className="mb-2 block text-xs font-semibold text-slate-700">{label}</span>
       <span className="relative block">
         <LockKeyhole className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
@@ -186,11 +157,7 @@ function PasswordInput({
           className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700"
           aria-label={`Toggle ${label.toLowerCase()} visibility`}
         >
-          {showPassword ? (
-            <EyeOff className="h-4 w-4" />
-          ) : (
-            <Eye className="h-4 w-4" />
-          )}
+          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </span>
     </label>
@@ -198,5 +165,9 @@ function PasswordInput({
 }
 
 function PasswordRule({ valid, text }) {
-  return <li className={valid ? "text-emerald-600" : ""}>{valid ? "✓" : "·"} {text}</li>;
+  return (
+    <li className={valid ? "text-emerald-600" : ""}>
+      {valid ? "✓" : "·"} {text}
+    </li>
+  );
 }

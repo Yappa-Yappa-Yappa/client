@@ -39,7 +39,9 @@ api.interceptors.response.use(
     const isPublicAuthRequest =
       originalRequest?.url?.includes("/auth/login") ||
       originalRequest?.url?.includes("/auth/register") ||
-      originalRequest?.url?.includes("/otps/");
+      originalRequest?.url?.includes("/auth/forgot-password") ||
+      originalRequest?.url?.includes("/auth/reset-password") ||
+      originalRequest?.url?.includes("/otps");
 
     if (
       error.response?.status !== 401 ||
