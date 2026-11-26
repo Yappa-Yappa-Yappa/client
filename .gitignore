@@ -24,4 +24,5 @@ dist-ssr
 *.sw?
 
 debug
-branding/*.env
+branding/*
+.env
